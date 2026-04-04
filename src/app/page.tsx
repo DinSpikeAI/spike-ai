@@ -567,7 +567,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="flex items-center gap-6 md:gap-12">
         <div className="select-none cursor-pointer flex items-center gap-2.5" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img src="/mascot.png" alt="Spike" className="h-10 w-auto" style={{ filter: "drop-shadow(0 0 8px rgba(147,130,220,0.3))" }} />
+          <img src="/mascot.png" alt="Spike" className="h-10 w-10 object-contain" style={{ filter: "drop-shadow(0 0 8px rgba(147,130,220,0.3))" }} />
           <div className="leading-none">
             <div className="flex items-baseline gap-0.5">
               <span className="text-[22px] font-black italic tracking-tight text-white">spike</span>
@@ -787,7 +787,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
           >
             <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
               <div className="flex items-center gap-2">
-                <img src="/mascot.png" alt="Spike" className="h-7 w-auto" />
+                <img src="/mascot.png" alt="Spike" className="h-7 w-7 object-contain" />
                 <span className="text-sm font-black tracking-tight text-white">spike</span>
                 <span className="text-sm font-black tracking-tight text-[#E50914]" style={{ marginLeft: "-3px" }}>AI</span>
               </div>
@@ -1493,7 +1493,7 @@ function Footer() {
     <footer className="px-5 md:px-12 py-12 md:py-20 border-t border-white/[0.03]">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8 flex items-center gap-3">
-          <img src="/mascot.png" alt="Spike" className="h-10 w-auto" />
+          <img src="/mascot.png" alt="Spike" className="h-10 w-10 object-contain" />
           <div>
             <div className="flex items-baseline gap-1">
               <span className="text-xl font-bold tracking-tight text-white">spike</span>
@@ -1544,10 +1544,8 @@ export default function HomePage() {
   const [splashFading, setSplashFading] = useState(false);
   const [splashChecked, setSplashChecked] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // ─── Supabase Data Layer (initialized from cache if available) ───
   const [liveCategories, setLiveCategories] = useState<Category[]>(__cache.categories || []);
@@ -1770,14 +1768,6 @@ export default function HomePage() {
     setShowSplash(true);
     sessionStorage.setItem("hasSeenIntro", "true");
 
-    // Try playing audio
-    try {
-      const audio = new Audio("/logo-sound.mp3");
-      audio.volume = 0.85;
-      audioRef.current = audio;
-      audio.play().then(() => setAudioUnlocked(true)).catch(() => setAudioUnlocked(false));
-    } catch {}
-
     // End splash after animation
     setTimeout(() => {
       setSplashFading(true);
@@ -1787,32 +1777,6 @@ export default function HomePage() {
       }, 800);
     }, 3200);
   }, []);
-
-  // ─── Unmute on First Interaction Anywhere ───
-  useEffect(() => {
-    if (audioUnlocked) return;
-
-    const unlockAudio = () => {
-      if (audioRef.current) {
-        audioRef.current.play().catch(() => {});
-        setAudioUnlocked(true);
-      }
-      // Remove listeners after first interaction
-      document.removeEventListener("click", unlockAudio);
-      document.removeEventListener("touchstart", unlockAudio);
-      document.removeEventListener("keydown", unlockAudio);
-    };
-
-    document.addEventListener("click", unlockAudio, { once: true });
-    document.addEventListener("touchstart", unlockAudio, { once: true });
-    document.addEventListener("keydown", unlockAudio, { once: true });
-
-    return () => {
-      document.removeEventListener("click", unlockAudio);
-      document.removeEventListener("touchstart", unlockAudio);
-      document.removeEventListener("keydown", unlockAudio);
-    };
-  }, [audioUnlocked]);
 
   // PWA Install Prompt
   useEffect(() => {
@@ -1888,7 +1852,7 @@ export default function HomePage() {
             <img
               src="/mascot.png"
               alt="Spike"
-              className="w-32 md:w-40 h-auto mb-10"
+              className="w-32 md:w-40 h-auto object-contain mb-10"
               style={{ filter: "drop-shadow(0 0 40px rgba(229, 9, 20, 0.2)) drop-shadow(0 0 80px rgba(147,130,220,0.1)) drop-shadow(0 20px 40px rgba(0,0,0,0.6))" }}
             />
             <div className="flex items-baseline gap-4 select-none">
@@ -1904,23 +1868,6 @@ export default function HomePage() {
             AI Cinema
           </div>
           <div className="splash-line" />
-
-          {/* Sound Toggle — appears if browser blocked audio */}
-          {!audioUnlocked && (
-            <button
-              onClick={() => {
-                if (audioRef.current) {
-                  audioRef.current.play().catch(() => {});
-                  setAudioUnlocked(true);
-                }
-              }}
-              className="absolute bottom-8 right-8 z-10 flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.06] border border-white/[0.08] text-white/40 hover:text-white hover:border-white/20 transition-all cursor-pointer backdrop-blur-sm"
-              style={{ animation: "fadeIn 0.5s ease 1.5s backwards" }}
-            >
-              <VolumeX size={14} />
-              <span className="text-[10px] tracking-[0.15em] uppercase font-medium">Sound On</span>
-            </button>
-          )}
         </div>
       )}
 
@@ -2015,7 +1962,7 @@ export default function HomePage() {
         <div className="fixed bottom-0 left-0 right-0 z-[150] p-4 md:p-0">
           <div className="max-w-lg mx-auto md:mb-6">
             <div className="bg-[#0c0c0e] border border-white/[0.06] rounded-2xl p-4 flex items-center gap-4 shadow-2xl shadow-black/60 backdrop-blur-xl">
-              <img src="/mascot.png" alt="Spike" className="w-12 h-12 flex-shrink-0" />
+              <img src="/mascot.png" alt="Spike" className="w-12 h-12 object-contain flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-semibold tracking-wide">Install Spike AI</p>
                 <p className="text-white/35 text-xs font-light tracking-wider">Add to your desktop for the full experience</p>
@@ -2039,4 +1986,3 @@ export default function HomePage() {
     </main>
   );
 }
-// build fix
