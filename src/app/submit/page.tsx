@@ -171,11 +171,24 @@ export default function SubmitPage() {
           poster_url: form.posterUrl || null,
           ai_models: selectedModels.length > 0 ? selectedModels : [],
           status,
+          creator_id: supabase ? (await supabase.auth.getSession()).data.session?.user?.id || null : null,
         });
 
       if (insertError) throw insertError;
       setSubmitted(true);
       if (isAdmin) setPublishedLive(true);
+
+      // Auto-mark user as creator after submitting a film
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const slug = form.creatorName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+          await supabase.from("profiles").update({
+            is_creator: true,
+            creator_slug: slug || session.user.id,
+          }).eq("id", session.user.id);
+        }
+      } catch {}
     } catch (err: any) {
       console.error("Submit error:", err);
       setError(err.message || "Something went wrong. Please try again.");
