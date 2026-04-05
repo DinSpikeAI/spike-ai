@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import {
   ArrowLeft, Play, Star, Clock, Film, Users,
   Cpu, ExternalLink, Share2, Sparkles, Award,
-  Globe, Twitter, Youtube, Instagram, Flame,
+ Globe, Flame,
 } from "lucide-react";
 import { supabase, getSmartPoster } from "@/lib/supabase";
 
