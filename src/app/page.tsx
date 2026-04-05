@@ -1546,6 +1546,7 @@ export default function HomePage() {
   const [mounted, setMounted] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // ─── Supabase Data Layer (initialized from cache if available) ───
   const [liveCategories, setLiveCategories] = useState<Category[]>(__cache.categories || []);
@@ -1767,6 +1768,14 @@ export default function HomePage() {
     // Auto-start splash immediately
     setShowSplash(true);
     sessionStorage.setItem("hasSeenIntro", "true");
+
+    // Play splash sound (works in PWA, may be blocked in browser — that's ok)
+    try {
+      const audio = new Audio("/logo-sound.mp3");
+      audio.volume = 0.7;
+      audioRef.current = audio;
+      audio.play().catch(() => {});
+    } catch {}
 
     // End splash after animation
     setTimeout(() => {
