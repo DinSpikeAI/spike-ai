@@ -1683,11 +1683,22 @@ export default function HomePage() {
           return;
         }
 
+        // Genre → category mapping (so a Trending+Horror movie also shows in AI Horror)
+        const GENRE_TO_CATEGORY: Record<string, string> = {
+          "Horror": "AI Horror",
+          "Sci-Fi": "Sci-Fi Visions",
+          "Anime": "AI Anime",
+          "Action": "Action",
+          "Drama": "Award Winning",
+          "Fantasy": "Fantasy",
+          "Thriller": "Sci-Fi Visions",
+          "Cyberpunk": "Sci-Fi Visions",
+        };
+
         const categoryMap: Record<string, Movie[]> = {};
         data.forEach((row: any) => {
           const cat = row.category || "Uncategorized";
-          if (!categoryMap[cat]) categoryMap[cat] = [];
-          categoryMap[cat].push({
+          const movieObj: Movie = {
             id: row.id,
             title: row.title,
             year: row.year || 2026,
@@ -1699,7 +1710,22 @@ export default function HomePage() {
             description: row.description || "",
             upvotes_count: row.upvotes_count || 0,
             video_url: row.video_url || undefined,
-          });
+          };
+
+          // Add to primary category
+          if (!categoryMap[cat]) categoryMap[cat] = [];
+          categoryMap[cat].push(movieObj);
+
+          // Also add to genre-matching category (if different from primary)
+          const genre = row.genre || "";
+          const genreCat = GENRE_TO_CATEGORY[genre];
+          if (genreCat && genreCat !== cat) {
+            if (!categoryMap[genreCat]) categoryMap[genreCat] = [];
+            // Avoid duplicates
+            if (!categoryMap[genreCat].some((m) => m.id === movieObj.id)) {
+              categoryMap[genreCat].push(movieObj);
+            }
+          }
         });
 
         const DB_CATEGORY_ORDER = [
@@ -1709,6 +1735,8 @@ export default function HomePage() {
           { key: "Sci-Fi Visions", title: "Sci-Fi Visions", slug: "scifi" },
           { key: "Award Winning", title: "Award Winning", slug: "awards" },
           { key: "AI Anime", title: "AI Anime", slug: "anime" },
+          { key: "Action", title: "Action & Thriller", slug: "action" },
+          { key: "Fantasy", title: "Fantasy Worlds", slug: "fantasy" },
         ];
 
         const dbCategories: Category[] = DB_CATEGORY_ORDER
