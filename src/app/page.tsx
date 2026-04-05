@@ -567,7 +567,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="flex items-center gap-6 md:gap-12">
         <div className="select-none cursor-pointer flex items-center gap-2.5" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img src="/mascot.png" alt="Spike" className="h-10 w-10 object-contain" style={{ filter: "drop-shadow(0 0 8px rgba(147,130,220,0.3))" }} />
+          <img src="/mascot.png" alt="Spike" className="h-10 w-auto" style={{ filter: "drop-shadow(0 0 8px rgba(147,130,220,0.3))" }} />
           <div className="leading-none">
             <div className="flex items-baseline gap-0.5">
               <span className="text-[22px] font-black italic tracking-tight text-white">spike</span>
@@ -787,7 +787,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
           >
             <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
               <div className="flex items-center gap-2">
-                <img src="/mascot.png" alt="Spike" className="h-7 w-7 object-contain" />
+                <img src="/mascot.png" alt="Spike" className="h-7 w-auto" />
                 <span className="text-sm font-black tracking-tight text-white">spike</span>
                 <span className="text-sm font-black tracking-tight text-[#E50914]" style={{ marginLeft: "-3px" }}>AI</span>
               </div>
@@ -1493,7 +1493,7 @@ function Footer() {
     <footer className="px-5 md:px-12 py-12 md:py-20 border-t border-white/[0.03]">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8 flex items-center gap-3">
-          <img src="/mascot.png" alt="Spike" className="h-10 w-10 object-contain" />
+          <img src="/mascot.png" alt="Spike" className="h-10 w-auto" />
           <div>
             <div className="flex items-baseline gap-1">
               <span className="text-xl font-bold tracking-tight text-white">spike</span>
@@ -1971,7 +1971,7 @@ export default function HomePage() {
         <div className="fixed bottom-0 left-0 right-0 z-[150] p-4 md:p-0">
           <div className="max-w-lg mx-auto md:mb-6">
             <div className="bg-[#0c0c0e] border border-white/[0.06] rounded-2xl p-4 flex items-center gap-4 shadow-2xl shadow-black/60 backdrop-blur-xl">
-              <img src="/mascot.png" alt="Spike" className="w-12 h-12 object-contain flex-shrink-0" />
+              <img src="/mascot.png" alt="Spike" className="h-12 w-auto flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-semibold tracking-wide">Install Spike AI</p>
                 <p className="text-white/35 text-xs font-light tracking-wider">Add to your desktop for the full experience</p>
