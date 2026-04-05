@@ -4,7 +4,7 @@
 // Skips: partial responses (206), video streams, YouTube, Vimeo
 // ═══════════════════════════════════════════════════════════════
 
-const CACHE_NAME = "spike-ai-v2";
+const CACHE_NAME = "spike-ai-v3";
 
 // Only cache static assets + pages
 const PRECACHE_URLS = [
