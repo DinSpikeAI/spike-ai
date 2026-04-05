@@ -581,6 +581,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
             { label: "Home", href: "/" },
             { label: "Films", href: "/#" },
             { label: "My List", href: "/my-list" },
+            { label: "Creators", href: "/creators" },
             { label: "Submit Film", href: "/submit", special: true },
           ].map((link) => (
             link.special ? (
@@ -798,6 +799,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                 { label: "Home", href: "/", icon: "🏠" },
                 { label: "Films", href: "/#", icon: "🎬" },
                 { label: "My List", href: "/my-list", icon: "📋" },
+                { label: "Creators", href: "/creators", icon: "🎭" },
                 { label: "Submit Film", href: "/submit", icon: "🎥" },
               ].map((item) => (
                 <a key={item.label} href={item.href} className="flex items-center gap-3 px-5 py-3.5 text-white/60 hover:text-white hover:bg-white/[0.04] transition-colors" onClick={() => setShowMobileMenu(false)}>
