@@ -1056,3 +1056,9 @@ body {
   background: #0c0c0e;
   color: white;
 }
+
+/* ─── Install Button Pulse ─────────────────────────────────── */
+@keyframes installPulse {
+  0%, 100% { border-color: rgba(255, 255, 255, 0.08); }
+  50% { border-color: rgba(255, 255, 255, 0.25); }
+}

@@ -1491,7 +1491,7 @@ function AiModelFilter({
    FOOTER
    ═══════════════════════════════════════════════════════════════ */
 
-function Footer() {
+function Footer({ onInstall }: { onInstall?: () => void }) {
   return (
     <footer className="px-5 md:px-12 py-12 md:py-20 border-t border-white/[0.03]">
       <div className="max-w-6xl mx-auto">
@@ -1503,6 +1503,28 @@ function Footer() {
           AI-generated cinema. Every frame, every voice, every score — crafted
           by artificial intelligence.
         </p>
+
+        {/* Install App — subtle pulse */}
+        {onInstall && (
+          <button
+            onClick={onInstall}
+            className="mt-8 flex items-center gap-3 px-5 py-3 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-all group"
+            style={{ animation: "installPulse 4s ease-in-out infinite" }}
+          >
+            <svg width="18" height="18" viewBox="0 0 40 40" fill="none" className="flex-shrink-0">
+              <rect x="6" y="22" width="4" height="10" rx="1.5" fill="white" opacity="0.3"/>
+              <rect x="12" y="16" width="4" height="16" rx="1.5" fill="white" opacity="0.55"/>
+              <rect x="18" y="6" width="5" height="26" rx="2" fill="white"/>
+              <rect x="25" y="14" width="4" height="18" rx="1.5" fill="white" opacity="0.55"/>
+              <rect x="31" y="20" width="4" height="12" rx="1.5" fill="white" opacity="0.3"/>
+            </svg>
+            <div className="text-left">
+              <p className="text-[13px] font-medium text-white/70 group-hover:text-white transition-colors">Install spike AI</p>
+              <p className="text-[10px] text-white/30 font-light tracking-wider">Get the desktop app</p>
+            </div>
+          </button>
+        )}
+
         <div className="flex gap-8 mt-8 text-xs font-light tracking-wider text-white/25">
           <a href="#" className="hover:text-white/50 transition-colors">About</a>
           <a href="#" className="hover:text-white/50 transition-colors">Terms</a>
@@ -1819,8 +1841,10 @@ export default function HomePage() {
     const handler = (e: any) => {
       e.preventDefault();
       setInstallPrompt(e);
-      const delay = splashChecked ? 2000 : 5000;
-      setTimeout(() => setShowInstallBanner(true), delay);
+      // Show once ever — after 5 min on homepage
+      const dismissed = localStorage.getItem("installDismissed");
+      if (dismissed) return;
+      setTimeout(() => setShowInstallBanner(true), 300000);
     };
     window.addEventListener("beforeinstallprompt", handler);
     return () => window.removeEventListener("beforeinstallprompt", handler);
@@ -1996,52 +2020,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <Footer />
-
-      {/* PWA Install Modal */}
-      {showInstallBanner && (
-        <div className="fixed inset-0 z-[500] flex items-center justify-center" onClick={() => setShowInstallBanner(false)}>
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" />
-          <div
-            className="relative z-10 w-full max-w-sm bg-[#0c0c0e] border border-white/[0.08] rounded-2xl shadow-2xl mx-4 overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-            style={{ animation: "fadeInUp 0.4s cubic-bezier(0.22,1,0.36,1)" }}
-          >
-            {/* Icon */}
-            <div className="pt-10 pb-6 flex flex-col items-center">
-              <div className="w-20 h-20 rounded-[18px] bg-[#0a0a0c] border border-white/10 flex items-center justify-center mb-6">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                  <rect x="6" y="22" width="4" height="10" rx="1.5" fill="white" opacity="0.3"/>
-                  <rect x="12" y="16" width="4" height="16" rx="1.5" fill="white" opacity="0.55"/>
-                  <rect x="18" y="6" width="5" height="26" rx="2" fill="white"/>
-                  <rect x="25" y="14" width="4" height="18" rx="1.5" fill="white" opacity="0.55"/>
-                  <rect x="31" y="20" width="4" height="12" rx="1.5" fill="white" opacity="0.3"/>
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold tracking-wide text-white mb-2">Install spike AI</h3>
-              <p className="text-sm text-white/40 font-light tracking-wide text-center px-8 leading-relaxed">
-                Add spike AI to your desktop for instant access and the full cinema experience
-              </p>
-            </div>
-
-            {/* Actions */}
-            <div className="px-6 pb-6 space-y-3">
-              <button
-                onClick={handleInstall}
-                className="w-full py-3.5 bg-white text-black text-sm font-semibold tracking-wide rounded-xl hover:bg-white/90 transition-all"
-              >
-                Install App
-              </button>
-              <button
-                onClick={() => setShowInstallBanner(false)}
-                className="w-full py-3 text-white/40 text-sm font-medium tracking-wide hover:text-white/60 transition-colors"
-              >
-                Not now
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Footer onInstall={installPrompt ? handleInstall : undefined} />
     </main>
   );
 }
