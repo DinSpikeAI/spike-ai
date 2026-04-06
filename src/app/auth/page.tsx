@@ -111,9 +111,9 @@ export default function AuthPage() {
         <div className="absolute inset-0 bg-black/60" />
 
         {/* Red atmospheric glow */}
-        <div className="absolute top-[-15%] left-[20%] w-[700px] h-[700px] rounded-full bg-[#E50914]/[0.06] blur-[200px] pointer-events-none" />
+        <div className="absolute top-[-15%] left-[20%] w-[700px] h-[700px] rounded-full bg-white/[0.06] blur-[200px] pointer-events-none" />
         <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] rounded-full bg-purple-900/[0.04] blur-[180px] pointer-events-none" />
-        <div className="absolute top-[40%] left-[60%] w-[300px] h-[300px] rounded-full bg-[#E50914]/[0.03] blur-[120px] pointer-events-none" />
+        <div className="absolute top-[40%] left-[60%] w-[300px] h-[300px] rounded-full bg-white/[0.03] blur-[120px] pointer-events-none" />
 
         {/* Edge vignette */}
         <div
@@ -137,24 +137,12 @@ export default function AuthPage() {
       {/* ── Nav ── */}
       <nav className="relative z-20 px-6 md:px-12 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => router.push("/")}>
-          <img
-            style={{ display: "none" }}
-            alt="Spike"
-            className="h-10 w-auto group-hover:scale-105 transition-transform duration-300"
-            style={{ filter: "drop-shadow(0 0 12px rgba(229,9,20,0.2)) drop-shadow(0 0 24px rgba(147,130,220,0.15))" }}
-          />
-          <div className="leading-none">
-            <div className="flex items-baseline gap-1">
-              <span className="text-[22px] font-extralight tracking-[0.03em] text-white">spike</span>
-              <span className="text-[22px] font-bold tracking-[0.03em] text-[#E50914]">AI</span>
-            </div>
-            <span className="text-[7px] tracking-[4px] uppercase text-white/15 font-light">AI Cinema</span>
-          </div>
+          <span className="text-[20px] font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
         </div>
 
         {/* Top-right subtle CTA */}
         <div className="hidden sm:flex items-center gap-2 text-[13px] text-white/30">
-          <Film size={14} className="text-[#E50914]/50" />
+          <Film size={14} className="text-[#ffffff]/50" />
           <span className="font-light tracking-wide">The future of cinema starts here</span>
         </div>
       </nav>
@@ -183,14 +171,14 @@ export default function AuthPage() {
               {/* ═════ Magic Link Sent ═════ */}
               {magicSent ? (
                 <div className="text-center py-6" style={{ animation: "authFadeIn 0.5s ease" }}>
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#E50914]/20 to-[#E50914]/5 border border-[#E50914]/15 flex items-center justify-center mx-auto mb-6 rotate-3">
-                    <Mail size={32} className="text-[#E50914] -rotate-3" />
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#ffffff]/20 to-[#ffffff]/5 border border-[#ffffff]/15 flex items-center justify-center mx-auto mb-6 rotate-3">
+                    <Mail size={32} className="text-[#ffffff] -rotate-3" />
                   </div>
                   <h1 className="text-2xl font-black text-white mb-2 tracking-tight">Check Your Inbox</h1>
                   <p className="text-white/40 text-sm mb-1">We sent a magic link to</p>
                   <p className="text-white font-semibold text-base mb-8">{email}</p>
                   <p className="text-white/20 text-xs leading-relaxed max-w-xs mx-auto mb-8">Click the link in the email to sign in instantly.<br />No password needed.</p>
-                  <button onClick={() => switchMode("signin")} className="text-[#E50914] text-sm font-semibold hover:text-[#ff1a25] transition-colors tracking-wide">
+                  <button onClick={() => switchMode("signin")} className="text-[#ffffff] text-sm font-semibold hover:text-[#ff1a25] transition-colors tracking-wide">
                     ← Back to Sign In
                   </button>
                 </div>
@@ -205,7 +193,7 @@ export default function AuthPage() {
                   <p className="text-white/40 text-sm mb-1">Confirmation sent to</p>
                   <p className="text-white font-semibold text-base mb-8">{email}</p>
                   <p className="text-white/20 text-xs leading-relaxed max-w-xs mx-auto mb-8">Click the link in your email to activate your account, then come back and sign in.</p>
-                  <button onClick={() => switchMode("signin")} className="px-8 py-3 bg-[#E50914] text-white font-bold text-sm rounded-xl hover:bg-[#f6121d] transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-[#E50914]/20">
+                  <button onClick={() => switchMode("signin")} className="px-8 py-3 bg-white text-white font-bold text-sm rounded-xl hover:bg-[#f6121d] transition-all hover:scale-[1.02] hover:shadow-lg hover:shadow-[#ffffff]/20">
                     Back to Sign In
                   </button>
                 </div>
@@ -216,7 +204,7 @@ export default function AuthPage() {
                   {/* Title */}
                   <div className="mb-8">
                     <div className="flex items-center gap-2.5 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#E50914] to-[#b00710] flex items-center justify-center shadow-lg shadow-[#E50914]/20">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#ffffff] to-[#b00710] flex items-center justify-center shadow-lg shadow-[#ffffff]/20">
                         {mode === "magic" ? <Wand2 size={15} className="text-white" /> : mode === "signup" ? <Sparkles size={15} className="text-white" /> : <Zap size={15} className="text-white" />}
                       </div>
                       <div>
@@ -240,7 +228,7 @@ export default function AuthPage() {
                     <div className="relative group">
                       <label className={`absolute left-4 transition-all duration-200 pointer-events-none ${
                         focusedField === "email" || email
-                          ? "top-2 text-[9px] font-bold tracking-[0.15em] uppercase text-[#E50914]/70"
+                          ? "top-2 text-[9px] font-bold tracking-[0.15em] uppercase text-[#ffffff]/70"
                           : "top-1/2 -translate-y-1/2 text-sm text-white/20"
                       }`}>
                         Email Address
@@ -255,11 +243,11 @@ export default function AuthPage() {
                           onKeyDown={(e) => { if (e.key === "Enter") handleAuth(); }}
                           className={`w-full pt-6 pb-3 px-4 bg-white/[0.04] rounded-xl text-white text-[15px] font-light outline-none transition-all duration-300 border ${
                             focusedField === "email"
-                              ? "border-[#E50914]/50 bg-white/[0.06] shadow-[0_0_20px_rgba(229,9,20,0.08)]"
+                              ? "border-[#ffffff]/50 bg-white/[0.06] shadow-[0_0_20px_rgba(229,9,20,0.08)]"
                               : "border-white/[0.06] hover:border-white/[0.1]"
                           }`}
                         />
-                        <Mail size={16} className={`absolute right-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${focusedField === "email" ? "text-[#E50914]/50" : "text-white/10"}`} />
+                        <Mail size={16} className={`absolute right-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${focusedField === "email" ? "text-[#ffffff]/50" : "text-white/10"}`} />
                       </div>
                     </div>
 
@@ -268,7 +256,7 @@ export default function AuthPage() {
                       <div className="relative group" style={{ animation: "authSlideDown 0.3s ease" }}>
                         <label className={`absolute left-4 transition-all duration-200 pointer-events-none z-10 ${
                           focusedField === "password" || password
-                            ? "top-2 text-[9px] font-bold tracking-[0.15em] uppercase text-[#E50914]/70"
+                            ? "top-2 text-[9px] font-bold tracking-[0.15em] uppercase text-[#ffffff]/70"
                             : "top-1/2 -translate-y-1/2 text-sm text-white/20"
                         }`}>
                           {mode === "signup" ? "Create Password" : "Password"}
@@ -283,7 +271,7 @@ export default function AuthPage() {
                             onKeyDown={(e) => { if (e.key === "Enter") handleAuth(); }}
                             className={`w-full pt-6 pb-3 px-4 pr-12 bg-white/[0.04] rounded-xl text-white text-[15px] font-light outline-none transition-all duration-300 border ${
                               focusedField === "password"
-                                ? "border-[#E50914]/50 bg-white/[0.06] shadow-[0_0_20px_rgba(229,9,20,0.08)]"
+                                ? "border-[#ffffff]/50 bg-white/[0.06] shadow-[0_0_20px_rgba(229,9,20,0.08)]"
                                 : "border-white/[0.06] hover:border-white/[0.1]"
                             }`}
                           />
@@ -348,13 +336,13 @@ export default function AuthPage() {
                   <p className="text-center text-[14px] text-white/25">
                     {mode === "signup" ? (
                       <>Already a member?{" "}
-                        <button onClick={() => switchMode("signin")} className="text-white font-semibold hover:text-[#E50914] transition-colors duration-200">
+                        <button onClick={() => switchMode("signin")} className="text-white font-semibold hover:text-[#ffffff] transition-colors duration-200">
                           Sign In
                         </button>
                       </>
                     ) : (
                       <>New to Spike AI?{" "}
-                        <button onClick={() => switchMode("signup")} className="text-white font-semibold hover:text-[#E50914] transition-colors duration-200">
+                        <button onClick={() => switchMode("signup")} className="text-white font-semibold hover:text-[#ffffff] transition-colors duration-200">
                           Join Now
                         </button>
                       </>
@@ -375,7 +363,7 @@ export default function AuthPage() {
       {/* ═════ Inline Styles for Animations ═════ */}
       <style jsx>{`
         .auth-hero-btn {
-          background: linear-gradient(180deg, #E50914 0%, #b00710 100%);
+          background: linear-gradient(180deg, #ffffff 0%, #b00710 100%);
           box-shadow:
             0 4px 15px rgba(229, 9, 20, 0.3),
             0 1px 0 rgba(255,255,255,0.1) inset,
