@@ -614,15 +614,17 @@ body {
   position: absolute;
   top: 8px;
   left: 8px;
-  background: var(--spike-red);
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: white;
   font-size: 9px;
   font-weight: 700;
   padding: 3px 7px;
-  border-radius: 3px;
-  letter-spacing: 0.05em;
+  border-radius: 4px;
+  letter-spacing: 0.08em;
   z-index: 5;
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* ─── Scroll Arrows ─────────────────────────────────────────── */

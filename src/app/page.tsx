@@ -585,7 +585,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
             { label: "Submit Film", href: "/submit", special: true },
           ].map((link) => (
             link.special ? (
-              <a key={link.label} href={link.href} className="text-[12.5px] font-medium tracking-[0.04em] px-5 py-1.5 rounded-full border border-[#ffffff]/40 text-[#ffffff] hover:bg-[#ffffff] hover:text-white transition-all duration-300 ml-1">{link.label}</a>
+              <a key={link.label} href={link.href} className="text-[12.5px] font-medium tracking-[0.04em] px-5 py-1.5 rounded-full border border-white/30 text-white/70 hover:bg-white/10 hover:text-white transition-all duration-300 ml-1">{link.label}</a>
             ) : (
               <a key={link.label} href={link.href} className="text-[13px] text-white/50 hover:text-white transition-colors duration-300 font-normal tracking-[0.04em]">{link.label}</a>
             )
@@ -968,7 +968,7 @@ function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
         {/* Top 10 Badge + Spike Original */}
         <div key={`badge-${activeSlide}`} className="animate-fade-in-up flex items-center gap-2 md:gap-3 mb-4 md:mb-5" style={{ animationDelay: "0.05s", animationFillMode: "backwards" }}>
           {slide.rank && (
-            <span className="text-[9px] md:text-[10px] font-black tracking-[0.15em] uppercase px-2.5 py-1 rounded bg-[#ffffff] text-white shadow-lg shadow-white/30">
+            <span className="text-[9px] md:text-[10px] font-black tracking-[0.15em] uppercase px-2.5 py-1 rounded bg-black/60 backdrop-blur-sm text-white/90 border border-white/10">
               TOP {slide.rank}
             </span>
           )}
@@ -1261,7 +1261,7 @@ function MovieCard({
               style={{ position: "relative", zIndex: 51 }}
               className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium transition-all cursor-pointer ${popAnim ? "upvote-pop" : ""} ${
                 voted
-                  ? "bg-[#ffffff]/20 text-[#ffffff] border border-[#ffffff]/30"
+                  ? "bg-white/20 text-white border border-white/30"
                   : "bg-white/[0.06] text-white/40 border border-white/[0.06] hover:text-white/70 hover:border-white/[0.15]"
               }`}
             >
@@ -2032,7 +2032,7 @@ export default function HomePage() {
               </div>
               <button
                 onClick={handleInstall}
-                className="px-4 py-2 bg-[#ffffff] text-white text-sm font-semibold tracking-wide rounded-lg hover:bg-[#e0e0e0] transition-all flex-shrink-0"
+                className="px-4 py-2 bg-white text-black text-sm font-semibold tracking-wide rounded-lg hover:bg-white/80 transition-all flex-shrink-0"
               >
                 Install
               </button>
