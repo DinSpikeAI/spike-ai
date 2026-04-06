@@ -158,7 +158,7 @@ export default function CreatorPage() {
     return (
       <div className="min-h-screen bg-[#08080a] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-[#E50914] border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin" />
           <p className="text-white/30 text-sm tracking-wider">Loading creator...</p>
         </div>
       </div>
@@ -172,7 +172,7 @@ export default function CreatorPage() {
         <div className="text-center">
           <h1 className="text-4xl font-bold text-white mb-4">Creator Not Found</h1>
           <p className="text-gray-400 mb-8">This creator profile doesn&apos;t exist.</p>
-          <button onClick={() => router.push("/")} className="px-6 py-3 bg-[#E50914] text-white rounded-lg hover:bg-[#f6121d] transition-all">Back to Home</button>
+          <button onClick={() => router.push("/")} className="px-6 py-3 bg-white text-black rounded-full hover:bg-white/90 transition-all">Back to Home</button>
         </div>
       </div>
     );
@@ -184,7 +184,7 @@ export default function CreatorPage() {
 
   const totalUpvotes = movies.reduce((sum, m) => sum + m.upvotes_count, 0);
 
-  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.display_name || "Creator")}&size=200&background=E50914&color=fff&bold=true`;
+  const defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.display_name || "Creator")}&size=200&background=333333&color=fff&bold=true`;
   const defaultBanner = `https://picsum.photos/seed/${creator.id}/1920/600`;
 
   return (
@@ -215,7 +215,7 @@ export default function CreatorPage() {
               alt={creator.display_name}
               className="w-24 h-24 md:w-40 md:h-40 rounded-2xl object-cover border-4 border-[#08080a] shadow-2xl shadow-black/60"
             />
-            <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-[#E50914] flex items-center justify-center border-2 border-[#08080a]">
+            <div className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-white flex items-center justify-center border-2 border-[#08080a]">
               <Award size={14} />
             </div>
           </div>
@@ -226,8 +226,8 @@ export default function CreatorPage() {
               <div>
                 <h1 className="text-2xl md:text-4xl font-black tracking-tight mb-1">{creator.display_name}</h1>
                 <div className="flex items-center gap-2 mb-4">
-                  <Sparkles size={14} className="text-[#E50914]" />
-                  <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#E50914]">
+                  <Sparkles size={14} className="text-[#ffffff]" />
+                  <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#ffffff]">
                     {creator.is_creator ? "Verified Creator" : "Member"}
                   </span>
                 </div>
@@ -240,7 +240,7 @@ export default function CreatorPage() {
                   className={`px-6 py-2.5 rounded-lg font-semibold text-sm transition-all ${
                     following
                       ? "bg-white/10 border border-white/20 text-white hover:bg-white/15"
-                      : "bg-[#E50914] text-white hover:bg-[#f6121d] shadow-lg shadow-[#E50914]/20"
+                      : "bg-white text-black hover:bg-white/90 shadow-lg shadow-black/20"
                   }`}
                 >
                   {following ? "Following" : "Follow"}
@@ -257,7 +257,7 @@ export default function CreatorPage() {
             {/* Stats */}
             <div className="flex flex-wrap items-center gap-3 md:gap-6 mb-5">
               <div className="flex items-center gap-2">
-                <Flame size={14} className="text-[#E50914]" />
+                <Flame size={14} className="text-[#ffffff]" />
                 <span className="text-white font-bold">{totalUpvotes.toLocaleString()}</span>
                 <span className="text-gray-500 text-sm">total upvotes</span>
               </div>
@@ -312,7 +312,7 @@ export default function CreatorPage() {
         {/* Filmography */}
         <div className={`transition-all duration-700 delay-300 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <Film size={18} className="text-[#E50914]" />
+            <Film size={18} className="text-[#ffffff]" />
             Filmography
             <span className="text-gray-600 text-sm font-normal ml-2">({movies.length} films)</span>
           </h2>
@@ -330,14 +330,14 @@ export default function CreatorPage() {
                   onClick={() => router.push(`/movie/${m.id}`)}
                   className="cursor-pointer group"
                 >
-                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden mb-2 border border-white/5 group-hover:border-[#E50914]/30 transition-all duration-300">
+                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden mb-2 border border-white/5 group-hover:border-white/30 transition-all duration-300">
                     <img
                       src={m.poster}
                       alt={m.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center">
-                      <div className="w-12 h-12 rounded-full bg-[#E50914] flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg shadow-[#E50914]/40">
+                      <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg shadow-black/40">
                         <Play size={20} fill="white" className="text-white ml-0.5" />
                       </div>
                     </div>
@@ -347,7 +347,7 @@ export default function CreatorPage() {
                       {m.rating}
                     </div>
                     {/* Upvotes */}
-                    <div className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded text-xs font-medium text-[#E50914] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded text-xs font-medium text-[#ffffff] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Flame size={10} fill="currentColor" />
                       {m.upvotes_count}
                     </div>

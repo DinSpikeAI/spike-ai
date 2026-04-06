@@ -86,7 +86,7 @@ export default function CreatorsPage() {
             </button>
             <div>
               <h1 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
-                <Sparkles size={20} className="text-[#E50914]" />
+                <Sparkles size={20} className="text-[#ffffff]" />
                 Creators & Studios
               </h1>
               <p className="text-xs text-white/30 tracking-wider mt-0.5">
@@ -114,14 +114,14 @@ export default function CreatorsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search creators..."
-            className="w-full pl-11 pr-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-white/20 outline-none focus:border-[#E50914]/40 focus:bg-white/[0.05] transition-all"
+            className="w-full pl-11 pr-4 py-3 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white placeholder-white/20 outline-none focus:border-white/40 focus:bg-white/[0.05] transition-all"
           />
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <div className="flex flex-col items-center gap-4">
-              <div className="w-10 h-10 border-2 border-[#E50914] border-t-transparent rounded-full animate-spin" />
+              <div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin" />
               <p className="text-white/30 text-sm">Loading creators...</p>
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function CreatorsPage() {
               {search ? `No results for "${search}"` : "Be the first to submit a film and become a creator."}
             </p>
             {!search && (
-              <button onClick={() => router.push("/submit")} className="mt-6 px-6 py-3 bg-[#E50914] text-white font-semibold text-sm rounded-lg hover:bg-[#f6121d] transition-all">
+              <button onClick={() => router.push("/submit")} className="mt-6 px-6 py-3 bg-white text-black font-semibold text-sm rounded-full hover:bg-white/90 transition-all">
                 Submit a Film
               </button>
             )}
@@ -154,8 +154,8 @@ export default function CreatorsPage() {
                   className="group cursor-pointer bg-white/[0.02] border border-white/[0.04] rounded-2xl overflow-hidden hover:border-white/[0.1] hover:bg-white/[0.03] transition-all duration-300"
                 >
                   {/* Top gradient bar */}
-                  <div className="h-24 bg-gradient-to-br from-[#E50914]/20 via-[#1a0a0a] to-[#0a0a12] relative overflow-hidden">
-                    <div className="absolute top-4 right-4 w-20 h-20 rounded-full bg-[#E50914]/[0.08] blur-[40px]" />
+                  <div className="h-24 bg-gradient-to-br from-white/20 via-[#1a0a0a] to-[#0a0a12] relative overflow-hidden">
+                    <div className="absolute top-4 right-4 w-20 h-20 rounded-full bg-white/[0.08] blur-[40px]" />
                   </div>
 
                   <div className="px-5 pb-5 -mt-10">
@@ -164,24 +164,24 @@ export default function CreatorsPage() {
                       {creator.avatar_url ? (
                         <img src={creator.avatar_url} alt={creator.display_name} className="w-16 h-16 rounded-full object-cover border-[3px] border-[#050505] shadow-xl shadow-black/60" />
                       ) : (
-                        <div className="w-16 h-16 rounded-full border-[3px] border-[#050505] shadow-xl shadow-black/60 bg-gradient-to-br from-[#E50914] to-[#8b0000] flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-full border-[3px] border-[#050505] shadow-xl shadow-black/60 bg-gradient-to-br from-white to-[#8b0000] flex items-center justify-center">
                           <span className="text-lg font-black text-white/90">{initials}</span>
                         </div>
                       )}
                       {creator.is_creator && (
-                        <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[#E50914] flex items-center justify-center border-2 border-[#050505]">
+                        <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white flex items-center justify-center border-2 border-[#050505]">
                           <Check size={10} className="text-white" />
                         </div>
                       )}
                     </div>
 
                     {/* Name */}
-                    <h3 className="text-base font-bold text-white group-hover:text-[#E50914] transition-colors mb-1">{creator.display_name}</h3>
+                    <h3 className="text-base font-bold text-white group-hover:text-[#ffffff] transition-colors mb-1">{creator.display_name}</h3>
 
                     {/* Badge */}
                     <div className="flex items-center gap-1.5 mb-3">
-                      <Sparkles size={10} className="text-[#E50914]" />
-                      <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-[#E50914]">Verified Creator</span>
+                      <Sparkles size={10} className="text-[#ffffff]" />
+                      <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-[#ffffff]">Verified Creator</span>
                     </div>
 
                     {/* Bio */}

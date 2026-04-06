@@ -206,8 +206,8 @@ export default function SubmitPage() {
     return (
       <div className="min-h-screen bg-[#08080a] flex items-center justify-center px-6">
         <div className="text-center max-w-md">
-          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${publishedLive ? "bg-green-500/10 border border-green-500/30" : "bg-[#E50914]/10 border border-[#E50914]/30"}`}>
-            {publishedLive ? <Zap size={40} className="text-green-400" /> : <CheckCircle size={40} className="text-[#E50914]" />}
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${publishedLive ? "bg-green-500/10 border border-green-500/30" : "bg-white/10 border border-white/30"}`}>
+            {publishedLive ? <Zap size={40} className="text-green-400" /> : <CheckCircle size={40} className="text-[#ffffff]" />}
           </div>
           <h1 className="text-3xl font-black text-white mb-3">
             {publishedLive ? "Published Live!" : "Film Submitted!"}
@@ -232,7 +232,7 @@ export default function SubmitPage() {
             </button>
             <button
               onClick={() => router.push("/")}
-              className={`px-6 py-3 text-white rounded-lg transition-all font-bold ${publishedLive ? "bg-green-600 hover:bg-green-500" : "bg-[#E50914] hover:bg-[#f6121d]"}`}
+              className={`px-6 py-3 text-white rounded-lg transition-all font-bold ${publishedLive ? "bg-green-600 hover:bg-green-500" : "bg-white hover:bg-white/90"}`}
             >
               {publishedLive ? "View on Home" : "Back to Home"}
             </button>
@@ -275,8 +275,8 @@ export default function SubmitPage() {
         {/* Header */}
         <div className="mb-8 md:mb-12">
           <div className="flex items-center gap-2 mb-3">
-            <Sparkles size={16} className="text-[#E50914]" />
-            <span className="text-xs font-bold tracking-[0.25em] uppercase text-[#E50914]">For Creators</span>
+            <Sparkles size={16} className="text-[#ffffff]" />
+            <span className="text-xs font-bold tracking-[0.25em] uppercase text-[#ffffff]">For Creators</span>
           </div>
           <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-4">
             Submit Your Film
@@ -298,8 +298,8 @@ export default function SubmitPage() {
           {/* Film Title */}
           <div>
             <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 mb-2">
-              <Type size={14} className="text-[#E50914]" />
-              Film Title <span className="text-[#E50914]">*</span>
+              <Type size={14} className="text-[#ffffff]" />
+              Film Title <span className="text-[#ffffff]">*</span>
             </label>
             <input id="film-title" name="film-title" type="text" value={form.title} onChange={(e) => handleChange("title", e.target.value)} placeholder="Enter your film title" className="submit-input" />
           </div>
@@ -307,8 +307,8 @@ export default function SubmitPage() {
           {/* Description */}
           <div>
             <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 mb-2">
-              <AlignLeft size={14} className="text-[#E50914]" />
-              Description <span className="text-[#E50914]">*</span>
+              <AlignLeft size={14} className="text-[#ffffff]" />
+              Description <span className="text-[#ffffff]">*</span>
             </label>
             <textarea id="film-desc" name="film-desc" value={form.description} onChange={(e) => handleChange("description", e.target.value)} placeholder="Describe your film — story, vision, what makes it unique..." className="submit-textarea" rows={5} />
           </div>
@@ -317,8 +317,8 @@ export default function SubmitPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 mb-2">
-                <Tag size={14} className="text-[#E50914]" />
-                Genre <span className="text-[#E50914]">*</span>
+                <Tag size={14} className="text-[#ffffff]" />
+                Genre <span className="text-[#ffffff]">*</span>
               </label>
               <select id="film-genre" name="film-genre" value={form.genre} onChange={(e) => handleChange("genre", e.target.value)} className="submit-select">
                 <option value="">Select genre</option>
@@ -327,8 +327,8 @@ export default function SubmitPage() {
             </div>
             <div>
               <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 mb-2">
-                <Layers size={14} className="text-[#E50914]" />
-                Category <span className="text-[#E50914]">*</span>
+                <Layers size={14} className="text-[#ffffff]" />
+                Category <span className="text-[#ffffff]">*</span>
               </label>
               <select id="film-cat" name="film-cat" value={form.category} onChange={(e) => handleChange("category", e.target.value)} className="submit-select">
                 <option value="">Select category</option>
@@ -341,15 +341,15 @@ export default function SubmitPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 mb-2">
-                <Clock size={14} className="text-[#E50914]" />
+                <Clock size={14} className="text-[#ffffff]" />
                 Duration
               </label>
               <input id="film-dur" name="film-dur" type="text" value={form.duration} onChange={(e) => handleChange("duration", e.target.value)} placeholder="e.g. 1h 45m or 12m" className="submit-input" />
             </div>
             <div>
               <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 mb-2">
-                <User size={14} className="text-[#E50914]" />
-                Creator / Studio <span className="text-[#E50914]">*</span>
+                <User size={14} className="text-[#ffffff]" />
+                Creator / Studio <span className="text-[#ffffff]">*</span>
               </label>
               <input id="film-creator" name="film-creator" type="text" value={form.creatorName} onChange={(e) => handleChange("creatorName", e.target.value)} placeholder="Your name or studio name" className="submit-input" />
             </div>
@@ -358,12 +358,12 @@ export default function SubmitPage() {
           {/* AI Models */}
           <div>
             <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 mb-3">
-              <Cpu size={14} className="text-[#E50914]" />
+              <Cpu size={14} className="text-[#ffffff]" />
               AI Models Used
             </label>
             <div className="flex flex-wrap gap-2">
               {AI_MODELS.map((model) => (
-                <button key={model} onClick={() => toggleModel(model)} className={`px-4 py-2 text-sm rounded-lg border transition-all ${selectedModels.includes(model) ? "bg-[#E50914]/15 border-[#E50914] text-white" : "bg-white/[0.03] border-white/10 text-gray-400 hover:border-white/20 hover:text-gray-300"}`}>
+                <button key={model} onClick={() => toggleModel(model)} className={`px-4 py-2 text-sm rounded-lg border transition-all ${selectedModels.includes(model) ? "bg-white/15 border-white text-white" : "bg-white/[0.03] border-white/10 text-gray-400 hover:border-white/20 hover:text-gray-300"}`}>
                   {selectedModels.includes(model) && <span className="mr-1">✓</span>}
                   {model}
                 </button>
@@ -377,7 +377,7 @@ export default function SubmitPage() {
           {/* Media Links */}
           <div>
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Link2 size={18} className="text-[#E50914]" />
+              <Link2 size={18} className="text-[#ffffff]" />
               Media Links
             </h3>
 
@@ -406,7 +406,7 @@ export default function SubmitPage() {
                         {videoThumb && <img src={videoThumb} alt="Video thumbnail" className="w-full h-full object-cover" />}
                         {!videoThumb && <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-zinc-800" />}
                         <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                          <div className="w-14 h-14 rounded-full bg-[#E50914] flex items-center justify-center shadow-lg shadow-[#E50914]/30 group-hover:scale-110 transition-transform">
+                          <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-lg shadow-black/30 group-hover:scale-110 transition-transform">
                             <Play size={22} fill="white" className="text-white ml-0.5" />
                           </div>
                         </div>
@@ -444,7 +444,7 @@ export default function SubmitPage() {
           {/* ═════════════ LIVE PREVIEW CARD ═════════════ */}
           <div>
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Sparkles size={18} className="text-[#E50914]" />
+              <Sparkles size={18} className="text-[#ffffff]" />
               Live Preview
             </h3>
             <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 md:p-6 flex flex-col sm:flex-row gap-4 md:gap-6">
@@ -473,7 +473,7 @@ export default function SubmitPage() {
                 {form.creatorName && <p className="text-sm text-gray-400 mb-2">by {form.creatorName}</p>}
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   {form.genre && (
-                    <span className="px-2 py-0.5 text-xs font-medium bg-[#E50914]/10 text-[#E50914] rounded-full border border-[#E50914]/20">{form.genre}</span>
+                    <span className="px-2 py-0.5 text-xs font-medium bg-white/10 text-[#ffffff] rounded-full border border-white/20">{form.genre}</span>
                   )}
                   {form.category && (
                     <span className="px-2 py-0.5 text-xs font-medium bg-white/5 text-gray-400 rounded-full border border-white/10">{form.category}</span>
@@ -518,7 +518,7 @@ export default function SubmitPage() {
               className={`w-full py-4 text-white font-bold text-lg rounded-xl transition-all shadow-lg flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed ${
                 isAdmin
                   ? "bg-green-600 hover:bg-green-500 shadow-green-500/20 hover:shadow-green-500/40"
-                  : "bg-[#E50914] hover:bg-[#f6121d] shadow-[#E50914]/20 hover:shadow-[#E50914]/40"
+                  : "bg-white hover:bg-white/90 shadow-black/20 hover:shadow-black/40"
               }`}
             >
               {submitting ? (

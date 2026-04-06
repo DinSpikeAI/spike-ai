@@ -145,7 +145,7 @@ export default function MyListPage() {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-[#E50914] border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin" />
           <p className="text-white/30 text-sm tracking-wider">Loading...</p>
         </div>
       </div>
@@ -166,7 +166,7 @@ export default function MyListPage() {
           </p>
           <button
             onClick={() => router.push("/auth")}
-            className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#E50914] text-white font-bold text-sm rounded-xl hover:bg-[#f6121d] transition-all shadow-lg shadow-[#E50914]/20"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black font-bold text-sm rounded-xl hover:bg-white/90 transition-all shadow-lg shadow-black/20"
           >
             <LogIn size={16} /> Sign In
           </button>
@@ -195,7 +195,7 @@ export default function MyListPage() {
             </button>
             <div>
               <h1 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
-                <Bookmark size={20} className="text-[#E50914]" />
+                <Bookmark size={20} className="text-[#ffffff]" />
                 My List
               </h1>
               <p className="text-xs text-white/30 tracking-wider mt-0.5">
@@ -219,7 +219,7 @@ export default function MyListPage() {
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <div className="flex flex-col items-center gap-4">
-              <Loader2 size={24} className="text-[#E50914] animate-spin" />
+              <Loader2 size={24} className="text-white/40 animate-spin" />
               <p className="text-white/30 text-sm tracking-wider">Loading your list...</p>
             </div>
           </div>
@@ -234,7 +234,7 @@ export default function MyListPage() {
             </p>
             <button
               onClick={() => router.push("/")}
-              className="px-6 py-3 bg-[#E50914] text-white font-semibold text-sm rounded-lg hover:bg-[#f6121d] transition-all"
+              className="px-6 py-3 bg-white text-black font-semibold text-sm rounded-full hover:bg-white/90 transition-all"
             >
               Browse Films
             </button>
@@ -252,7 +252,7 @@ export default function MyListPage() {
                   <div className="relative w-[80px] md:w-[100px] flex-shrink-0 aspect-[2/3] rounded-lg overflow-hidden">
                     <img src={movie.poster} alt={movie.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
-                      <div className="w-10 h-10 rounded-full bg-[#E50914] flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all shadow-lg shadow-[#E50914]/40">
+                      <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all shadow-lg shadow-black/40">
                         <Play size={16} fill="white" className="text-white ml-0.5" />
                       </div>
                     </div>
@@ -261,7 +261,7 @@ export default function MyListPage() {
                   {/* Info */}
                   <div className="flex-1 min-w-0 flex flex-col justify-between">
                     <div>
-                      <h3 className="text-base font-bold text-white truncate group-hover:text-[#E50914] transition-colors">{movie.title}</h3>
+                      <h3 className="text-base font-bold text-white truncate group-hover:text-white transition-colors">{movie.title}</h3>
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                         <span className="text-yellow-400 text-xs flex items-center gap-0.5"><Star size={10} fill="currentColor" />{movie.rating}</span>
                         <span className="text-gray-500 text-xs">{movie.year}</span>
