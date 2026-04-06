@@ -1491,7 +1491,7 @@ function AiModelFilter({
    FOOTER
    ═══════════════════════════════════════════════════════════════ */
 
-function Footer({ onInstall }: { onInstall?: () => void }) {
+function Footer() {
   return (
     <footer className="px-5 md:px-12 py-12 md:py-20 border-t border-white/[0.03]">
       <div className="max-w-6xl mx-auto">
@@ -1503,28 +1503,6 @@ function Footer({ onInstall }: { onInstall?: () => void }) {
           AI-generated cinema. Every frame, every voice, every score — crafted
           by artificial intelligence.
         </p>
-
-        {/* Install App — subtle pulse */}
-        {onInstall && (
-          <button
-            onClick={onInstall}
-            className="mt-8 flex items-center gap-3 px-5 py-3 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] transition-all group"
-            style={{ animation: "installPulse 4s ease-in-out infinite" }}
-          >
-            <svg width="18" height="18" viewBox="0 0 40 40" fill="none" className="flex-shrink-0">
-              <rect x="6" y="22" width="4" height="10" rx="1.5" fill="white" opacity="0.3"/>
-              <rect x="12" y="16" width="4" height="16" rx="1.5" fill="white" opacity="0.55"/>
-              <rect x="18" y="6" width="5" height="26" rx="2" fill="white"/>
-              <rect x="25" y="14" width="4" height="18" rx="1.5" fill="white" opacity="0.55"/>
-              <rect x="31" y="20" width="4" height="12" rx="1.5" fill="white" opacity="0.3"/>
-            </svg>
-            <div className="text-left">
-              <p className="text-[13px] font-medium text-white/70 group-hover:text-white transition-colors">Install spike AI</p>
-              <p className="text-[10px] text-white/30 font-light tracking-wider">Get the desktop app</p>
-            </div>
-          </button>
-        )}
-
         <div className="flex gap-8 mt-8 text-xs font-light tracking-wider text-white/25">
           <a href="#" className="hover:text-white/50 transition-colors">About</a>
           <a href="#" className="hover:text-white/50 transition-colors">Terms</a>
@@ -2020,7 +1998,25 @@ export default function HomePage() {
         </div>
       </div>
 
-      <Footer onInstall={installPrompt ? handleInstall : undefined} />
+      <Footer />
+
+      {/* Fixed Install Button — always visible at bottom right */}
+      {installPrompt && !showInstallBanner && (
+        <button
+          onClick={handleInstall}
+          className="fixed bottom-5 right-5 z-[100] flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#0c0c0e]/90 backdrop-blur-md border border-white/[0.08] shadow-2xl shadow-black/40 hover:bg-white/10 transition-all group"
+          style={{ animation: "installPulse 4s ease-in-out infinite" }}
+        >
+          <svg width="16" height="16" viewBox="0 0 40 40" fill="none" className="flex-shrink-0">
+            <rect x="6" y="22" width="4" height="10" rx="1.5" fill="white" opacity="0.3"/>
+            <rect x="12" y="16" width="4" height="16" rx="1.5" fill="white" opacity="0.55"/>
+            <rect x="18" y="6" width="5" height="26" rx="2" fill="white"/>
+            <rect x="25" y="14" width="4" height="18" rx="1.5" fill="white" opacity="0.55"/>
+            <rect x="31" y="20" width="4" height="12" rx="1.5" fill="white" opacity="0.3"/>
+          </svg>
+          <span className="text-[12px] font-medium text-white/60 group-hover:text-white transition-colors tracking-wide">Install App</span>
+        </button>
+      )}
     </main>
   );
 }

@@ -371,9 +371,9 @@ export default function CreatorPage() {
       <footer className="py-8 md:py-12 px-4 md:px-6 border-t border-white/5 mt-12 md:mt-16">
         <div className="max-w-[1200px] mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <img src="/mascot.png" alt="Spike" className="h-8 w-auto" />
-            <span className="text-lg font-black tracking-tight text-white">spike</span>
-            <span className="text-lg font-black tracking-tight text-[#E50914]" style={{ marginLeft: "-4px" }}>AI</span>
+            
+            <span className="text-lg font-semibold tracking-[0.15em] text-white/80">spike</span>
+            <span className="text-lg font-semibold tracking-[0.15em] text-white" >AI</span>
           </div>
           <p className="text-[10px] tracking-[0.3em] uppercase text-gray-600 mb-4">AI Cinema</p>
           <p className="text-gray-500 text-xs">&copy; {new Date().getFullYear()} Spike AI. The world&apos;s first streaming platform for AI-generated cinema.</p>

@@ -138,7 +138,7 @@ export default function AuthPage() {
       <nav className="relative z-20 px-6 md:px-12 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => router.push("/")}>
           <img
-            src="/mascot.png"
+            style={{ display: "none" }}
             alt="Spike"
             className="h-10 w-auto group-hover:scale-105 transition-transform duration-300"
             style={{ filter: "drop-shadow(0 0 12px rgba(229,9,20,0.2)) drop-shadow(0 0 24px rgba(147,130,220,0.15))" }}

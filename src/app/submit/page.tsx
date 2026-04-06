@@ -255,9 +255,9 @@ export default function SubmitPage() {
             </button>
             <div className="h-5 w-px bg-gray-700" />
             <div className="cursor-pointer flex items-center gap-2" onClick={() => router.push("/")}>
-              <img src="/mascot.png" alt="Spike" className="h-7 w-auto" />
-              <span className="text-[16px] font-black tracking-tight text-white">spike</span>
-              <span className="text-[16px] font-black tracking-tight text-[#E50914]" style={{ marginLeft: "-4px" }}>AI</span>
+              
+              <span className="text-[16px] font-semibold tracking-[0.15em] text-white/80">spike</span>
+              <span className="text-[16px] font-semibold tracking-[0.15em] text-white" >AI</span>
             </div>
           </div>
           {/* Admin Badge */}
@@ -542,9 +542,9 @@ export default function SubmitPage() {
       <footer className="py-8 px-4 md:px-6 border-t border-white/5">
         <div className="max-w-[900px] mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <img src="/mascot.png" alt="Spike" className="h-8 w-auto" />
-            <span className="text-lg font-black tracking-tight text-white">spike</span>
-            <span className="text-lg font-black tracking-tight text-[#E50914]" style={{ marginLeft: "-4px" }}>AI</span>
+            
+            <span className="text-lg font-semibold tracking-[0.15em] text-white/80">spike</span>
+            <span className="text-lg font-semibold tracking-[0.15em] text-white" >AI</span>
           </div>
           <p className="text-gray-500 text-xs">&copy; {new Date().getFullYear()} Spike AI. The world&apos;s first streaming platform for AI-generated cinema.</p>
         </div>

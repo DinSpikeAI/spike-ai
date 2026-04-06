@@ -95,9 +95,9 @@ export default function CreatorsPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <img src="/mascot.png" alt="Spike" className="h-7 w-auto" />
-            <span className="text-sm font-black tracking-tight text-white hidden sm:inline">spike</span>
-            <span className="text-sm font-black tracking-tight text-[#E50914] hidden sm:inline" style={{ marginLeft: "-3px" }}>AI</span>
+            
+            <span className="text-sm font-semibold tracking-[0.15em] text-white/80 hidden sm:inline">spike</span>
+            <span className="text-sm font-semibold tracking-[0.15em] text-white hidden sm:inline" style={{ marginLeft: "-3px" }}>AI</span>
           </div>
         </div>
       </div>
@@ -212,9 +212,9 @@ export default function CreatorsPage() {
       <footer className="py-10 px-4 md:px-6 border-t border-white/[0.04] mt-8">
         <div className="max-w-[1200px] mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <img src="/mascot.png" alt="Spike" className="h-8 w-auto" />
-            <span className="text-lg font-black tracking-tight text-white">spike</span>
-            <span className="text-lg font-black tracking-tight text-[#E50914]" style={{ marginLeft: "-4px" }}>AI</span>
+            
+            <span className="text-lg font-semibold tracking-[0.15em] text-white/80">spike</span>
+            <span className="text-lg font-semibold tracking-[0.15em] text-white" >AI</span>
           </div>
           <p className="text-gray-600 text-xs">&copy; {new Date().getFullYear()} Spike AI. AI-generated cinema.</p>
         </div>

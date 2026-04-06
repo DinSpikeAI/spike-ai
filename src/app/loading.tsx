@@ -6,7 +6,7 @@ export default function Loading() {
         <div className="relative">
           <div className="absolute inset-0 rounded-full bg-[#E50914]/20 animate-ping" style={{ animationDuration: "1.5s" }} />
           <img
-            src="/mascot.png"
+            style={{ display: "none" }}
             alt="Loading"
             className="h-14 w-auto relative z-10"
             style={{ filter: "drop-shadow(0 0 20px rgba(229,9,20,0.3))" }}

@@ -241,9 +241,9 @@ export default function AdminDashboard() {
               <ArrowLeft size={18} />
             </button>
             <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push("/")}>
-              <img src="/mascot.png" alt="Spike" className="h-7 w-auto" />
-              <span className="text-[16px] font-black tracking-tight text-white">spike</span>
-              <span className="text-[16px] font-black tracking-tight text-[#E50914]" style={{ marginLeft: "-4px" }}>AI</span>
+              
+              <span className="text-[16px] font-semibold tracking-[0.15em] text-white/80">spike</span>
+              <span className="text-[16px] font-semibold tracking-[0.15em] text-white" >AI</span>
             </div>
             <div className="h-5 w-px bg-gray-700" />
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${adminMethod === "auth" ? "bg-green-500/10 border-green-500/20" : "bg-yellow-500/10 border-yellow-500/20"}`}>
