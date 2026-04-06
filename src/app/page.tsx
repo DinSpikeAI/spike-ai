@@ -567,13 +567,12 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="flex items-center gap-6 md:gap-12">
         <div className="select-none cursor-pointer flex items-center gap-2.5" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img src="/mascot.png" alt="Spike" className="h-10 w-auto" style={{ filter: "drop-shadow(0 0 8px rgba(147,130,220,0.3))" }} />
+          <img src="/mascot.png" alt="Spike" className="h-10 w-auto" style={{ filter: "drop-shadow(0 0 8px rgba(255,255,255,0.15))" }} />
           <div className="leading-none">
             <div className="flex items-baseline gap-0.5">
-              <span className="text-[22px] font-black italic tracking-tight text-white">spike</span>
-              <span className="text-[22px] font-black italic tracking-tight text-[#E50914]">AI</span>
+              <span className="text-[22px] font-extralight tracking-[0.08em] text-white/90" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike</span>
+              <span className="text-[22px] font-semibold tracking-[0.08em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>AI</span>
             </div>
-            <span className="text-[6px] tracking-[3px] uppercase text-white/20 font-medium">AI Cinema</span>
           </div>
         </div>
         <div className="hidden md:flex items-center gap-10">
@@ -789,8 +788,8 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
             <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
               <div className="flex items-center gap-2">
                 <img src="/mascot.png" alt="Spike" className="h-7 w-auto" />
-                <span className="text-sm font-black tracking-tight text-white">spike</span>
-                <span className="text-sm font-black tracking-tight text-[#E50914]" style={{ marginLeft: "-3px" }}>AI</span>
+                <span className="text-sm font-extralight tracking-wider text-white/90">spike</span>
+                <span className="text-sm font-semibold tracking-wider text-white" style={{ marginLeft: "-1px" }}>AI</span>
               </div>
               <button onClick={() => setShowMobileMenu(false)} className="text-white/30 hover:text-white transition-colors"><X size={20} /></button>
             </div>
@@ -1507,10 +1506,9 @@ function Footer() {
           <img src="/mascot.png" alt="Spike" className="h-10 w-auto" />
           <div>
             <div className="flex items-baseline gap-1">
-              <span className="text-xl font-bold tracking-tight text-white">spike</span>
-              <span className="text-xl font-bold tracking-tight text-[#E50914]">AI</span>
+              <span className="text-xl font-extralight tracking-wider text-white/90">spike</span>
+              <span className="text-xl font-semibold tracking-wider text-white">AI</span>
             </div>
-            <span className="text-[8px] tracking-[0.3em] uppercase text-white/15 font-light">AI Cinema</span>
           </div>
         </div>
         <p className="text-sm font-light tracking-wide text-white/30 max-w-md leading-relaxed">
@@ -1683,6 +1681,7 @@ export default function HomePage() {
           .from("movies")
           .select("*")
           .eq("status", "approved")
+          .order("sort_order", { ascending: true })
           .order("upvotes_count", { ascending: false });
 
         if (error || !data || data.length === 0) {
@@ -1887,13 +1886,13 @@ export default function HomePage() {
       {showSplash && (
         <div className={`splash-screen ${splashFading ? "fade-out" : ""}`}>
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[600px] h-[600px] rounded-full bg-[#E50914]/[0.06] blur-[150px]" />
+            <div className="w-[600px] h-[600px] rounded-full bg-white/[0.03] blur-[150px]" />
           </div>
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[400px] h-[400px] rounded-full bg-purple-500/[0.04] blur-[100px] translate-y-[-80px]" />
+            <div className="w-[400px] h-[400px] rounded-full bg-white/[0.02] blur-[100px] translate-y-[-80px]" />
           </div>
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[200px] h-[200px] rounded-full bg-[#E50914]/[0.08] blur-[60px] translate-y-[40px]" />
+            <div className="w-[200px] h-[200px] rounded-full bg-white/[0.04] blur-[60px] translate-y-[40px]" />
           </div>
 
           <div className="splash-logo relative flex flex-col items-center">
@@ -1901,13 +1900,13 @@ export default function HomePage() {
               src="/mascot.png"
               alt="Spike"
               className="w-32 md:w-40 h-auto object-contain mb-10"
-              style={{ filter: "drop-shadow(0 0 40px rgba(229, 9, 20, 0.2)) drop-shadow(0 0 80px rgba(147,130,220,0.1)) drop-shadow(0 20px 40px rgba(0,0,0,0.6))" }}
+              style={{ filter: "drop-shadow(0 0 40px rgba(255,255,255,0.1)) drop-shadow(0 20px 40px rgba(0,0,0,0.6))" }}
             />
             <div className="flex items-baseline gap-4 select-none">
-              <span className="splash-text-spike text-7xl sm:text-8xl md:text-[9rem] font-extralight tracking-[0.04em] text-white" style={{ fontStyle: "normal" }}>
+              <span className="splash-text-spike text-7xl sm:text-8xl md:text-[9rem] font-extralight tracking-[0.06em] text-white/90" style={{ fontStyle: "normal", fontFamily: "'Inter', -apple-system, sans-serif" }}>
                 spike
               </span>
-              <span className="splash-text-ai text-7xl sm:text-8xl md:text-[9rem] font-bold tracking-[0.04em] text-[#E50914]" style={{ fontStyle: "normal" }}>
+              <span className="splash-text-ai text-7xl sm:text-8xl md:text-[9rem] font-semibold tracking-[0.06em] text-white" style={{ fontStyle: "normal", fontFamily: "'Inter', -apple-system, sans-serif" }}>
                 AI
               </span>
             </div>

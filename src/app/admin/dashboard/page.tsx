@@ -31,6 +31,7 @@ interface Movie {
   ai_models: string[];
   creator_name: string | null;
   upvotes_count: number;
+  sort_order: number;
   status: string;
   created_at: string;
   updated_at: string;
@@ -98,6 +99,7 @@ export default function AdminDashboard() {
     const { data, error } = await supabase
       .from("movies")
       .select("*")
+      .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
 
     if (!error && data) setMovies(data as Movie[]);
@@ -158,6 +160,7 @@ export default function AdminDashboard() {
         creator_name: editMovie.creator_name,
         ai_models: editMovie.ai_models,
         rating: editMovie.rating,
+        sort_order: editMovie.sort_order || 0,
       })
       .eq("id", editMovie.id);
     if (!error) {
@@ -419,8 +422,11 @@ export default function AdminDashboard() {
                   className="flex items-center gap-4 p-3 md:p-4 bg-white/[0.02] border border-white/[0.04] rounded-xl hover:border-white/[0.08] transition-colors group"
                 >
                   {/* Poster Thumbnail — auto YouTube thumbnail */}
-                  <div className="w-12 h-16 md:w-14 md:h-20 rounded-lg overflow-hidden bg-zinc-900 flex-shrink-0 border border-white/5">
-                    <img src={getSmartPoster(movie.poster_url, movie.video_url, movie.id)} alt={movie.title} className="w-full h-full object-cover" />
+                  <div className="flex items-center gap-3 flex-shrink-0">
+                    <span className="text-[11px] font-bold text-gray-600 w-5 text-center">{movie.sort_order || "–"}</span>
+                    <div className="w-12 h-16 md:w-14 md:h-20 rounded-lg overflow-hidden bg-zinc-900 border border-white/5">
+                      <img src={getSmartPoster(movie.poster_url, movie.video_url, movie.id)} alt={movie.title} className="w-full h-full object-cover" />
+                    </div>
                   </div>
 
                   {/* Info */}
@@ -525,8 +531,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Duration + Rating + Creator */}
-              <div className="grid grid-cols-3 gap-4">
+              {/* Duration + Rating + Creator + Position */}
+              <div className="grid grid-cols-4 gap-4">
                 <div>
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Duration</label>
                   <input value={editMovie.duration || ""} onChange={(e) => setEditMovie({ ...editMovie, duration: e.target.value })} className="submit-input" placeholder="1h 45m" />
@@ -538,6 +544,11 @@ export default function AdminDashboard() {
                 <div>
                   <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Creator</label>
                   <input value={editMovie.creator_name || ""} onChange={(e) => setEditMovie({ ...editMovie, creator_name: e.target.value })} className="submit-input" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Position</label>
+                  <input type="number" min="0" max="100" value={editMovie.sort_order || 0} onChange={(e) => setEditMovie({ ...editMovie, sort_order: parseInt(e.target.value) || 0 })} className="submit-input" placeholder="1 = first" />
+                  <span className="text-[9px] text-gray-600 mt-0.5 block">Lower = higher on page</span>
                 </div>
               </div>
 
