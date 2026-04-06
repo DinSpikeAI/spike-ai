@@ -194,6 +194,7 @@ interface Movie {
   creator?: string;
   upvotes_count: number;
   video_url?: string;
+  sort_order?: number;
 }
 
 interface Category {
@@ -1718,6 +1719,7 @@ export default function HomePage() {
             description: row.description || "",
             upvotes_count: row.upvotes_count || 0,
             video_url: row.video_url || undefined,
+            sort_order: row.sort_order || 0,
           };
 
           // Add to primary category
@@ -1852,7 +1854,16 @@ export default function HomePage() {
   // Deduplicate by id
   const uniqueMoviesMap = new Map<string, Movie>();
   allMovies.forEach((m) => { if (!uniqueMoviesMap.has(m.id)) uniqueMoviesMap.set(m.id, m); });
-  const uniqueMovies = Array.from(uniqueMoviesMap.values());
+  const uniqueMovies = Array.from(uniqueMoviesMap.values()).sort((a, b) => {
+    const aPos = a.sort_order || 0;
+    const bPos = b.sort_order || 0;
+    // Movies with position > 0 come first, sorted ascending
+    // Movies with position 0 go last
+    if (aPos > 0 && bPos > 0) return aPos - bPos;
+    if (aPos > 0) return -1;
+    if (bPos > 0) return 1;
+    return 0;
+  });
 
   const filteredMovies = uniqueMovies.filter((m) => {
     const genreMatch =
