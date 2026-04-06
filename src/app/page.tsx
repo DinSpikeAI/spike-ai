@@ -1764,10 +1764,11 @@ export default function HomePage() {
           setLiveCategories(FALLBACK_CATEGORIES);
         }
 
-        // Build Top 10 Hero Slides from highest-upvoted DB movies
-        const top10 = data
-          .sort((a: any, b: any) => (b.upvotes_count || 0) - (a.upvotes_count || 0))
-          .slice(0, 10)
+        // Build Top 5 Hero Slides from sort_order (admin-controlled)
+        const top5 = data
+          .filter((r: any) => (r.sort_order || 0) > 0)
+          .sort((a: any, b: any) => (a.sort_order || 999) - (b.sort_order || 999))
+          .slice(0, 5)
           .map((row: any, idx: number) => ({
             id: row.id,
             title: row.title.toUpperCase().replace(/ /g, "\n").slice(0, 30),
@@ -1782,8 +1783,8 @@ export default function HomePage() {
             rank: idx + 1,
           }));
 
-        if (top10.length > 0) {
-          setHeroSlides(top10);
+        if (top5.length > 0) {
+          setHeroSlides(top5);
         }
 
         setDbReady(true);
