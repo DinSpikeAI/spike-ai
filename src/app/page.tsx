@@ -1932,8 +1932,8 @@ export default function HomePage() {
         <div className="mt-8 md:mt-14 px-4 md:px-12">
           {/* Shimmer loading while fetching from DB */}
           {!dbReady && uniqueMovies.length === 0 && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((card) => (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-8">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((card) => (
                 <div key={card}>
                   <div className="aspect-[2/3] rounded-lg bg-white/[0.03] shimmer-card" />
                   <div className="h-3 w-3/4 bg-white/[0.03] rounded mt-3 shimmer-card" />
@@ -1952,7 +1952,7 @@ export default function HomePage() {
           )}
 
           {/* Single Grid of All Movies */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-8">
             {filteredMovies.map((movie, index) => (
               <MovieCard
                 key={movie.id}
