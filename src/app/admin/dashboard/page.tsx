@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   Shield, Film, Trash2, Pencil, Check, X, Loader2, RefreshCw,
   ArrowLeft, ChevronDown, Search, Zap, Clock, XCircle, Eye,
-  Save, Plus, AlertTriangle, Inbox, CheckCircle, Ban,
+  Save, Plus, AlertTriangle, Inbox, CheckCircle, Ban, Bell,
 } from "lucide-react";
 import { supabase, getSmartPoster, checkIsAdmin } from "@/lib/supabase";
 
@@ -69,6 +69,11 @@ export default function AdminDashboard() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
+  // ── Notifications Management ──
+  const [notifs, setNotifs] = useState<{ id: string; title: string; created_at: string }[]>([]);
+  const [newNotif, setNewNotif] = useState("");
+  const [showNotifPanel, setShowNotifPanel] = useState(false);
+
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
   // ─── Auth-based Admin Check ───
@@ -109,6 +114,29 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!authChecking && isAdmin) fetchMovies();
   }, [isAdmin, authChecking, fetchMovies]);
+
+  /* ── Notifications CRUD ── */
+  const fetchNotifs = useCallback(async () => {
+    if (!supabase) return;
+    const { data } = await supabase.from("notifications").select("*").order("created_at", { ascending: false }).limit(20);
+    if (data) setNotifs(data);
+  }, []);
+
+  useEffect(() => { if (isAdmin) fetchNotifs(); }, [isAdmin, fetchNotifs]);
+
+  const addNotif = async () => {
+    if (!supabase || !newNotif.trim()) return;
+    const { error } = await supabase.from("notifications").insert({ title: newNotif.trim() });
+    if (!error) { setNewNotif(""); fetchNotifs(); showToast("Notification sent"); }
+    else showToast("Error: " + error.message);
+  };
+
+  const deleteNotif = async (id: string) => {
+    if (!supabase) return;
+    await supabase.from("notifications").delete().eq("id", id);
+    setNotifs((p) => p.filter((n) => n.id !== id));
+    showToast("Notification deleted");
+  };
 
   /* ── Status Change ── */
   const updateStatus = async (movie: Movie, newStatus: string) => {
@@ -292,6 +320,55 @@ export default function AdminDashboard() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* ═══════ Notifications Panel ═══════ */}
+        <div className="mb-8">
+          <button
+            onClick={() => setShowNotifPanel(!showNotifPanel)}
+            className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-white/50 hover:text-white transition-colors mb-3 cursor-pointer"
+          >
+            <Bell size={14} />
+            Notifications ({notifs.length})
+            <ChevronDown size={14} className={`transition-transform ${showNotifPanel ? "rotate-180" : ""}`} />
+          </button>
+          {showNotifPanel && (
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 space-y-3">
+              <div className="flex gap-2">
+                <input
+                  value={newNotif}
+                  onChange={(e) => setNewNotif(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addNotif()}
+                  placeholder="Write a notification for all users..."
+                  className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/20 transition-colors"
+                />
+                <button
+                  onClick={addNotif}
+                  disabled={!newNotif.trim()}
+                  className="px-4 py-2.5 bg-white text-black text-sm font-bold rounded-lg hover:bg-white/90 transition-all disabled:opacity-30 cursor-pointer"
+                >
+                  Send
+                </button>
+              </div>
+              {notifs.length === 0 ? (
+                <p className="text-[12px] text-white/20 text-center py-3">No notifications yet</p>
+              ) : (
+                <div className="space-y-1 max-h-[200px] overflow-y-auto">
+                  {notifs.map((n) => (
+                    <div key={n.id} className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg hover:bg-white/[0.03] group">
+                      <div className="min-w-0">
+                        <p className="text-[13px] text-white/70 truncate">{n.title}</p>
+                        <p className="text-[10px] text-white/20">{new Date(n.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <button onClick={() => deleteNotif(n.id)} className="text-white/10 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer flex-shrink-0">
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* ═══════ REVIEW QUEUE — Pending Submissions ═══════ */}

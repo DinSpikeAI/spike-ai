@@ -557,12 +557,37 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
       ).slice(0, 5)
     : [];
 
-  const NOTIFICATIONS = [
-    { id: 1, text: "\"Neon Ronin\" is now trending", time: "2m ago", unread: true },
-    { id: 2, text: "New AI Anime collection added", time: "1h ago", unread: true },
-    { id: 3, text: "\"Genesis Protocol\" reached 1K upvotes", time: "3h ago", unread: false },
-    { id: 4, text: "Creator NeonFrame Studios uploaded a new film", time: "5h ago", unread: false },
-  ];
+  // ── DB-driven notifications (admin adds via Supabase) ──
+  const [dbNotifs, setDbNotifs] = useState<{ id: string; title: string; body: string | null; created_at: string }[]>([]);
+  useEffect(() => {
+    if (!supabase) return;
+    async function loadNotifs() {
+      const { data } = await supabase!
+        .from("notifications")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(10);
+      if (data) setDbNotifs(data);
+    }
+    loadNotifs();
+  }, []);
+
+  function timeAgo(date: string) {
+    const diff = Date.now() - new Date(date).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+  }
+
+  const NOTIFICATIONS = dbNotifs.map((n, i) => ({
+    id: n.id,
+    text: n.title,
+    time: timeAgo(n.created_at),
+    unread: i < 2,
+  }));
 
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
@@ -646,7 +671,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
             className="text-white/40 hover:text-white transition-colors relative cursor-pointer"
           >
             <Bell size={19} />
-            <span className="absolute -top-1 -right-1 w-2 h-2 bg-white/20 rounded-full" />
+            {dbNotifs.length > 0 && <span className="absolute -top-1 -right-1 w-2 h-2 bg-white/20 rounded-full" />}
           </button>
 
           {showNotifs && (
@@ -655,23 +680,29 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                 <span className="text-sm font-semibold tracking-wide text-white">Notifications</span>
                 <span onClick={() => showToast("All notifications marked as read")} className="text-[10px] font-medium tracking-wide text-[#ffffff] cursor-pointer hover:text-[#e0e0e0] transition-colors">Mark all read</span>
               </div>
-              {NOTIFICATIONS.map((n) => (
-                <div
-                  key={n.id}
-                  onClick={() => showToast(n.text)}
-                  className="flex items-start gap-3 px-4 py-3 hover:bg-white/[0.04] cursor-pointer transition-colors border-b border-white/[0.04] last:border-0 active:scale-[0.98]"
-                >
-                  {n.unread && <span className="w-1.5 h-1.5 bg-[#ffffff] rounded-full mt-1.5 flex-shrink-0" />}
-                  {!n.unread && <span className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" />}
-                  <div className="min-w-0">
-                    <p className={`text-[13px] leading-snug tracking-wide ${n.unread ? "text-white font-medium" : "text-white/50 font-normal"}`}>{n.text}</p>
-                    <p className="text-[10px] font-light tracking-wider text-white/25 mt-1">{n.time}</p>
-                  </div>
+              {NOTIFICATIONS.length === 0 ? (
+                <div className="px-4 py-8 text-center">
+                  <Bell size={20} className="text-white/10 mx-auto mb-2" />
+                  <p className="text-[12px] text-white/25 tracking-wide">No notifications yet</p>
                 </div>
-              ))}
-              <div className="px-4 py-2.5 text-center">
-                <span className="text-[11px] font-medium tracking-wide text-white/30 hover:text-white/50 cursor-pointer transition-colors">View all notifications</span>
-              </div>
+              ) : (
+                <>
+                  {NOTIFICATIONS.map((n) => (
+                    <div
+                      key={n.id}
+                      onClick={() => showToast(n.text)}
+                      className="flex items-start gap-3 px-4 py-3 hover:bg-white/[0.04] cursor-pointer transition-colors border-b border-white/[0.04] last:border-0 active:scale-[0.98]"
+                    >
+                      {n.unread && <span className="w-1.5 h-1.5 bg-[#ffffff] rounded-full mt-1.5 flex-shrink-0" />}
+                      {!n.unread && <span className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" />}
+                      <div className="min-w-0">
+                        <p className={`text-[13px] leading-snug tracking-wide ${n.unread ? "text-white font-medium" : "text-white/50 font-normal"}`}>{n.text}</p>
+                        <p className="text-[10px] font-light tracking-wider text-white/25 mt-1">{n.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
           )}
         </div>
@@ -730,14 +761,14 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                     </div>
                   )}
                   {[
-                    { label: "My Profile", icon: "👤", href: "" },
+                    { label: "My Profile", icon: "👤", href: "/profile" },
                     { label: "My List", icon: "📋", href: "/my-list" },
-                    { label: "Settings", icon: "⚙️", href: "" },
-                    { label: "Help Center", icon: "❓", href: "" },
+                    { label: "Settings", icon: "⚙️", href: "/settings" },
+                    { label: "Help Center", icon: "❓", href: "/help" },
                   ].map((item) => (
                     <div
                       key={item.label}
-                      onClick={() => { if (item.href) { router.push(item.href); } else { showToast(`${item.label} — coming soon`); } }}
+                      onClick={() => { setShowProfile(false); router.push(item.href); }}
                       className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.04] cursor-pointer transition-colors text-white/60 hover:text-white active:scale-[0.98]"
                     >
                       <span className="text-sm">{item.icon}</span>
