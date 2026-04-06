@@ -585,7 +585,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
             { label: "Submit Film", href: "/submit", special: true },
           ].map((link) => (
             link.special ? (
-              <a key={link.label} href={link.href} className="text-[12.5px] font-medium tracking-[0.04em] px-5 py-1.5 rounded-full border border-[#E50914]/40 text-[#E50914] hover:bg-[#E50914] hover:text-white transition-all duration-300 ml-1">{link.label}</a>
+              <a key={link.label} href={link.href} className="text-[12.5px] font-medium tracking-[0.04em] px-5 py-1.5 rounded-full border border-[#ffffff]/40 text-[#ffffff] hover:bg-[#ffffff] hover:text-white transition-all duration-300 ml-1">{link.label}</a>
             ) : (
               <a key={link.label} href={link.href} className="text-[13px] text-white/50 hover:text-white transition-colors duration-300 font-normal tracking-[0.04em]">{link.label}</a>
             )
@@ -637,7 +637,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
               ))}
               <button
                 onClick={() => { onSearchOpen(); toggleSearch(); }}
-                className="w-full py-2.5 text-xs font-medium tracking-wide text-[#E50914] hover:bg-white/[0.04] transition-colors"
+                className="w-full py-2.5 text-xs font-medium tracking-wide text-[#ffffff] hover:bg-white/[0.04] transition-colors"
               >
                 See all results →
               </button>
@@ -652,14 +652,14 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
             className="text-white/40 hover:text-white transition-colors relative cursor-pointer"
           >
             <Bell size={19} />
-            <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-600 rounded-full" />
+            <span className="absolute -top-1 -right-1 w-2 h-2 bg-white/20 rounded-full" />
           </button>
 
           {showNotifs && (
             <div className="absolute top-full right-0 mt-3 w-[320px] bg-[#0c0c0e] border border-white/[0.06] rounded-xl shadow-2xl shadow-black/60 overflow-hidden z-[200]" style={{ animation: "fadeInUp 0.25s cubic-bezier(0.22,1,0.36,1)" }}>
               <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
                 <span className="text-sm font-semibold tracking-wide text-white">Notifications</span>
-                <span onClick={() => showToast("All notifications marked as read")} className="text-[10px] font-medium tracking-wide text-[#E50914] cursor-pointer hover:text-[#ff1a25] transition-colors">Mark all read</span>
+                <span onClick={() => showToast("All notifications marked as read")} className="text-[10px] font-medium tracking-wide text-[#ffffff] cursor-pointer hover:text-[#e0e0e0] transition-colors">Mark all read</span>
               </div>
               {NOTIFICATIONS.map((n) => (
                 <div
@@ -667,7 +667,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                   onClick={() => showToast(n.text)}
                   className="flex items-start gap-3 px-4 py-3 hover:bg-white/[0.04] cursor-pointer transition-colors border-b border-white/[0.04] last:border-0 active:scale-[0.98]"
                 >
-                  {n.unread && <span className="w-1.5 h-1.5 bg-[#E50914] rounded-full mt-1.5 flex-shrink-0" />}
+                  {n.unread && <span className="w-1.5 h-1.5 bg-[#ffffff] rounded-full mt-1.5 flex-shrink-0" />}
                   {!n.unread && <span className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" />}
                   <div className="min-w-0">
                     <p className={`text-[13px] leading-snug tracking-wide ${n.unread ? "text-white font-medium" : "text-white/50 font-normal"}`}>{n.text}</p>
@@ -693,7 +693,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                 {user.user_metadata?.avatar_url ? (
                   <img src={user.user_metadata.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center text-[11px] font-bold text-white">
+                  <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900 flex items-center justify-center text-[11px] font-bold text-white">
                     {(user.user_metadata?.display_name || user.email || "U")[0].toUpperCase()}
                   </div>
                 )}
@@ -706,7 +706,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                       {user.user_metadata?.avatar_url ? (
                         <img src={user.user_metadata.avatar_url} alt="" className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center text-xs font-bold">
+                        <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900 flex items-center justify-center text-xs font-bold">
                           {(user.user_metadata?.display_name || user.email || "U")[0].toUpperCase()}
                         </div>
                       )}
@@ -721,10 +721,10 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                     <div className="border-b border-white/[0.06]">
                       <div
                         onClick={() => { setShowProfile(false); router.push("/admin/dashboard"); }}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#E50914]/[0.06] cursor-pointer transition-colors active:scale-[0.98]"
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#ffffff]/[0.06] cursor-pointer transition-colors active:scale-[0.98]"
                       >
-                        <Shield size={14} className="text-[#E50914]" />
-                        <span className="text-[13px] font-semibold tracking-wide text-[#E50914]">Admin Dashboard</span>
+                        <Shield size={14} className="text-[#ffffff]" />
+                        <span className="text-[13px] font-semibold tracking-wide text-[#ffffff]">Admin Dashboard</span>
                       </div>
                       <div
                         onClick={() => { setShowProfile(false); router.push("/submit"); }}
@@ -757,7 +757,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                         setShowProfile(false);
                         showToast("Signed out");
                       }}
-                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.04] cursor-pointer transition-colors text-[#E50914] hover:text-[#ff1a25] active:scale-[0.98]"
+                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.04] cursor-pointer transition-colors text-[#ffffff] hover:text-[#e0e0e0] active:scale-[0.98]"
                     >
                       <span className="text-sm">🚪</span>
                       <span className="text-[13px] font-medium tracking-wide">Sign Out</span>
@@ -819,13 +819,13 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                 {user ? (
                   <button
                     onClick={async () => { if (supabase) await supabase.auth.signOut(); setShowMobileMenu(false); }}
-                    className="flex items-center gap-3 px-5 py-3.5 text-[#E50914] hover:bg-red-500/5 transition-colors w-full"
+                    className="flex items-center gap-3 px-5 py-3.5 text-[#ffffff] hover:bg-white/15/5 transition-colors w-full"
                   >
                     <span className="text-base">🚪</span>
                     <span className="text-[14px] font-medium tracking-wide">Sign Out</span>
                   </button>
                 ) : (
-                  <a href="/auth" className="flex items-center gap-3 px-5 py-3.5 text-[#E50914] hover:bg-red-500/5 transition-colors" onClick={() => setShowMobileMenu(false)}>
+                  <a href="/auth" className="flex items-center gap-3 px-5 py-3.5 text-[#ffffff] hover:bg-white/15/5 transition-colors" onClick={() => setShowMobileMenu(false)}>
                     <span className="text-base">🔑</span>
                     <span className="text-[14px] font-medium tracking-wide">Sign In</span>
                   </a>
@@ -968,11 +968,11 @@ function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
         {/* Top 10 Badge + Spike Original */}
         <div key={`badge-${activeSlide}`} className="animate-fade-in-up flex items-center gap-2 md:gap-3 mb-4 md:mb-5" style={{ animationDelay: "0.05s", animationFillMode: "backwards" }}>
           {slide.rank && (
-            <span className="text-[9px] md:text-[10px] font-black tracking-[0.15em] uppercase px-2.5 py-1 rounded bg-[#E50914] text-white shadow-lg shadow-[#E50914]/30">
+            <span className="text-[9px] md:text-[10px] font-black tracking-[0.15em] uppercase px-2.5 py-1 rounded bg-[#ffffff] text-white shadow-lg shadow-white/30">
               TOP {slide.rank}
             </span>
           )}
-          <span className="text-[9px] md:text-[10px] font-medium tracking-[0.2em] uppercase px-2 md:px-3 py-1 rounded border border-red-500/20 text-red-400/90 bg-red-500/[0.08]">
+          <span className="text-[9px] md:text-[10px] font-medium tracking-[0.2em] uppercase px-2 md:px-3 py-1 rounded border border-white/20 text-white/60/90 bg-white/15/[0.08]">
             Spike Original
           </span>
           <span className="text-[9px] md:text-[10px] font-light tracking-[0.2em] uppercase text-white/25">
@@ -1237,7 +1237,7 @@ function MovieCard({
               setDeleting(false);
             }}
             disabled={deleting}
-            className="w-7 h-7 rounded-md bg-red-600/80 backdrop-blur-sm flex items-center justify-center hover:bg-red-500 transition-all shadow-lg disabled:opacity-50"
+            className="w-7 h-7 rounded-md bg-white/20/80 backdrop-blur-sm flex items-center justify-center hover:bg-white/15 transition-all shadow-lg disabled:opacity-50"
             title="Delete Film"
           >
             <Trash2 size={12} className="text-white" />
@@ -1254,14 +1254,14 @@ function MovieCard({
           {/* Upvote Button */}
           <div className="relative" style={{ zIndex: 50 }}>
             {showFloat && (
-              <span className="upvote-float text-[#E50914]"><Flame size={14} fill="currentColor" /></span>
+              <span className="upvote-float text-[#ffffff]"><Flame size={14} fill="currentColor" /></span>
             )}
             <button
               onClick={handleUpvote}
               style={{ position: "relative", zIndex: 51 }}
               className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium transition-all cursor-pointer ${popAnim ? "upvote-pop" : ""} ${
                 voted
-                  ? "bg-[#E50914]/20 text-[#E50914] border border-[#E50914]/30"
+                  ? "bg-[#ffffff]/20 text-[#ffffff] border border-[#ffffff]/30"
                   : "bg-white/[0.06] text-white/40 border border-white/[0.06] hover:text-white/70 hover:border-white/[0.15]"
               }`}
             >
@@ -1985,7 +1985,7 @@ export default function HomePage() {
             </p>
             <button
               onClick={() => { setSelectedGenre("All"); setSelectedModel("All"); }}
-              className="mt-4 text-red-500 text-sm font-normal tracking-wide hover:text-red-400 transition-colors"
+              className="mt-4 text-white/60 text-sm font-normal tracking-wide hover:text-white/60 transition-colors"
             >
               Clear all filters
             </button>
@@ -2032,7 +2032,7 @@ export default function HomePage() {
               </div>
               <button
                 onClick={handleInstall}
-                className="px-4 py-2 bg-[#E50914] text-white text-sm font-semibold tracking-wide rounded-lg hover:bg-[#f6121d] transition-all flex-shrink-0"
+                className="px-4 py-2 bg-[#ffffff] text-white text-sm font-semibold tracking-wide rounded-lg hover:bg-[#e0e0e0] transition-all flex-shrink-0"
               >
                 Install
               </button>
