@@ -567,14 +567,8 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="flex items-center gap-6 md:gap-12">
-        <div className="select-none cursor-pointer flex items-center gap-2.5" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img src="/mascot.png" alt="Spike" className="h-10 w-auto" style={{ filter: "drop-shadow(0 0 8px rgba(255,255,255,0.15))" }} />
-          <div className="leading-none">
-            <div className="flex items-baseline gap-0.5">
-              <span className="text-[22px] font-extralight tracking-[0.08em] text-white/90" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike</span>
-              <span className="text-[22px] font-semibold tracking-[0.08em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>AI</span>
-            </div>
-          </div>
+        <div className="select-none cursor-pointer flex items-center" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <span className="text-[20px] font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
         </div>
         <div className="hidden md:flex items-center gap-10">
           {[
@@ -787,10 +781,8 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
             style={{ animation: "slideInRight 0.3s cubic-bezier(0.22,1,0.36,1)" }}
           >
             <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
-              <div className="flex items-center gap-2">
-                <img src="/mascot.png" alt="Spike" className="h-7 w-auto" />
-                <span className="text-sm font-extralight tracking-wider text-white/90">spike</span>
-                <span className="text-sm font-semibold tracking-wider text-white" style={{ marginLeft: "-1px" }}>AI</span>
+              <div className="flex items-center">
+                <span className="text-[16px] font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
               </div>
               <button onClick={() => setShowMobileMenu(false)} className="text-white/30 hover:text-white transition-colors"><X size={20} /></button>
             </div>
@@ -1503,14 +1495,8 @@ function Footer() {
   return (
     <footer className="px-5 md:px-12 py-12 md:py-20 border-t border-white/[0.03]">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8 flex items-center gap-3">
-          <img src="/mascot.png" alt="Spike" className="h-10 w-auto" />
-          <div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-xl font-extralight tracking-wider text-white/90">spike</span>
-              <span className="text-xl font-semibold tracking-wider text-white">AI</span>
-            </div>
-          </div>
+        <div className="mb-8">
+          <span className="text-xl font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
         </div>
         <p className="text-sm font-light tracking-wide text-white/30 max-w-md leading-relaxed">
           The world&apos;s first streaming platform dedicated entirely to
@@ -1908,18 +1894,9 @@ export default function HomePage() {
           </div>
 
           <div className="splash-logo relative flex flex-col items-center">
-            <img
-              src="/mascot.png"
-              alt="Spike"
-              className="w-32 md:w-40 h-auto object-contain mb-10"
-              style={{ filter: "drop-shadow(0 0 40px rgba(255,255,255,0.1)) drop-shadow(0 20px 40px rgba(0,0,0,0.6))" }}
-            />
-            <div className="flex items-baseline gap-4 select-none">
-              <span className="splash-text-spike text-7xl sm:text-8xl md:text-[9rem] font-extralight tracking-[0.06em] text-white/90" style={{ fontStyle: "normal", fontFamily: "'Inter', -apple-system, sans-serif" }}>
-                spike
-              </span>
-              <span className="splash-text-ai text-7xl sm:text-8xl md:text-[9rem] font-semibold tracking-[0.06em] text-white" style={{ fontStyle: "normal", fontFamily: "'Inter', -apple-system, sans-serif" }}>
-                AI
+            <div className="select-none">
+              <span className="splash-text-spike text-7xl sm:text-8xl md:text-[9rem] font-semibold tracking-[0.15em] text-white" style={{ fontStyle: "normal", fontFamily: "'Inter', -apple-system, sans-serif" }}>
+                spike AI
               </span>
             </div>
           </div>
@@ -2026,7 +2003,7 @@ export default function HomePage() {
         <div className="fixed bottom-0 left-0 right-0 z-[150] p-4 md:p-0">
           <div className="max-w-lg mx-auto md:mb-6">
             <div className="bg-[#0c0c0e] border border-white/[0.06] rounded-2xl p-4 flex items-center gap-4 shadow-2xl shadow-black/60 backdrop-blur-xl">
-              <img src="/mascot.png" alt="Spike" className="h-12 w-auto flex-shrink-0" />
+              <span className="text-[14px] font-semibold tracking-[0.15em] text-white flex-shrink-0" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-semibold tracking-wide">Install Spike AI</p>
                 <p className="text-white/35 text-xs font-light tracking-wider">Add to your desktop for the full experience</p>
