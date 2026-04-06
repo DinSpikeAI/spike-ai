@@ -46,7 +46,7 @@ const STATUS_STYLES: Record<string, { bg: string; text: string; icon: any }> = {
 
 const CATEGORIES = ["Trending", "Sora Masterpieces", "AI Horror", "Sci-Fi Visions", "Award Winning", "AI Anime"];
 const GENRES = ["Sci-Fi", "Horror", "Drama", "Thriller", "Fantasy", "Action", "Cyberpunk", "Romance", "Art House", "Animation", "Comedy", "Mystery", "Musical", "Documentary"];
-const AI_MODELS = ["Sora", "Runway Gen-4", "Runway Gen-3", "Midjourney", "Stable Diffusion XL", "Stable Video", "Kling AI", "Pika Labs", "ElevenLabs", "Other"];
+const AI_MODELS = ["Runway Gen-4", "Runway Gen-3", "Midjourney", "Stable Diffusion XL", "Stable Video", "Kling AI", "Pika Labs", "ElevenLabs", "Other"];
 
 /* ═══════════════════════════════════════════════════════════════
    ADMIN DASHBOARD

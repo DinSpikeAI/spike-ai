@@ -61,7 +61,7 @@ const CATEGORIES = [
 ];
 
 const AI_MODELS = [
-  "Sora", "Runway Gen-4", "Runway Gen-3", "Midjourney",
+  "Runway Gen-4", "Runway Gen-3", "Midjourney",
   "Stable Diffusion XL", "Stable Video", "Kling AI",
   "Pika Labs", "ElevenLabs", "Other",
 ];

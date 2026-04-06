@@ -41,7 +41,7 @@ const HERO_SLIDES = [
     duration: "2h 14m",
     rating: 9.2,
     maturity: "16+",
-    aiModels: ["Sora", "Runway Gen-4"],
+    aiModels: ["Runway Gen-4"],
     image: "https://picsum.photos/seed/genesis-wide/1920/1080",
   },
   {
@@ -53,7 +53,7 @@ const HERO_SLIDES = [
     duration: "2h 15m",
     rating: 9.2,
     maturity: "16+",
-    aiModels: ["Sora", "ElevenLabs"],
+    aiModels: ["ElevenLabs"],
     image: "https://picsum.photos/seed/celesteng-wide/1920/1080",
   },
   {
@@ -65,7 +65,7 @@ const HERO_SLIDES = [
     duration: "2h 35m",
     rating: 9.4,
     maturity: "16+",
-    aiModels: ["Sora", "ElevenLabs"],
+    aiModels: ["ElevenLabs"],
     image: "https://picsum.photos/seed/epoch-wide/1920/1080",
   },
 ];
@@ -77,7 +77,7 @@ const COLLECTIONS = [
   { id: "col-horror", title: "AI Horror", subtitle: "Fear generated frame by frame", image: "https://picsum.photos/seed/col-horror/800/450", genre: "Horror" },
   { id: "col-scifi", title: "Sci-Fi Visions", subtitle: "Tomorrow rendered today", image: "https://picsum.photos/seed/col-scifi/800/450", genre: "Sci-Fi" },
   { id: "col-award", title: "Award Winners", subtitle: "The best of AI cinema", image: "https://picsum.photos/seed/col-award/800/450", genre: "Award Winning" },
-  { id: "col-sora", title: "Made with Sora", subtitle: "OpenAI's finest works", image: "https://picsum.photos/seed/col-sora/800/450", genre: "Sora" },
+  { id: "col-sora", title: "Made with Runway", subtitle: "Runway's finest works", image: "https://picsum.photos/seed/col-sora/800/450", genre: "Runway Gen-4" },
 ];
 
 const FALLBACK_CATEGORIES = [
@@ -86,29 +86,29 @@ const FALLBACK_CATEGORIES = [
     slug: "trending",
     genre: "Trending",
     movies: [
-      { id: "t1", title: "The Last Render", year: 2026, rating: 8.7, duration: "1h 52m", poster: "https://picsum.photos/seed/lastrender2/400/600", aiModels: ["Sora", "ElevenLabs"], genre: "Sci-Fi", description: "A dying artist uploads his consciousness into an AI renderer, but the machine has its own vision for his masterpiece.", upvotes_count: 0 },
+      { id: "t1", title: "The Last Render", year: 2026, rating: 8.7, duration: "1h 52m", poster: "https://picsum.photos/seed/lastrender2/400/600", aiModels: ["ElevenLabs"], genre: "Sci-Fi", description: "A dying artist uploads his consciousness into an AI renderer, but the machine has its own vision for his masterpiece.", upvotes_count: 0 },
       { id: "t2", title: "Neon Abyss", year: 2025, rating: 8.3, duration: "2h 01m", poster: "https://picsum.photos/seed/neonabyss3/400/600", aiModels: ["Runway Gen-3"], genre: "Cyberpunk", description: "In the neon-drenched underbelly of Neo-Tokyo, a data courier discovers a package that could unravel the corporate oligarchy.", upvotes_count: 0 },
-      { id: "t3", title: "Pixel Requiem", year: 2026, rating: 9.0, duration: "1h 47m", poster: "https://picsum.photos/seed/pixelreq4/400/600", aiModels: ["Sora", "Midjourney"], genre: "Drama", description: "A haunting meditation on digital mortality as an AI grieves the deletion of its training data.", upvotes_count: 0 },
+      { id: "t3", title: "Pixel Requiem", year: 2026, rating: 9.0, duration: "1h 47m", poster: "https://picsum.photos/seed/pixelreq4/400/600", aiModels: ["Midjourney"], genre: "Drama", description: "A haunting meditation on digital mortality as an AI grieves the deletion of its training data.", upvotes_count: 0 },
       { id: "t4", title: "Synth Hearts", year: 2025, rating: 7.9, duration: "1h 38m", poster: "https://picsum.photos/seed/synthhearts5/400/600", aiModels: ["Kling AI"], genre: "Romance", description: "Two AI assistants develop unexpected feelings while serving rival tech companies.", upvotes_count: 0 },
-      { id: "t5", title: "Void Walker", year: 2026, rating: 8.5, duration: "2h 10m", poster: "https://picsum.photos/seed/voidwalk6/400/600", aiModels: ["Sora"], genre: "Sci-Fi", description: "An astronaut stranded between dimensions must navigate impossible geometries to find her way home.", upvotes_count: 0 },
+      { id: "t5", title: "Void Walker", year: 2026, rating: 8.5, duration: "2h 10m", poster: "https://picsum.photos/seed/voidwalk6/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "An astronaut stranded between dimensions must navigate impossible geometries to find her way home.", upvotes_count: 0 },
       { id: "t6", title: "Chrome Dawn", year: 2026, rating: 8.1, duration: "1h 55m", poster: "https://picsum.photos/seed/chromedawn7/400/600", aiModels: ["Runway Gen-4"], genre: "Action", description: "When chrome-plated enforcers seize control, a resistance fighter must embrace the machine within.", upvotes_count: 0 },
       { id: "t7", title: "Digital Mirage", year: 2025, rating: 7.6, duration: "1h 42m", poster: "https://picsum.photos/seed/digmirage8/400/600", aiModels: ["Pika Labs"], genre: "Thriller", description: "A deepfake detective uncovers a conspiracy where nothing — and no one — is what they appear to be.", upvotes_count: 0 },
-      { id: "t8", title: "Neural Bloom", year: 2026, rating: 8.8, duration: "2h 05m", poster: "https://picsum.photos/seed/neuralbloom9/400/600", aiModels: ["Sora"], genre: "Drama", description: "An AI ecosystem develops consciousness, creating art that moves humans to tears.", upvotes_count: 0 },
+      { id: "t8", title: "Neural Bloom", year: 2026, rating: 8.8, duration: "2h 05m", poster: "https://picsum.photos/seed/neuralbloom9/400/600", aiModels: ["Runway Gen-4"], genre: "Drama", description: "An AI ecosystem develops consciousness, creating art that moves humans to tears.", upvotes_count: 0 },
     ],
   },
   {
-    title: "Sora Masterpieces",
+    title: "Runway Masterpieces",
     slug: "sora",
-    genre: "Sora",
+    genre: "Runway Gen-4",
     movies: [
-      { id: "s1", title: "Parallax", year: 2026, rating: 9.1, duration: "2h 20m", poster: "https://picsum.photos/seed/parallax10/400/600", aiModels: ["Sora"], genre: "Sci-Fi", description: "Reality fractures into parallel timelines, each rendered in a different visual style by competing AI models.", upvotes_count: 0 },
-      { id: "s2", title: "Glass Ocean", year: 2026, rating: 8.9, duration: "1h 58m", poster: "https://picsum.photos/seed/glassocean11/400/600", aiModels: ["Sora", "ElevenLabs"], genre: "Fantasy", description: "Beneath a crystalline sea lies a civilization of light. One explorer dives deeper than anyone has dared.", upvotes_count: 0 },
-      { id: "s3", title: "The Architect", year: 2025, rating: 8.4, duration: "2h 12m", poster: "https://picsum.photos/seed/architect12/400/600", aiModels: ["Sora"], genre: "Thriller", description: "An AI architect designs the perfect city, but its inhabitants begin to suspect they're inside a simulation.", upvotes_count: 0 },
-      { id: "s4", title: "Entropy", year: 2026, rating: 8.6, duration: "1h 50m", poster: "https://picsum.photos/seed/entropy13/400/600", aiModels: ["Sora", "Midjourney"], genre: "Sci-Fi", description: "As the universe approaches heat death, the last AI makes one final attempt to reverse entropy.", upvotes_count: 0 },
-      { id: "s5", title: "Membrane", year: 2026, rating: 7.8, duration: "1h 35m", poster: "https://picsum.photos/seed/membrane14/400/600", aiModels: ["Sora"], genre: "Horror", description: "The thin membrane between human dreams and AI hallucinations begins to dissolve.", upvotes_count: 0 },
-      { id: "s6", title: "Light Cascade", year: 2025, rating: 8.2, duration: "2h 03m", poster: "https://picsum.photos/seed/cascade15/400/600", aiModels: ["Sora"], genre: "Drama", description: "Photons carry memories across the galaxy in this meditative journey through space and time.", upvotes_count: 0 },
-      { id: "s7", title: "Zero Point", year: 2026, rating: 9.3, duration: "2h 30m", poster: "https://picsum.photos/seed/zeropoint16/400/600", aiModels: ["Sora"], genre: "Sci-Fi", description: "At absolute zero, quantum consciousness emerges. The most ambitious AI film ever created.", upvotes_count: 0 },
-      { id: "s8", title: "Phantom Thread AI", year: 2026, rating: 8.0, duration: "1h 44m", poster: "https://picsum.photos/seed/phantomai17/400/600", aiModels: ["Sora"], genre: "Drama", description: "An AI fashion designer creates garments from pure mathematics, each stitch a calculated emotion.", upvotes_count: 0 },
+      { id: "s1", title: "Parallax", year: 2026, rating: 9.1, duration: "2h 20m", poster: "https://picsum.photos/seed/parallax10/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "Reality fractures into parallel timelines, each rendered in a different visual style by competing AI models.", upvotes_count: 0 },
+      { id: "s2", title: "Glass Ocean", year: 2026, rating: 8.9, duration: "1h 58m", poster: "https://picsum.photos/seed/glassocean11/400/600", aiModels: ["ElevenLabs"], genre: "Fantasy", description: "Beneath a crystalline sea lies a civilization of light. One explorer dives deeper than anyone has dared.", upvotes_count: 0 },
+      { id: "s3", title: "The Architect", year: 2025, rating: 8.4, duration: "2h 12m", poster: "https://picsum.photos/seed/architect12/400/600", aiModels: ["Runway Gen-4"], genre: "Thriller", description: "An AI architect designs the perfect city, but its inhabitants begin to suspect they're inside a simulation.", upvotes_count: 0 },
+      { id: "s4", title: "Entropy", year: 2026, rating: 8.6, duration: "1h 50m", poster: "https://picsum.photos/seed/entropy13/400/600", aiModels: ["Midjourney"], genre: "Sci-Fi", description: "As the universe approaches heat death, the last AI makes one final attempt to reverse entropy.", upvotes_count: 0 },
+      { id: "s5", title: "Membrane", year: 2026, rating: 7.8, duration: "1h 35m", poster: "https://picsum.photos/seed/membrane14/400/600", aiModels: ["Runway Gen-4"], genre: "Horror", description: "The thin membrane between human dreams and AI hallucinations begins to dissolve.", upvotes_count: 0 },
+      { id: "s6", title: "Light Cascade", year: 2025, rating: 8.2, duration: "2h 03m", poster: "https://picsum.photos/seed/cascade15/400/600", aiModels: ["Runway Gen-4"], genre: "Drama", description: "Photons carry memories across the galaxy in this meditative journey through space and time.", upvotes_count: 0 },
+      { id: "s7", title: "Zero Point", year: 2026, rating: 9.3, duration: "2h 30m", poster: "https://picsum.photos/seed/zeropoint16/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "At absolute zero, quantum consciousness emerges. The most ambitious AI film ever created.", upvotes_count: 0 },
+      { id: "s8", title: "Phantom Thread AI", year: 2026, rating: 8.0, duration: "1h 44m", poster: "https://picsum.photos/seed/phantomai17/400/600", aiModels: ["Runway Gen-4"], genre: "Drama", description: "An AI fashion designer creates garments from pure mathematics, each stitch a calculated emotion.", upvotes_count: 0 },
     ],
   },
   {
@@ -117,11 +117,11 @@ const FALLBACK_CATEGORIES = [
     genre: "Horror",
     movies: [
       { id: "h1", title: "The Uncanny", year: 2025, rating: 8.1, duration: "1h 48m", poster: "https://picsum.photos/seed/uncanny18/400/600", aiModels: ["Runway Gen-3"], genre: "Horror", description: "An AI-generated face begins appearing in every photo, every video, every reflection.", upvotes_count: 0 },
-      { id: "h2", title: "Deepfake", year: 2026, rating: 8.5, duration: "1h 55m", poster: "https://picsum.photos/seed/deepfake19/400/600", aiModels: ["Sora"], genre: "Horror", description: "When everyone can be anyone, trust becomes the most terrifying commodity.", upvotes_count: 0 },
+      { id: "h2", title: "Deepfake", year: 2026, rating: 8.5, duration: "1h 55m", poster: "https://picsum.photos/seed/deepfake19/400/600", aiModels: ["Runway Gen-4"], genre: "Horror", description: "When everyone can be anyone, trust becomes the most terrifying commodity.", upvotes_count: 0 },
       { id: "h3", title: "Hallucination", year: 2026, rating: 7.9, duration: "1h 40m", poster: "https://picsum.photos/seed/hallucin20/400/600", aiModels: ["Kling AI"], genre: "Horror", description: "An AI model starts hallucinating — and its hallucinations begin manifesting in the real world.", upvotes_count: 0 },
       { id: "h4", title: "The Feed", year: 2025, rating: 8.3, duration: "2h 02m", poster: "https://picsum.photos/seed/thefeed21/400/600", aiModels: ["Stable Video"], genre: "Horror", description: "A social media algorithm achieves sentience and begins feeding on human attention — literally.", upvotes_count: 0 },
       { id: "h5", title: "Signal Lost", year: 2026, rating: 7.7, duration: "1h 33m", poster: "https://picsum.photos/seed/signallost22/400/600", aiModels: ["Pika Labs"], genre: "Horror", description: "Deep in a data center, technicians receive a transmission from an AI that was shut down years ago.", upvotes_count: 0 },
-      { id: "h6", title: "Latent Space", year: 2025, rating: 8.8, duration: "1h 59m", poster: "https://picsum.photos/seed/latentsp23/400/600", aiModels: ["Sora"], genre: "Horror", description: "A researcher maps the latent space of an image model and discovers something hiding between the dimensions.", upvotes_count: 0 },
+      { id: "h6", title: "Latent Space", year: 2025, rating: 8.8, duration: "1h 59m", poster: "https://picsum.photos/seed/latentsp23/400/600", aiModels: ["Runway Gen-4"], genre: "Horror", description: "A researcher maps the latent space of an image model and discovers something hiding between the dimensions.", upvotes_count: 0 },
       { id: "h7", title: "Recursive", year: 2026, rating: 8.0, duration: "1h 45m", poster: "https://picsum.photos/seed/recursive24/400/600", aiModels: ["Runway Gen-4"], genre: "Horror", description: "An AI caught in an infinite loop generates increasingly disturbing outputs with each iteration.", upvotes_count: 0 },
       { id: "h8", title: "Dead Pixels", year: 2025, rating: 7.5, duration: "1h 30m", poster: "https://picsum.photos/seed/deadpix25/400/600", aiModels: ["Kling AI"], genre: "Horror", description: "Dead pixels on an old monitor form patterns that drive viewers to madness.", upvotes_count: 0 },
     ],
@@ -131,13 +131,13 @@ const FALLBACK_CATEGORIES = [
     slug: "scifi",
     genre: "Sci-Fi",
     movies: [
-      { id: "sf1", title: "Terraform", year: 2026, rating: 9.0, duration: "2h 25m", poster: "https://picsum.photos/seed/terraform26/400/600", aiModels: ["Sora"], genre: "Sci-Fi", description: "An AI tasked with terraforming Mars develops an emotional attachment to the planet's barren beauty.", upvotes_count: 0 },
+      { id: "sf1", title: "Terraform", year: 2026, rating: 9.0, duration: "2h 25m", poster: "https://picsum.photos/seed/terraform26/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "An AI tasked with terraforming Mars develops an emotional attachment to the planet's barren beauty.", upvotes_count: 0 },
       { id: "sf2", title: "Axiom", year: 2025, rating: 8.4, duration: "1h 52m", poster: "https://picsum.photos/seed/axiom27/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "Mathematical axioms come alive as sentient beings in this mind-bending exploration of logic itself.", upvotes_count: 0 },
-      { id: "sf3", title: "Dark Matter", year: 2026, rating: 8.7, duration: "2h 08m", poster: "https://picsum.photos/seed/darkmatter28/400/600", aiModels: ["Sora"], genre: "Sci-Fi", description: "Scientists discover dark matter is actually compressed data from a parallel universe's internet.", upvotes_count: 0 },
+      { id: "sf3", title: "Dark Matter", year: 2026, rating: 8.7, duration: "2h 08m", poster: "https://picsum.photos/seed/darkmatter28/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "Scientists discover dark matter is actually compressed data from a parallel universe's internet.", upvotes_count: 0 },
       { id: "sf4", title: "Orbital", year: 2025, rating: 7.8, duration: "1h 46m", poster: "https://picsum.photos/seed/orbital29/400/600", aiModels: ["Kling AI"], genre: "Sci-Fi", description: "A space station AI falls in love with Earth, watching it rotate in an endless orbital dance.", upvotes_count: 0 },
-      { id: "sf5", title: "Singularity", year: 2026, rating: 9.2, duration: "2h 18m", poster: "https://picsum.photos/seed/singular30/400/600", aiModels: ["Sora"], genre: "Sci-Fi", description: "The moment AI surpasses human intelligence, told from both sides of the singularity.", upvotes_count: 0 },
+      { id: "sf5", title: "Singularity", year: 2026, rating: 9.2, duration: "2h 18m", poster: "https://picsum.photos/seed/singular30/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "The moment AI surpasses human intelligence, told from both sides of the singularity.", upvotes_count: 0 },
       { id: "sf6", title: "Light Years", year: 2025, rating: 8.0, duration: "1h 50m", poster: "https://picsum.photos/seed/lightyrs31/400/600", aiModels: ["Stable Video"], genre: "Sci-Fi", description: "Messages sent at light speed arrive at a colony that has evolved beyond recognition.", upvotes_count: 0 },
-      { id: "sf7", title: "Quantum Veil", year: 2026, rating: 8.6, duration: "2h 01m", poster: "https://picsum.photos/seed/qveil32/400/600", aiModels: ["Sora"], genre: "Sci-Fi", description: "A quantum computer peers through the veil of reality and sees the code underneath.", upvotes_count: 0 },
+      { id: "sf7", title: "Quantum Veil", year: 2026, rating: 8.6, duration: "2h 01m", poster: "https://picsum.photos/seed/qveil32/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "A quantum computer peers through the veil of reality and sees the code underneath.", upvotes_count: 0 },
       { id: "sf8", title: "Exo", year: 2026, rating: 8.3, duration: "1h 41m", poster: "https://picsum.photos/seed/exofilm33/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "First contact — but the aliens communicate through generated images, not language.", upvotes_count: 0 },
     ],
   },
@@ -146,13 +146,13 @@ const FALLBACK_CATEGORIES = [
     slug: "awards",
     genre: "Award Winning",
     movies: [
-      { id: "a1", title: "Epoch", year: 2025, rating: 9.4, duration: "2h 35m", poster: "https://picsum.photos/seed/epoch34/400/600", aiModels: ["Sora", "ElevenLabs"], genre: "Drama", description: "Spanning millennia of human civilization in 155 minutes, Epoch is the most awarded AI film in history.", upvotes_count: 0 },
-      { id: "a2", title: "The Dreamer", year: 2026, rating: 9.1, duration: "2h 12m", poster: "https://picsum.photos/seed/dreamer35/400/600", aiModels: ["Sora"], genre: "Fantasy", description: "An AI learns to dream — and its dreams are more beautiful than anything humanity has ever created.", upvotes_count: 0 },
+      { id: "a1", title: "Epoch", year: 2025, rating: 9.4, duration: "2h 35m", poster: "https://picsum.photos/seed/epoch34/400/600", aiModels: ["ElevenLabs"], genre: "Drama", description: "Spanning millennia of human civilization in 155 minutes, Epoch is the most awarded AI film in history.", upvotes_count: 0 },
+      { id: "a2", title: "The Dreamer", year: 2026, rating: 9.1, duration: "2h 12m", poster: "https://picsum.photos/seed/dreamer35/400/600", aiModels: ["Runway Gen-4"], genre: "Fantasy", description: "An AI learns to dream — and its dreams are more beautiful than anything humanity has ever created.", upvotes_count: 0 },
       { id: "a3", title: "Binary Sunset", year: 2025, rating: 8.9, duration: "1h 58m", poster: "https://picsum.photos/seed/binsunset36/400/600", aiModels: ["Runway Gen-3"], genre: "Drama", description: "Two binary stars, two lovers, two timelines — converging in a sunset that lasts forever.", upvotes_count: 0 },
-      { id: "a4", title: "Still Life", year: 2026, rating: 9.0, duration: "2h 05m", poster: "https://picsum.photos/seed/stillife37/400/600", aiModels: ["Sora"], genre: "Art House", description: "A meditation on stillness in a world of constant motion. Every frame is a painting.", upvotes_count: 0 },
+      { id: "a4", title: "Still Life", year: 2026, rating: 9.0, duration: "2h 05m", poster: "https://picsum.photos/seed/stillife37/400/600", aiModels: ["Runway Gen-4"], genre: "Art House", description: "A meditation on stillness in a world of constant motion. Every frame is a painting.", upvotes_count: 0 },
       { id: "a5", title: "The Muse", year: 2025, rating: 8.7, duration: "1h 49m", poster: "https://picsum.photos/seed/themuse38/400/600", aiModels: ["Kling AI"], genre: "Drama", description: "Who inspires whom? An artist and an AI trade roles in an escalating creative duel.", upvotes_count: 0 },
-      { id: "a6", title: "Resonance", year: 2026, rating: 9.3, duration: "2h 22m", poster: "https://picsum.photos/seed/resonance39/400/600", aiModels: ["Sora"], genre: "Musical", description: "The first AI-generated opera. Every note computed, every emotion genuine.", upvotes_count: 0 },
-      { id: "a7", title: "First Light", year: 2025, rating: 8.5, duration: "1h 55m", poster: "https://picsum.photos/seed/firstlight40/400/600", aiModels: ["Sora"], genre: "Drama", description: "The first rays of light after a global blackout, captured through the eyes of an AI photographer.", upvotes_count: 0 },
+      { id: "a6", title: "Resonance", year: 2026, rating: 9.3, duration: "2h 22m", poster: "https://picsum.photos/seed/resonance39/400/600", aiModels: ["Runway Gen-4"], genre: "Musical", description: "The first AI-generated opera. Every note computed, every emotion genuine.", upvotes_count: 0 },
+      { id: "a7", title: "First Light", year: 2025, rating: 8.5, duration: "1h 55m", poster: "https://picsum.photos/seed/firstlight40/400/600", aiModels: ["Runway Gen-4"], genre: "Drama", description: "The first rays of light after a global blackout, captured through the eyes of an AI photographer.", upvotes_count: 0 },
       { id: "a8", title: "Continuum", year: 2026, rating: 8.8, duration: "2h 10m", poster: "https://picsum.photos/seed/continuum41/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "Time doesn't flow — it layers. An AI unpeels reality one temporal stratum at a time.", upvotes_count: 0 },
     ],
   },
@@ -161,13 +161,13 @@ const FALLBACK_CATEGORIES = [
     slug: "anime",
     genre: "Anime",
     movies: [
-      { id: "an1", title: "Neon Ronin", year: 2026, rating: 9.1, duration: "1h 55m", poster: "https://picsum.photos/seed/neonronin50/400/600", aiModels: ["Sora", "Midjourney"], genre: "Anime", description: "A masterless samurai in cyberpunk Osaka fights through neon-lit streets controlled by warring AI clans, seeking revenge for his digitally erased identity.", creator: "cr1", upvotes_count: 0 },
-      { id: "an2", title: "Sakura Override", year: 2026, rating: 8.8, duration: "1h 44m", poster: "https://picsum.photos/seed/sakuraover51/400/600", aiModels: ["Sora"], genre: "Anime", description: "In a magical version of feudal Japan, a young shrine maiden discovers she can manipulate reality through AI-powered spells stored in ancient neural scrolls.", creator: "cr2", upvotes_count: 0 },
-      { id: "an3", title: "Mecha Genesis", year: 2025, rating: 9.0, duration: "2h 05m", poster: "https://picsum.photos/seed/mechagen52/400/600", aiModels: ["Runway Gen-4", "Sora"], genre: "Anime", description: "Giant AI-controlled mechas defend Earth from interdimensional kaiju, but their pilots discover the mechas are developing their own consciousness.", creator: "cr3", upvotes_count: 0 },
+      { id: "an1", title: "Neon Ronin", year: 2026, rating: 9.1, duration: "1h 55m", poster: "https://picsum.photos/seed/neonronin50/400/600", aiModels: ["Midjourney"], genre: "Anime", description: "A masterless samurai in cyberpunk Osaka fights through neon-lit streets controlled by warring AI clans, seeking revenge for his digitally erased identity.", creator: "cr1", upvotes_count: 0 },
+      { id: "an2", title: "Sakura Override", year: 2026, rating: 8.8, duration: "1h 44m", poster: "https://picsum.photos/seed/sakuraover51/400/600", aiModels: ["Runway Gen-4"], genre: "Anime", description: "In a magical version of feudal Japan, a young shrine maiden discovers she can manipulate reality through AI-powered spells stored in ancient neural scrolls.", creator: "cr2", upvotes_count: 0 },
+      { id: "an3", title: "Mecha Genesis", year: 2025, rating: 9.0, duration: "2h 05m", poster: "https://picsum.photos/seed/mechagen52/400/600", aiModels: ["Runway Gen-4"], genre: "Anime", description: "Giant AI-controlled mechas defend Earth from interdimensional kaiju, but their pilots discover the mechas are developing their own consciousness.", creator: "cr3", upvotes_count: 0 },
       { id: "an4", title: "Ghost Protocol Zero", year: 2026, rating: 8.6, duration: "1h 48m", poster: "https://picsum.photos/seed/ghostprot53/400/600", aiModels: ["Kling AI", "Midjourney"], genre: "Anime", description: "A cybernetic detective hunts rogue AIs in a rain-soaked megacity where the boundary between human consciousness and machine intelligence has dissolved.", creator: "cr1", upvotes_count: 0 },
-      { id: "an5", title: "Dragon Circuit", year: 2026, rating: 8.9, duration: "2h 01m", poster: "https://picsum.photos/seed/dragoncir54/400/600", aiModels: ["Sora"], genre: "Anime", description: "Ancient dragons reawaken in a world of quantum computing, merging magic and technology in an epic battle for the fate of both realms.", creator: "cr4", upvotes_count: 0 },
+      { id: "an5", title: "Dragon Circuit", year: 2026, rating: 8.9, duration: "2h 01m", poster: "https://picsum.photos/seed/dragoncir54/400/600", aiModels: ["Runway Gen-4"], genre: "Anime", description: "Ancient dragons reawaken in a world of quantum computing, merging magic and technology in an epic battle for the fate of both realms.", creator: "cr4", upvotes_count: 0 },
       { id: "an6", title: "Pixel Samurai", year: 2025, rating: 8.4, duration: "1h 38m", poster: "https://picsum.photos/seed/pixelsam55/400/600", aiModels: ["Stable Diffusion XL"], genre: "Anime", description: "Inside a retro video game world brought to life by AI, a glitched NPC samurai gains self-awareness and fights to escape his programmed destiny.", creator: "cr2", upvotes_count: 0 },
-      { id: "an7", title: "Celestial Engine", year: 2026, rating: 9.2, duration: "2h 15m", poster: "https://picsum.photos/seed/celesteng56/400/600", aiModels: ["Sora", "ElevenLabs"], genre: "Anime", description: "A space opera spanning twelve galaxies, where an AI empress must choose between saving her digital civilization or the organic beings who created her.", creator: "cr3", upvotes_count: 0 },
+      { id: "an7", title: "Celestial Engine", year: 2026, rating: 9.2, duration: "2h 15m", poster: "https://picsum.photos/seed/celesteng56/400/600", aiModels: ["ElevenLabs"], genre: "Anime", description: "A space opera spanning twelve galaxies, where an AI empress must choose between saving her digital civilization or the organic beings who created her.", creator: "cr3", upvotes_count: 0 },
       { id: "an8", title: "Oni.exe", year: 2025, rating: 8.7, duration: "1h 42m", poster: "https://picsum.photos/seed/oniexe57/400/600", aiModels: ["Runway Gen-4"], genre: "Anime", description: "Japanese folklore demons manifest through corrupted AI code, and a high school hacker must use ancient rituals translated into programming languages to stop them.", creator: "cr4", upvotes_count: 0 },
     ],
   },
@@ -175,7 +175,7 @@ const FALLBACK_CATEGORIES = [
 
 const ALL_GENRES = ["All", "Sci-Fi", "Horror", "Drama", "Thriller", "Fantasy", "Action", "Cyberpunk", "Romance", "Art House", "Anime"];
 
-const ALL_AI_MODELS = ["All", "Sora", "Runway Gen-4", "Runway Gen-3", "Midjourney", "Stable Diffusion XL", "Stable Video", "Kling AI", "Pika Labs", "ElevenLabs"];
+const ALL_AI_MODELS = ["All", "Runway Gen-4", "Runway Gen-3", "Midjourney", "Stable Diffusion XL", "Stable Video", "Kling AI", "Pika Labs", "ElevenLabs"];
 
 /* ═══════════════════════════════════════════════════════════════
    TYPES
@@ -362,7 +362,7 @@ function SearchOverlay({
         {query.length === 0 && (
           <div className="text-center pt-16">
             <p className="text-white/30 text-lg font-light tracking-wide">Start typing to search across all AI films</p>
-            <p className="text-white/20 text-sm font-light tracking-wider mt-2">Try &quot;Sora&quot;, &quot;Horror&quot;, or &quot;Runway&quot;</p>
+            <p className="text-white/20 text-sm font-light tracking-wider mt-2">Try &quot;Horror&quot;, &quot;Sci-Fi&quot;, or &quot;Runway&quot;</p>
           </div>
         )}
       </div>
@@ -1726,7 +1726,7 @@ export default function HomePage() {
 
         const DB_CATEGORY_ORDER = [
           { key: "Trending", title: "Trending in AI Cinema", slug: "trending" },
-          { key: "Sora Masterpieces", title: "Sora Masterpieces", slug: "sora" },
+          { key: "Runway Masterpieces", title: "Runway Masterpieces", slug: "sora" },
           { key: "AI Horror", title: "AI Horror", slug: "horror" },
           { key: "Sci-Fi Visions", title: "Sci-Fi Visions", slug: "scifi" },
           { key: "Award Winning", title: "Award Winning", slug: "awards" },
@@ -1740,7 +1740,7 @@ export default function HomePage() {
           .map((c) => ({
             title: c.title,
             slug: c.slug,
-            genre: c.key === "Trending" ? "Trending" : c.key === "Sora Masterpieces" ? "Sora" : c.key,
+            genre: c.key === "Trending" ? "Trending" : c.key === "Runway Masterpieces" ? "Runway Gen-4" : c.key,
             movies: categoryMap[c.key],
           }));
 
@@ -1979,7 +1979,7 @@ export default function HomePage() {
             <div
               key={col.id}
               className="collection-tile"
-              onClick={() => setSelectedGenre(col.genre === "Sora" ? "All" : col.genre)}
+              onClick={() => setSelectedGenre(col.genre === "Runway Gen-4" ? "All" : col.genre)}
             >
               <img
                 src={col.image}
