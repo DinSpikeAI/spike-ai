@@ -1205,6 +1205,15 @@ function MovieCard({
         <Play size={18} fill="white" className="text-white ml-0.5" />
       </div>
 
+      {/* Genre Badge */}
+      {movie.genre && (
+        <div className="absolute z-20 pointer-events-none" style={{ bottom: 8, left: 8 }}>
+          <span className="px-2 py-0.5 rounded text-[9px] font-semibold tracking-wider uppercase bg-black/60 backdrop-blur-sm border border-white/10 text-white/70">
+            {movie.genre}
+          </span>
+        </div>
+      )}
+
       {/* Admin Controls */}
       {isAdmin && (
         <div className="absolute top-2 right-2 z-30 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -1839,24 +1848,24 @@ export default function HomePage() {
     setInstallPrompt(null);
   };
 
-  // ─── Filtering (Genre + AI Model) ───
-  const filteredCategories = liveCategories
-    .map((cat) => ({
-      ...cat,
-      movies: cat.movies.filter((m) => {
-        const genreMatch =
-          selectedGenre === "All" ||
-          m.genre?.toLowerCase() === selectedGenre.toLowerCase() ||
-          cat.genre.toLowerCase() === selectedGenre.toLowerCase();
+  // ─── Filtering (Genre + AI Model) — flat list, no category rows ───
+  const allMovies = liveCategories.flatMap((cat) => cat.movies);
+  // Deduplicate by id
+  const uniqueMoviesMap = new Map<string, Movie>();
+  allMovies.forEach((m) => { if (!uniqueMoviesMap.has(m.id)) uniqueMoviesMap.set(m.id, m); });
+  const uniqueMovies = Array.from(uniqueMoviesMap.values());
 
-        const modelMatch =
-          selectedModel === "All" ||
-          m.aiModels.some((ai) => ai.toLowerCase() === selectedModel.toLowerCase());
+  const filteredMovies = uniqueMovies.filter((m) => {
+    const genreMatch =
+      selectedGenre === "All" ||
+      m.genre?.toLowerCase() === selectedGenre.toLowerCase();
 
-        return genreMatch && modelMatch;
-      }),
-    }))
-    .filter((cat) => cat.movies.length > 0);
+    const modelMatch =
+      selectedModel === "All" ||
+      m.aiModels.some((ai) => ai.toLowerCase() === selectedModel.toLowerCase());
+
+    return genreMatch && modelMatch;
+  });
 
   const activeFilterLabel =
     selectedGenre !== "All" && selectedModel !== "All"
@@ -1920,41 +1929,46 @@ export default function HomePage() {
         <GenreFilter selected={selectedGenre} onChange={setSelectedGenre} />
         <AiModelFilter selected={selectedModel} onChange={setSelectedModel} />
 
-        <div className="mt-8 md:mt-14 space-y-20 md:space-y-28">
+        <div className="mt-8 md:mt-14 px-4 md:px-12">
           {/* Shimmer loading while fetching from DB */}
-          {!dbReady && liveCategories.length === 0 && (
-            <>
-              {[1, 2, 3].map((row) => (
-                <div key={row} className="px-4 md:px-12">
-                  <div className="h-6 w-48 bg-white/[0.04] rounded-md mb-5 shimmer-card" />
-                  <div className="flex gap-6 overflow-hidden">
-                    {[1, 2, 3, 4, 5, 6].map((card) => (
-                      <div key={card} className="flex-shrink-0 w-[195px]">
-                        <div className="aspect-[2/3] rounded-lg bg-white/[0.03] shimmer-card" />
-                        <div className="h-3 w-3/4 bg-white/[0.03] rounded mt-3 shimmer-card" />
-                        <div className="h-2 w-1/2 bg-white/[0.02] rounded mt-2 shimmer-card" />
-                      </div>
-                    ))}
-                  </div>
+          {!dbReady && uniqueMovies.length === 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((card) => (
+                <div key={card}>
+                  <div className="aspect-[2/3] rounded-lg bg-white/[0.03] shimmer-card" />
+                  <div className="h-3 w-3/4 bg-white/[0.03] rounded mt-3 shimmer-card" />
+                  <div className="h-2 w-1/2 bg-white/[0.02] rounded mt-2 shimmer-card" />
                 </div>
               ))}
-            </>
+            </div>
           )}
-          {filteredCategories.map((category, index) => (
-            <CategoryRow
-              key={category.slug}
-              category={category}
-              index={index}
-              isAdmin={isAdmin}
-              onDeleteMovie={handleDeleteMovie}
-              userVotedIds={userVotedIds}
-              watchlistIds={watchlistIds}
-              onWatchlistToggle={handleWatchlistToggle}
-            />
-          ))}
+
+          {/* Section Title */}
+          {dbReady && filteredMovies.length > 0 && (
+            <h2 className="text-lg md:text-xl font-semibold mb-6 text-white/70 tracking-wide">
+              {activeFilterLabel ? `${activeFilterLabel}` : "All Films"}
+              <span className="text-sm font-light text-white/30 ml-3">{filteredMovies.length} film{filteredMovies.length !== 1 ? "s" : ""}</span>
+            </h2>
+          )}
+
+          {/* Single Grid of All Movies */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+            {filteredMovies.map((movie, index) => (
+              <MovieCard
+                key={movie.id}
+                movie={movie}
+                rank={index < 10 && selectedGenre === "All" && selectedModel === "All" ? index + 1 : undefined}
+                isAdmin={isAdmin}
+                onDelete={handleDeleteMovie}
+                userVoted={userVotedIds.has(movie.id)}
+                inWatchlist={watchlistIds.has(movie.id)}
+                onWatchlistToggle={handleWatchlistToggle}
+              />
+            ))}
+          </div>
         </div>
 
-        {dbReady && filteredCategories.length === 0 && (
+        {dbReady && filteredMovies.length === 0 && (
           <div className="text-center py-24">
             <p className="text-white/30 text-lg font-light tracking-wide">
               No films found{activeFilterLabel ? ` for "${activeFilterLabel}"` : ""}
