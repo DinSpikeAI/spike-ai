@@ -198,6 +198,11 @@ body {
   will-change: transform;
   border: 1px solid transparent;
 }
+
+/* In grid layout, cards fill their column */
+.grid .movie-card {
+  width: 100%;
+}
 .movie-card:hover {
   transform: scale(1.05) translateY(-4px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6),
