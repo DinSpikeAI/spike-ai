@@ -1998,27 +1998,45 @@ export default function HomePage() {
 
       <Footer />
 
-      {/* PWA Install Banner */}
+      {/* PWA Install Modal */}
       {showInstallBanner && (
-        <div className="fixed bottom-0 left-0 right-0 z-[150] p-4 md:p-0">
-          <div className="max-w-lg mx-auto md:mb-6">
-            <div className="bg-[#0c0c0e] border border-white/[0.06] rounded-2xl p-4 flex items-center gap-4 shadow-2xl shadow-black/60 backdrop-blur-xl">
-              <span className="text-[14px] font-semibold tracking-[0.15em] text-white flex-shrink-0" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-semibold tracking-wide">Install Spike AI</p>
-                <p className="text-white/35 text-xs font-light tracking-wider">Add to your desktop for the full experience</p>
+        <div className="fixed inset-0 z-[500] flex items-center justify-center" onClick={() => setShowInstallBanner(false)}>
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" />
+          <div
+            className="relative z-10 w-full max-w-sm bg-[#0c0c0e] border border-white/[0.08] rounded-2xl shadow-2xl mx-4 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+            style={{ animation: "fadeInUp 0.4s cubic-bezier(0.22,1,0.36,1)" }}
+          >
+            {/* Icon */}
+            <div className="pt-10 pb-6 flex flex-col items-center">
+              <div className="w-20 h-20 rounded-[18px] bg-[#0a0a0c] border border-white/10 flex items-center justify-center mb-6">
+                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                  <rect x="6" y="22" width="4" height="10" rx="1.5" fill="white" opacity="0.3"/>
+                  <rect x="12" y="16" width="4" height="16" rx="1.5" fill="white" opacity="0.55"/>
+                  <rect x="18" y="6" width="5" height="26" rx="2" fill="white"/>
+                  <rect x="25" y="14" width="4" height="18" rx="1.5" fill="white" opacity="0.55"/>
+                  <rect x="31" y="20" width="4" height="12" rx="1.5" fill="white" opacity="0.3"/>
+                </svg>
               </div>
+              <h3 className="text-xl font-semibold tracking-wide text-white mb-2">Install spike AI</h3>
+              <p className="text-sm text-white/40 font-light tracking-wide text-center px-8 leading-relaxed">
+                Add spike AI to your desktop for instant access and the full cinema experience
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="px-6 pb-6 space-y-3">
               <button
                 onClick={handleInstall}
-                className="px-4 py-2 bg-white text-black text-sm font-semibold tracking-wide rounded-lg hover:bg-white/80 transition-all flex-shrink-0"
+                className="w-full py-3.5 bg-white text-black text-sm font-semibold tracking-wide rounded-xl hover:bg-white/90 transition-all"
               >
-                Install
+                Install App
               </button>
               <button
                 onClick={() => setShowInstallBanner(false)}
-                className="text-white/30 hover:text-white transition-colors flex-shrink-0"
+                className="w-full py-3 text-white/40 text-sm font-medium tracking-wide hover:text-white/60 transition-colors"
               >
-                <X size={18} />
+                Not now
               </button>
             </div>
           </div>
