@@ -4,13 +4,12 @@
 // Skips: partial responses (206), video streams, YouTube, Vimeo
 // ═══════════════════════════════════════════════════════════════
 
-const CACHE_NAME = "spike-ai-v3";
+const CACHE_NAME = "spike-ai-v4";
 
 // Only cache static assets + pages
 const PRECACHE_URLS = [
   "/",
   "/manifest.json",
-  "/mascot.png",
 ];
 
 // Domains to NEVER cache (video streams, analytics, etc.)
