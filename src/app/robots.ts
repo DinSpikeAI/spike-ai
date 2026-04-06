@@ -7,6 +7,6 @@ export default function robots() {
         disallow: ["/admin/", "/api/"],
       },
     ],
-    sitemap: "https://spikeai.com/sitemap.xml",
+    sitemap: "https://www.spikeai.studio/sitemap.xml",
   };
 }

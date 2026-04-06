@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-const SITE_URL = "https://spikeai.com";
+const SITE_URL = "https://www.spikeai.studio";
 
 export default async function sitemap() {
   const pages = [
