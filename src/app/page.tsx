@@ -2004,17 +2004,22 @@ export default function HomePage() {
       {installPrompt && !showInstallBanner && (
         <button
           onClick={handleInstall}
-          className="fixed bottom-5 right-5 z-[100] flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-[#0c0c0e]/90 backdrop-blur-md border border-white/[0.08] shadow-2xl shadow-black/40 hover:bg-white/10 transition-all group"
+          className="fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-6 py-3.5 rounded-2xl bg-[#0c0c0e]/95 backdrop-blur-xl border border-white/[0.1] shadow-2xl shadow-black/60 hover:bg-white/10 hover:border-white/20 transition-all group"
           style={{ animation: "installPulse 4s ease-in-out infinite" }}
         >
-          <svg width="16" height="16" viewBox="0 0 40 40" fill="none" className="flex-shrink-0">
-            <rect x="6" y="22" width="4" height="10" rx="1.5" fill="white" opacity="0.3"/>
-            <rect x="12" y="16" width="4" height="16" rx="1.5" fill="white" opacity="0.55"/>
-            <rect x="18" y="6" width="5" height="26" rx="2" fill="white"/>
-            <rect x="25" y="14" width="4" height="18" rx="1.5" fill="white" opacity="0.55"/>
-            <rect x="31" y="20" width="4" height="12" rx="1.5" fill="white" opacity="0.3"/>
-          </svg>
-          <span className="text-[12px] font-medium text-white/60 group-hover:text-white transition-colors tracking-wide">Install App</span>
+          <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-center flex-shrink-0">
+            <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
+              <rect x="6" y="22" width="4" height="10" rx="1.5" fill="white" opacity="0.3"/>
+              <rect x="12" y="16" width="4" height="16" rx="1.5" fill="white" opacity="0.55"/>
+              <rect x="18" y="6" width="5" height="26" rx="2" fill="white"/>
+              <rect x="25" y="14" width="4" height="18" rx="1.5" fill="white" opacity="0.55"/>
+              <rect x="31" y="20" width="4" height="12" rx="1.5" fill="white" opacity="0.3"/>
+            </svg>
+          </div>
+          <div className="text-left">
+            <p className="text-[13px] font-semibold text-white/80 group-hover:text-white transition-colors tracking-wide">Install App</p>
+            <p className="text-[10px] text-white/30 font-light tracking-wider">spike AI for desktop</p>
+          </div>
         </button>
       )}
     </main>
