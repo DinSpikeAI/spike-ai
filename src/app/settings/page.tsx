@@ -34,97 +34,75 @@ export default function SettingsPage() {
     } catch {}
   }, []);
 
-  const toggleNotifs = () => {
-    const val = !notificationsOn;
-    setNotificationsOn(val);
-    try { localStorage.setItem("spike_notifs", String(val)); } catch {}
-    showToast(val ? "Notifications enabled" : "Notifications disabled");
-  };
-
-  const toggleAutoplay = () => {
-    const val = !autoplay;
-    setAutoplay(val);
-    try { localStorage.setItem("spike_autoplay", String(val)); } catch {}
-    showToast(val ? "Autoplay enabled" : "Autoplay disabled");
-  };
-
-  const handleSignOut = async () => {
-    if (supabase) await supabase.auth.signOut();
-    showToast("Signed out");
-    setTimeout(() => router.push("/"), 500);
-  };
+  const toggleNotifs = () => { const v = !notificationsOn; setNotificationsOn(v); try { localStorage.setItem("spike_notifs", String(v)); } catch {} showToast(v ? "Notifications enabled" : "Notifications disabled"); };
+  const toggleAutoplay = () => { const v = !autoplay; setAutoplay(v); try { localStorage.setItem("spike_autoplay", String(v)); } catch {} showToast(v ? "Autoplay enabled" : "Autoplay disabled"); };
+  const handleSignOut = async () => { if (supabase) await supabase.auth.signOut(); showToast("Signed out"); setTimeout(() => router.push("/"), 500); };
 
   if (authChecking) return <div className="min-h-screen bg-[#060608] flex items-center justify-center"><Loader2 className="w-6 h-6 text-white/15 animate-spin" /></div>;
 
   if (!user) return (
-    <div className="min-h-screen bg-[#060608] flex flex-col items-center justify-center gap-8 px-6 text-center">
-      <div className="w-24 h-24 rounded-[26px] bg-gradient-to-br from-violet-500/20 to-indigo-500/10 border border-violet-400/10 flex items-center justify-center">
-        <LogIn size={36} className="text-violet-300/40" />
+    <div className="min-h-screen bg-[#060608] flex flex-col items-center justify-center gap-8 px-6 text-center relative overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none"><div className="absolute top-[20%] left-[50%] -translate-x-1/2 w-[700px] h-[500px] rounded-full opacity-[0.05]" style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.8) 0%, transparent 70%)" }} /></div>
+      <div className="relative z-10">
+        <div className="w-24 h-24 rounded-[26px] bg-gradient-to-br from-violet-500/20 to-indigo-500/10 border border-violet-400/10 flex items-center justify-center mx-auto mb-8"><LogIn size={36} className="text-violet-300/40" /></div>
+        <h2 className="text-[40px] font-bold text-white tracking-tight mb-3">Settings</h2>
+        <p className="text-[16px] text-white/20 max-w-sm mx-auto mb-10">Sign in to manage your preferences.</p>
+        <button onClick={() => router.push("/auth")} className="cta-btn px-10 py-4 text-black text-[15px] font-semibold rounded-full cursor-pointer">Sign In</button>
       </div>
-      <h2 className="text-[36px] font-bold text-white tracking-tight">Settings</h2>
-      <p className="text-[16px] text-white/25 max-w-sm">Sign in to manage your preferences.</p>
-      <button onClick={() => router.push("/auth")} className="px-10 py-4 bg-white text-black text-[15px] font-semibold rounded-full hover:bg-white/90 transition-all cursor-pointer">Sign In</button>
     </div>
   );
 
-  /* ── Toggle Component — brand-colored (indigo when on, gray when off) ── */
   const Toggle = ({ on, onToggle }: { on: boolean; onToggle: () => void }) => (
-    <button onClick={onToggle}
-      className={`w-[52px] h-[30px] rounded-full transition-all duration-300 cursor-pointer relative flex-shrink-0 ${on ? "bg-indigo-500" : "bg-white/[0.08]"}`}>
+    <button onClick={onToggle} className={`w-[52px] h-[30px] rounded-full transition-all duration-300 cursor-pointer relative flex-shrink-0 ${on ? "bg-indigo-500" : "bg-white/[0.08]"}`}>
       <span className={`absolute top-[3px] w-[24px] h-[24px] rounded-full transition-all duration-300 shadow-md ${on ? "left-[25px] bg-white" : "left-[3px] bg-white/40"}`} />
     </button>
   );
 
   return (
-    <div className="min-h-screen bg-[#060608] text-white">
+    <div className="min-h-screen bg-[#060608] text-white relative overflow-hidden">
+      {/* ═══ Ambient Background ═══ */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[10%] left-[50%] -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-[0.04]"
+          style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.7) 0%, rgba(139,92,246,0.3) 30%, transparent 70%)", animation: "glow 15s ease-in-out infinite" }} />
+        <div className="absolute inset-0 opacity-[0.025]"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")` }} />
+      </div>
+
       {/* ── Nav ── */}
-      <div className="sticky top-0 z-50 bg-[#060608]/80 backdrop-blur-2xl border-b border-white/[0.04]">
+      <div className="sticky top-0 z-50 bg-[#060608]/60 backdrop-blur-2xl border-b border-white/[0.04]">
         <div className="max-w-[600px] mx-auto px-6 h-14 flex items-center gap-4">
-          <button onClick={() => router.push("/")} className="w-9 h-9 rounded-full border border-white/[0.08] flex items-center justify-center text-white/25 hover:text-white transition-all cursor-pointer">
-            <ArrowLeft size={15} />
-          </button>
+          <button onClick={() => router.push("/")} className="w-9 h-9 rounded-full border border-white/[0.08] flex items-center justify-center text-white/25 hover:text-white transition-all cursor-pointer"><ArrowLeft size={15} /></button>
           <span className="text-[15px] font-semibold tracking-wide text-white/50">Settings</span>
         </div>
       </div>
 
-      {/* ── CENTERED CONTAINER ── */}
-      <div className="max-w-[600px] mx-auto px-6 pt-12 pb-20" style={{ animation: "reveal 0.6s ease" }}>
+      {/* ═══ CENTERED CONTENT ═══ */}
+      <div className="relative z-10 max-w-[600px] mx-auto px-6 pt-16 pb-20" style={{ animation: "reveal 0.7s cubic-bezier(0.16,1,0.3,1)" }}>
 
-        {/* Page Title */}
-        <div className="text-center mb-12">
-          <h1 className="text-[38px] font-bold tracking-tight mb-2">Preferences</h1>
-          <p className="text-[15px] text-white/20">Customize your spike AI experience.</p>
+        {/* Title */}
+        <div className="text-center mb-14">
+          <h1 className="text-[42px] md:text-[52px] font-bold tracking-tight mb-3">
+            Prefer<span className="bg-gradient-to-r from-white/40 via-indigo-300/50 to-violet-400/40 bg-clip-text text-transparent">ences</span>
+          </h1>
+          <p className="text-[16px] text-white/20">Customize your spike AI experience.</p>
         </div>
 
         <div className="space-y-8">
-
           {/* ═══ GENERAL ═══ */}
           <div>
             <h2 className="text-[11px] font-bold tracking-[0.25em] text-white/25 uppercase mb-3 ml-1">General</h2>
-            <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden divide-y divide-white/[0.04]">
-              {/* Notifications */}
+            <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden divide-y divide-white/[0.04] backdrop-blur-xl">
               <div className="flex items-center justify-between px-5 py-[18px] hover:bg-white/[0.015] transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-violet-500/80 to-indigo-600/80 flex items-center justify-center shadow-sm">
-                    <Bell size={16} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[15px] font-medium">Notifications</p>
-                    <p className="text-[12px] text-white/20 mt-0.5">New film alerts and updates</p>
-                  </div>
+                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/20"><Bell size={16} className="text-white" /></div>
+                  <div><p className="text-[15px] font-medium">Notifications</p><p className="text-[12px] text-white/20 mt-0.5">New film alerts and updates</p></div>
                 </div>
                 <Toggle on={notificationsOn} onToggle={toggleNotifs} />
               </div>
-              {/* Autoplay */}
               <div className="flex items-center justify-between px-5 py-[18px] hover:bg-white/[0.015] transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-cyan-500/80 to-blue-600/80 flex items-center justify-center shadow-sm">
-                    <Monitor size={16} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[15px] font-medium">Autoplay Trailers</p>
-                    <p className="text-[12px] text-white/20 mt-0.5">Play trailers on hover</p>
-                  </div>
+                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20"><Monitor size={16} className="text-white" /></div>
+                  <div><p className="text-[15px] font-medium">Autoplay Trailers</p><p className="text-[12px] text-white/20 mt-0.5">Play trailers on hover</p></div>
                 </div>
                 <Toggle on={autoplay} onToggle={toggleAutoplay} />
               </div>
@@ -134,26 +112,17 @@ export default function SettingsPage() {
           {/* ═══ ACCOUNT ═══ */}
           <div>
             <h2 className="text-[11px] font-bold tracking-[0.25em] text-white/25 uppercase mb-3 ml-1">Account</h2>
-            <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden divide-y divide-white/[0.04]">
-              {/* Email */}
+            <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden divide-y divide-white/[0.04] backdrop-blur-xl">
               <div className="flex items-center justify-between px-5 py-[18px]">
                 <div className="flex items-center gap-4">
-                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-emerald-500/80 to-teal-600/80 flex items-center justify-center shadow-sm">
-                    <Globe size={16} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[15px] font-medium">Email</p>
-                    <p className="text-[12px] text-white/20 mt-0.5">{user.email}</p>
-                  </div>
+                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20"><Globe size={16} className="text-white" /></div>
+                  <div><p className="text-[15px] font-medium">Email</p><p className="text-[12px] text-white/20 mt-0.5">{user.email}</p></div>
                 </div>
               </div>
-              {/* Edit Profile */}
               <div onClick={() => router.push("/profile")} className="flex items-center justify-between px-5 py-[18px] cursor-pointer hover:bg-white/[0.02] transition-colors group">
                 <div className="flex items-center gap-4">
-                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-blue-500/80 to-indigo-600/80 flex items-center justify-center shadow-sm">
-                    <Shield size={16} className="text-white" />
-                  </div>
-                  <p className="text-[15px] font-medium group-hover:text-white/90 transition-colors">Edit Profile</p>
+                  <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20"><Shield size={16} className="text-white" /></div>
+                  <p className="text-[15px] font-medium group-hover:text-white transition-colors">Edit Profile</p>
                 </div>
                 <ChevronRight size={17} className="text-white/12 group-hover:text-white/25 transition-colors" />
               </div>
@@ -161,30 +130,24 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* ═══ SIGN OUT — Separate, centered ═══ */}
+        {/* ═══ SIGN OUT ═══ */}
         <div className="mt-16 text-center">
-          <button onClick={handleSignOut}
-            className="inline-flex items-center gap-2.5 px-8 py-3.5 text-[14px] font-medium text-red-400/60 hover:text-red-400/90 border border-red-500/[0.08] hover:border-red-500/20 rounded-full hover:bg-red-500/[0.04] transition-all cursor-pointer">
-            <LogOut size={16} />
-            Sign Out
+          <button onClick={handleSignOut} className="inline-flex items-center gap-2.5 px-8 py-3.5 text-[14px] font-medium text-red-400/50 hover:text-red-400/80 border border-red-500/[0.06] hover:border-red-500/15 rounded-full hover:bg-red-500/[0.04] transition-all cursor-pointer">
+            <LogOut size={16} /> Sign Out
           </button>
         </div>
 
-        {/* ═══ Footer ═══ */}
-        <div className="mt-20 text-center">
-          <span className="text-[14px] font-semibold tracking-[0.2em] text-white/[0.06]">spike AI</span>
-        </div>
+        <div className="mt-20 text-center"><span className="text-[14px] font-semibold tracking-[0.2em] text-white/[0.04]">spike AI</span></div>
       </div>
 
-      {/* Toast */}
       {toast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/[0.08] backdrop-blur-2xl border border-white/[0.06] text-white text-[14px] px-8 py-4 rounded-full z-[300] font-medium shadow-2xl" style={{ animation: "reveal 0.3s ease" }}>
-          {toast}
-        </div>
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/[0.06] backdrop-blur-2xl border border-white/[0.06] text-white text-[14px] px-8 py-4 rounded-full z-[300] font-medium shadow-2xl" style={{ animation: "reveal 0.3s ease" }}>{toast}</div>
       )}
 
       <style jsx>{`
-        @keyframes reveal { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
+        .cta-btn { background: linear-gradient(180deg, #fff 0%, #e4e4e7 100%); box-shadow: 0 4px 20px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.9); }
+        @keyframes reveal { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes glow { 0%,100% { opacity:0.04; transform:translate(-50%,0) scale(1) } 50% { opacity:0.07; transform:translate(-50%,0) scale(1.1) } }
       `}</style>
     </div>
   );
