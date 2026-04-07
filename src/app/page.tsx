@@ -1478,7 +1478,7 @@ function GenreFilter({
         <button
           key={genre}
           onClick={() => onChange(genre)}
-          className={`genre-pill ${selected === genre ? "active" : ""}`}
+          className={`genre-pill ${selected === genre ? "active" : ""}`} style={selected === genre ? {boxShadow: "0 0 15px rgba(139,92,246,0.25)"} : {}}
         >
           {genre}
         </button>
@@ -1500,7 +1500,7 @@ function AiModelFilter({
 }) {
   return (
     <div className="px-4 md:px-12 pb-2 flex gap-2 overflow-x-auto items-center" style={{ scrollbarWidth: "none" }}>
-      <span className="text-[9px] tracking-[0.15em] uppercase text-white/20 font-medium mr-1 flex-shrink-0">Made with</span>
+      <span className="text-[9px] tracking-[0.15em] uppercase text-white/20 font-medium mr-1 flex-shrink-0">AI Model</span>
       {ALL_AI_MODELS.map((model) => (
         <button
           key={model}
@@ -1524,7 +1524,7 @@ function AiModelFilter({
 
 function Footer() {
   return (
-    <footer className="px-5 md:px-12 py-12 md:py-20 border-t border-white/[0.03]">
+    <footer className="px-5 md:px-12 py-16 md:py-24 border-t border-white/[0.06] relative overflow-hidden"><div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-purple-600/[0.03] blur-[120px] pointer-events-none" />
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <span className="text-xl font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
@@ -1968,7 +1968,7 @@ export default function HomePage() {
           {dbReady && filteredMovies.length > 0 && (
             <h2 className="text-lg md:text-xl font-semibold mb-6 text-white/70 tracking-wide">
               {activeFilterLabel ? `${activeFilterLabel}` : "All Films"}
-              <span className="text-sm font-light text-white/30 ml-3">{filteredMovies.length} film{filteredMovies.length !== 1 ? "s" : ""}</span>
+              
             </h2>
           )}
 
@@ -2006,7 +2006,7 @@ export default function HomePage() {
 
       {/* Collections Row (Disney+ Style) */}
       <div className="px-4 md:px-12 py-16 md:py-24">
-        <h2 className="text-lg md:text-xl font-semibold mb-8 text-white/70 tracking-wide">Browse Collections</h2>
+        <h2 className="text-lg md:text-xl font-semibold mb-8 text-white/70 tracking-wide">Browse Collections ✦</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4">
           {COLLECTIONS.map((col) => (
             <div
