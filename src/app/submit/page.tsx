@@ -138,7 +138,7 @@ export default function SubmitPage() {
 
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[#060608]/60 backdrop-blur-2xl border-b border-white/[0.04]">
-        <div className="max-w-[960px] mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-[900px] mx-auto px-8 md:px-12 h-14 flex items-center justify-between">
           <div className="flex items-center gap-5">
             <button onClick={() => router.push("/")} className="w-9 h-9 rounded-full border border-white/[0.08] flex items-center justify-center text-white/25 hover:text-white transition-all cursor-pointer"><ArrowLeft size={15} /></button>
             <span className="text-[17px] font-semibold tracking-[0.2em] text-white/25 cursor-pointer" onClick={() => router.push("/")}>spike AI</span>
@@ -153,7 +153,7 @@ export default function SubmitPage() {
       </nav>
 
       {/* ═══ CENTERED CONTENT ═══ */}
-      <div className="max-w-[960px] mx-auto px-6 pt-32 pb-20 relative z-10" style={{ animation: "reveal 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
+      <div className="max-w-[900px] mx-auto px-8 md:px-12 pt-36 md:pt-40 pb-20 relative z-10" style={{ animation: "reveal 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
 
         {/* Header — centered */}
         <div className="text-center mb-16">
