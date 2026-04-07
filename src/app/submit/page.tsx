@@ -115,7 +115,7 @@ export default function SubmitPage() {
       </div>
 
       {/* Top nav */}
-      <nav className="relative z-10 px-6 py-5 flex items-center gap-4 max-w-[1000px] mx-auto">
+      <nav className="relative z-10 px-6 py-5 flex items-center gap-4 max-w-[1100px] mx-auto">
         <Link href="/" className="flex items-center gap-2 text-zinc-400 hover:text-white transition-colors">
           <ArrowLeft className="w-4 h-4" />
           <span className="text-sm tracking-wide uppercase">Back</span>
@@ -127,11 +127,11 @@ export default function SubmitPage() {
       </nav>
 
       {/* Master container */}
-      <main className="relative z-10 max-w-[1000px] mx-auto px-6 pb-24">
+      <main className="relative z-10 max-w-[1100px] mx-auto px-8 pb-24">
         {/* Hero headline */}
-        <header className="text-center pt-4 pb-12">
+        <header className="text-center pt-4 pb-14">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-none mb-4"
+            className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-none mb-5"
             style={{
               background: 'linear-gradient(135deg, #ffffff 0%, #a78bfa 50%, #7c3aed 100%)',
               WebkitBackgroundClip: 'text',
@@ -141,7 +141,7 @@ export default function SubmitPage() {
           >
             Submit Your Film.
           </h1>
-          <p className="text-xl text-zinc-400 max-w-lg mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl text-zinc-400 max-w-xl mx-auto leading-relaxed">
             Share your AI-generated masterpiece with the world.
             <br />
             <span className="text-zinc-500">Our team will review your submission.</span>
@@ -149,10 +149,10 @@ export default function SubmitPage() {
         </header>
 
         {/* 2-column grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start max-w-[960px] mx-auto">
 
           {/* ─── LEFT COLUMN: FORM (3/5) ─── */}
-          <div className="lg:col-span-3 space-y-8">
+          <div className="space-y-8">
 
             {/* Film details section */}
             <section className="space-y-5">
@@ -274,7 +274,7 @@ export default function SubmitPage() {
           </div>
 
           {/* ─── RIGHT COLUMN: STICKY PREVIEW (2/5) ─── */}
-          <div className="lg:col-span-2 lg:sticky lg:top-8">
+          <div className="lg:sticky lg:top-8">
             <div className="space-y-6">
               {/* Preview card */}
               <div>
