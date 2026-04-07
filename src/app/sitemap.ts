@@ -1,13 +1,29 @@
 import { createClient } from "@supabase/supabase-js";
+import { getAllPosts } from "@/lib/blog";
 
 const SITE_URL = "https://www.spikeai.studio";
 
 export default async function sitemap() {
   const pages = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: "daily" as const, priority: 1 },
+    { url: `${SITE_URL}/blog`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.9 },
     { url: `${SITE_URL}/auth`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.5 },
     { url: `${SITE_URL}/submit`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.6 },
+    { url: `${SITE_URL}/creators`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
   ];
+
+  // Add blog posts
+  try {
+    const posts = getAllPosts();
+    posts.forEach((post) => {
+      pages.push({
+        url: `${SITE_URL}/blog/${post.slug}`,
+        lastModified: new Date(post.date),
+        changeFrequency: "monthly" as const,
+        priority: 0.8,
+      });
+    });
+  } catch {}
 
   // Add all approved movies
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
