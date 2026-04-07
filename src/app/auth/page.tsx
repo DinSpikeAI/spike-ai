@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Mail, Lock, ArrowRight, Loader2, Eye, EyeOff, AlertCircle,
-  Wand2, CheckCircle, ArrowLeft, Sparkles, User, Check, Film,
+  Wand2, CheckCircle, ArrowLeft, Sparkles, User, Check,
 } from "lucide-react";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 
 type View = "signin" | "signup" | "magic" | "magic-sent" | "signup-done" | "setup-profile";
@@ -24,6 +25,18 @@ const AVATARS = [
   { id: "a11", gradient: "from-indigo-300 to-violet-600", emoji: "🎵" },
   { id: "a12", gradient: "from-teal-300 to-cyan-600", emoji: "💎" },
 ];
+
+/* Google "G" SVG icon */
+function GoogleIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+    </svg>
+  );
+}
 
 export default function AuthPage() {
   const router = useRouter();
@@ -55,12 +68,23 @@ export default function AuthPage() {
   const handleGoogleSignIn = async () => {
     if (!supabase) return;
     setGoogleLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/` },
-    });
-    if (error) setError(error.message);
-    setGoogleLoading(false);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/`,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
+        },
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      setError(err.message || "Google sign-in failed. Make sure Google provider is enabled in Supabase Dashboard → Authentication → Providers.");
+      setGoogleLoading(false);
+    }
   };
 
   const handleAuth = async () => {
@@ -119,8 +143,8 @@ export default function AuthPage() {
           <button onClick={() => view === "setup-profile" ? switchView("signup-done") : router.push("/")} className="w-10 h-10 rounded-full border border-white/[0.08] flex items-center justify-center text-white/20 hover:text-white hover:border-white/20 transition-all cursor-pointer">
             <ArrowLeft size={16} />
           </button>
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => router.push("/")}>
-            <Film size={14} className="text-purple-400/60" />
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
+            <Image src="/spike-icon-512.png" alt="Spike AI" width={28} height={28} className="rounded-lg" />
             <span className="text-[15px] font-semibold tracking-[0.25em] text-white/25 uppercase">spike AI</span>
           </div>
         </div>
@@ -204,23 +228,69 @@ export default function AuthPage() {
           {(view === "signin" || view === "signup" || view === "magic") && (
             <div style={{ animation: "reveal 0.7s cubic-bezier(0.16,1,0.3,1)" }}>
 
-              {/* Icon */}
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/[0.03] border border-white/[0.06] mb-8 backdrop-blur-sm">
-                {view === "signup" ? <Sparkles size={26} className="text-purple-400/70" /> : view === "magic" ? <Wand2 size={26} className="text-blue-400/70" /> : <Film size={26} className="text-purple-400/70" />}
+              {/* Spike AI Logo */}
+              <div className="inline-block mb-8">
+                <Image
+                  src="/spike-icon-512.png"
+                  alt="Spike AI"
+                  width={64}
+                  height={64}
+                  className="rounded-2xl"
+                />
               </div>
 
-              {/* Title — WHITE as requested */}
+              {/* Title — WHITE */}
               <h1 className="text-[50px] md:text-[62px] font-bold tracking-[-0.03em] leading-[1.06] text-white mb-4"
                 style={{ textShadow: "0 0 80px rgba(139, 92, 246, 0.12)" }}>
                 {view === "signin" ? <>Welcome{"\n"}back.</> : view === "signup" ? <>Create{"\n"}account.</> : <>Magic{"\n"}link.</>}
               </h1>
-              <p className="text-[17px] text-white/25 mb-14">
+              <p className="text-[17px] text-white/25 mb-12">
                 {view === "signin" ? "Sign in to continue to spike AI." : view === "signup" ? "Join the future of AI cinema." : "We'll email you a sign-in link."}
               </p>
 
               {/* ═══ Form Card — Glassmorphic ═══ */}
               <div className="max-w-[380px] mx-auto">
                 <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-xl p-7 shadow-[0_0_60px_rgba(0,0,0,0.3)]">
+
+                  {/* ── Google Button (Primary) ── */}
+                  {view !== "magic" && (
+                    <button
+                      onClick={handleGoogleSignIn}
+                      disabled={googleLoading}
+                      className={`
+                        google-btn w-full py-[15px] px-5 rounded-xl text-[15px] font-medium
+                        flex items-center justify-center gap-3
+                        bg-white/[0.05] border border-white/[0.1]
+                        text-white/80 hover:text-white
+                        hover:bg-white/[0.08] hover:border-white/[0.16]
+                        transition-all duration-300 cursor-pointer
+                        active:scale-[0.98]
+                        ${googleLoading ? "google-pulse" : ""}
+                      `}
+                    >
+                      {googleLoading ? (
+                        <span className="flex items-center gap-3">
+                          <GoogleIcon className="w-5 h-5" />
+                          <span className="text-white/40">Connecting...</span>
+                        </span>
+                      ) : (
+                        <>
+                          <GoogleIcon className="w-5 h-5" />
+                          Continue with Google
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  {/* ── OR Divider ── */}
+                  {view !== "magic" && (
+                    <div className="flex items-center gap-3 my-5">
+                      <div className="flex-1 h-px bg-white/[0.06]" />
+                      <span className="text-[10px] text-white/15 uppercase tracking-[0.2em]">or</span>
+                      <div className="flex-1 h-px bg-white/[0.06]" />
+                    </div>
+                  )}
+
                   <div className="space-y-5 text-left">
                     {/* Email */}
                     <div>
@@ -254,7 +324,7 @@ export default function AuthPage() {
                       </div>
                     )}
 
-                    {/* Primary CTA */}
+                    {/* Email/Password CTA */}
                     <button onClick={handleAuth} disabled={loading}
                       className="cta-btn w-full mt-2 py-[16px] text-black text-[15px] font-bold tracking-wide rounded-full flex items-center justify-center gap-2.5 disabled:opacity-30 cursor-pointer active:scale-[0.97]">
                       {loading ? <Loader2 size={19} className="animate-spin text-black/40" />
@@ -264,7 +334,7 @@ export default function AuthPage() {
                     </button>
                   </div>
 
-                  {/* Divider */}
+                  {/* Divider before magic link */}
                   <div className="flex items-center gap-3 my-5">
                     <div className="flex-1 h-px bg-white/[0.06]" />
                     <span className="text-[10px] text-white/15 uppercase tracking-[0.2em]">or</span>
@@ -320,6 +390,13 @@ export default function AuthPage() {
             0 0 100px rgba(139,92,246,0.1),
             inset 0 1px 0 rgba(255,255,255,1);
           transform: translateY(-2px);
+        }
+        .google-pulse {
+          animation: googlePulse 1.5s ease-in-out infinite;
+        }
+        @keyframes googlePulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+          50% { box-shadow: 0 0 20px 2px rgba(255,255,255,0.06); }
         }
         @keyframes reveal { from { opacity:0; transform:translateY(28px) } to { opacity:1; transform:translateY(0) } }
         @keyframes slideIn { from { opacity:0; transform:translateY(-10px) } to { opacity:1; transform:translateY(0) } }
