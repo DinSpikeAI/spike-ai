@@ -156,7 +156,14 @@ export default function CreatorPage() {
   // ── Loading ──
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#08080a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#060608] relative overflow-hidden flex items-center justify-center">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[10%] left-[50%] -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-[0.04]"
+          style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.7) 0%, transparent 70%)" }} />
+        <div className="absolute inset-0 opacity-[0.025]"
+          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 512 512\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'1\'/%3E%3C/svg%3E")' }} />
+      </div>
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin" />
           <p className="text-white/30 text-sm tracking-wider">Loading creator...</p>
@@ -168,10 +175,10 @@ export default function CreatorPage() {
   // ── Not Found ──
   if (notFound || !creator) {
     return (
-      <div className="min-h-screen bg-[#08080a] flex items-center justify-center">
+      <div className="min-h-screen bg-[#060608] relative overflow-hidden flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-white mb-4">Creator Not Found</h1>
-          <p className="text-gray-400 mb-8">This creator profile doesn&apos;t exist.</p>
+          <p className="text-white/30 mb-8">This creator profile doesn&apos;t exist.</p>
           <button onClick={() => router.push("/")} className="px-6 py-3 bg-white text-black rounded-full hover:bg-white/90 transition-all">Back to Home</button>
         </div>
       </div>
@@ -188,7 +195,7 @@ export default function CreatorPage() {
   const defaultBanner = `https://picsum.photos/seed/${creator.id}/1920/600`;
 
   return (
-    <div className="min-h-screen bg-[#08080a] text-white">
+    <div className="min-h-screen bg-[#060608] relative overflow-hidden text-white">
       {/* Back Button */}
       <button onClick={() => router.back()} className="fixed top-5 left-5 z-50 w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:border-white/20 transition-all">
         <ArrowLeft size={18} />
@@ -247,7 +254,7 @@ export default function CreatorPage() {
                 </button>
                 <button
                   onClick={handleShare}
-                  className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:border-white/20 transition-all"
+                  className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/30 hover:text-white hover:border-white/20 transition-all"
                 >
                   <Share2 size={16} />
                 </button>
@@ -259,25 +266,25 @@ export default function CreatorPage() {
               <div className="flex items-center gap-2">
                 <Flame size={14} className="text-[#ffffff]" />
                 <span className="text-white font-bold">{totalUpvotes.toLocaleString()}</span>
-                <span className="text-gray-500 text-sm">total upvotes</span>
+                <span className="text-white/20 text-sm">total upvotes</span>
               </div>
               <div className="flex items-center gap-2">
-                <Film size={14} className="text-gray-500" />
+                <Film size={14} className="text-white/20" />
                 <span className="text-white font-bold">{movies.length}</span>
-                <span className="text-gray-500 text-sm">films</span>
+                <span className="text-white/20 text-sm">films</span>
               </div>
               {movies.length > 0 && (
                 <div className="flex items-center gap-2">
                   <Star size={14} className="text-yellow-400" fill="currentColor" />
                   <span className="text-white font-bold">{avgRating}</span>
-                  <span className="text-gray-500 text-sm">avg rating</span>
+                  <span className="text-white/20 text-sm">avg rating</span>
                 </div>
               )}
             </div>
 
             {/* Bio */}
             {creator.bio && (
-              <p className="text-gray-400 text-sm leading-relaxed max-w-2xl mb-5">{creator.bio}</p>
+              <p className="text-white/30 text-sm leading-relaxed max-w-2xl mb-5">{creator.bio}</p>
             )}
 
             {/* Social Links */}
@@ -311,16 +318,16 @@ export default function CreatorPage() {
 
         {/* Filmography */}
         <div className={`transition-all duration-700 delay-300 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
             <Film size={18} className="text-[#ffffff]" />
             Filmography
-            <span className="text-gray-600 text-sm font-normal ml-2">({movies.length} films)</span>
+            <span className="text-white/15 text-sm font-normal ml-2">({movies.length} films)</span>
           </h2>
 
           {movies.length === 0 ? (
             <div className="text-center py-16">
               <Film size={40} className="text-white/10 mx-auto mb-4" />
-              <p className="text-gray-500 text-sm">No films published yet.</p>
+              <p className="text-white/20 text-sm">No films published yet.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -330,14 +337,14 @@ export default function CreatorPage() {
                   onClick={() => router.push(`/movie/${m.id}`)}
                   className="cursor-pointer group"
                 >
-                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden mb-2 border border-white/5 group-hover:border-white/30 transition-all duration-300">
+                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden mb-2 border border-white/[0.04] group-hover:border-white/30 transition-all duration-300">
                     <img
                       src={m.poster}
                       alt={m.title}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center">
-                      <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg shadow-black/40">
+                      <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300 shadow-lg shadow-black/40">
                         <Play size={20} fill="white" className="text-white ml-0.5" />
                       </div>
                     </div>
@@ -352,13 +359,13 @@ export default function CreatorPage() {
                       {m.upvotes_count}
                     </div>
                   </div>
-                  <p className="text-sm font-medium text-gray-200 group-hover:text-white transition-colors truncate">{m.title}</p>
+                  <p className="text-sm font-medium text-white/80 group-hover:text-white transition-colors truncate">{m.title}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-gray-500 text-xs">{m.year}</span>
-                    <span className="text-gray-600 text-xs">·</span>
-                    <span className="text-gray-500 text-xs">{m.genre}</span>
-                    <span className="text-gray-600 text-xs">·</span>
-                    <span className="text-gray-500 text-xs flex items-center gap-0.5"><Clock size={9} />{m.duration}</span>
+                    <span className="text-white/20 text-xs">{m.year}</span>
+                    <span className="text-white/15 text-xs">·</span>
+                    <span className="text-white/20 text-xs">{m.genre}</span>
+                    <span className="text-white/15 text-xs">·</span>
+                    <span className="text-white/20 text-xs flex items-center gap-0.5"><Clock size={9} />{m.duration}</span>
                   </div>
                 </div>
               ))}
@@ -368,21 +375,21 @@ export default function CreatorPage() {
       </div>
 
       {/* Footer */}
-      <footer className="py-8 md:py-12 px-4 md:px-6 border-t border-white/5 mt-12 md:mt-16">
+      <footer className="py-8 md:py-12 px-4 md:px-6 border-t border-white/[0.03][0.04] mt-12 md:mt-16">
         <div className="max-w-[1200px] mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             
             <span className="text-lg font-semibold tracking-[0.15em] text-white/80">spike</span>
             <span className="text-lg font-semibold tracking-[0.15em] text-white" >AI</span>
           </div>
-          <p className="text-[10px] tracking-[0.3em] uppercase text-gray-600 mb-4">AI Cinema</p>
-          <p className="text-gray-500 text-xs">&copy; {new Date().getFullYear()} Spike AI. The world&apos;s first streaming platform for AI-generated cinema.</p>
+          <p className="text-[10px] tracking-[0.3em] uppercase text-white/15 mb-4">AI Cinema</p>
+          <p className="text-white/20 text-xs">&copy; {new Date().getFullYear()} Spike AI. The world&apos;s first streaming platform for AI-generated cinema.</p>
         </div>
       </footer>
 
       {/* Share Toast */}
       {shareMsg && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[600] px-5 py-3 rounded-xl bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/[0.08] shadow-2xl" style={{ animation: "fadeInUp 0.3s cubic-bezier(0.22,1,0.36,1)" }}>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[600] px-5 py-3 rounded-xl bg-[#1a1a1e]/95 backdrop-blur-2xl border border-white/[0.08] shadow-2xl" style={{ animation: "fadeInUp 0.3s cubic-bezier(0.22,1,0.36,1)" }}>
           <span className="text-[13px] font-medium tracking-wide text-white/80">{shareMsg}</span>
         </div>
       )}

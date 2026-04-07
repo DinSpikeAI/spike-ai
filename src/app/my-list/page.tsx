@@ -143,9 +143,9 @@ export default function MyListPage() {
   // ── Loading State ──
   if (authChecking) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+      <div className="min-h-screen bg-[#060608] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-indigo-500/20 border-t-indigo-400 rounded-full animate-spin" />
           <p className="text-white/30 text-sm tracking-wider">Loading...</p>
         </div>
       </div>
@@ -155,13 +155,13 @@ export default function MyListPage() {
   // ── Not Logged In ──
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-[#060608] flex flex-col items-center justify-center gap-8 px-6 text-center relative overflow-hidden">
         <div className="text-center max-w-md">
           <div className="w-20 h-20 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex items-center justify-center mx-auto mb-6">
             <Bookmark size={32} className="text-white/20" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-3">Sign in to see your list</h1>
-          <p className="text-gray-500 text-sm leading-relaxed mb-8">
+          <h1 className="text-2xl font-semibold text-white mb-3">Sign in to see your list</h1>
+          <p className="text-white/20 text-sm leading-relaxed mb-8">
             Save your favorite AI films and keep track of what you want to watch next.
           </p>
           <button
@@ -182,20 +182,22 @@ export default function MyListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-screen bg-[#060608] text-white relative overflow-hidden">
+      {/* Ambient */}
+      <div className="fixed inset-0 pointer-events-none"><div className="absolute top-[10%] left-[50%] -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-[0.04]" style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.7) 0%, transparent 70%)" }} /><div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")` }} /></div>
       {/* HEADER */}
-      <div className="sticky top-0 z-40 bg-[#050505]/90 backdrop-blur-xl border-b border-white/[0.04]">
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-[#060608]/90 backdrop-blur-2xl border-b border-white/[0.04]">
+        <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push("/")}
-              className="w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-white/50 hover:text-white hover:border-white/15 transition-all"
+              className="w-9 h-9 rounded-full border border-white/[0.08] flex items-center justify-center text-white/25 hover:text-white hover:border-white/20 transition-all"
             >
               <ArrowLeft size={16} />
             </button>
             <div>
-              <h1 className="text-xl md:text-2xl font-bold tracking-tight flex items-center gap-2">
-                <Bookmark size={20} className="text-[#ffffff]" />
+              <h1 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-2">
+                <Bookmark size={20} className="text-indigo-400/70" />
                 My List
               </h1>
               <p className="text-xs text-white/30 tracking-wider mt-0.5">
@@ -215,11 +217,11 @@ export default function MyListPage() {
       </div>
 
       {/* CONTENT */}
-      <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8 md:py-12">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-6 py-8 md:py-12">
         {loading ? (
           <div className="flex items-center justify-center py-24">
             <div className="flex flex-col items-center gap-4">
-              <Loader2 size={24} className="text-white/40 animate-spin" />
+              <Loader2 size={24} className="text-indigo-400/50 animate-spin" />
               <p className="text-white/30 text-sm tracking-wider">Loading your list...</p>
             </div>
           </div>
@@ -228,8 +230,8 @@ export default function MyListPage() {
             <div className="w-24 h-24 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-center mb-6">
               <Film size={40} className="text-white/10" />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Your list is empty</h2>
-            <p className="text-gray-500 text-sm max-w-sm mb-8">
+            <h2 className="text-xl font-semibold text-white mb-2">Your list is empty</h2>
+            <p className="text-white/20 text-sm max-w-sm mb-8">
               Browse films and click &ldquo;My List&rdquo; to save them here for later.
             </p>
             <button
@@ -252,7 +254,7 @@ export default function MyListPage() {
                   <div className="relative w-[80px] md:w-[100px] flex-shrink-0 aspect-[2/3] rounded-lg overflow-hidden">
                     <img src={movie.poster} alt={movie.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
-                      <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all shadow-lg shadow-black/40">
+                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all shadow-lg shadow-black/40">
                         <Play size={16} fill="white" className="text-white ml-0.5" />
                       </div>
                     </div>
@@ -264,16 +266,16 @@ export default function MyListPage() {
                       <h3 className="text-base font-bold text-white truncate group-hover:text-white transition-colors">{movie.title}</h3>
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                         <span className="text-yellow-400 text-xs flex items-center gap-0.5"><Star size={10} fill="currentColor" />{movie.rating}</span>
-                        <span className="text-gray-500 text-xs">{movie.year}</span>
-                        <span className="text-gray-600 text-xs">·</span>
-                        <span className="text-gray-500 text-xs">{movie.genre}</span>
-                        <span className="text-gray-600 text-xs">·</span>
-                        <span className="text-gray-500 text-xs flex items-center gap-0.5"><Clock size={9} />{movie.duration}</span>
+                        <span className="text-white/20 text-xs">{movie.year}</span>
+                        <span className="text-white/15 text-xs">·</span>
+                        <span className="text-white/20 text-xs">{movie.genre}</span>
+                        <span className="text-white/15 text-xs">·</span>
+                        <span className="text-white/20 text-xs flex items-center gap-0.5"><Clock size={9} />{movie.duration}</span>
                       </div>
-                      <p className="text-gray-500 text-xs leading-relaxed mt-2 line-clamp-2">{movie.description}</p>
+                      <p className="text-white/20 text-xs leading-relaxed mt-2 line-clamp-2">{movie.description}</p>
                     </div>
 
-                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/[0.04]">
+                    <div className="flex items-center justify-between mt-3 pt-2 border-t border-white/[0.03][0.04]">
                       <div className="flex items-center gap-3">
                         <span className="flex items-center gap-1 text-[10px] text-white/30">
                           <Flame size={10} /> {movie.upvotes_count}
@@ -307,21 +309,21 @@ export default function MyListPage() {
       </div>
 
       {/* FOOTER */}
-      <footer className="py-8 px-4 md:px-6 border-t border-white/5 mt-8">
+      <footer className="py-8 px-4 md:px-6 border-t border-white/[0.03][0.04] mt-8">
         <div className="max-w-[1400px] mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             
             <span className="text-lg font-semibold tracking-[0.15em] text-white/80">spike</span>
             <span className="text-lg font-semibold tracking-[0.15em] text-white" >AI</span>
           </div>
-          <p className="text-gray-500 text-xs">&copy; {new Date().getFullYear()} Spike AI. The world&apos;s first streaming platform for AI-generated cinema.</p>
+          <p className="text-white/20 text-xs">&copy; {new Date().getFullYear()} Spike AI. The world&apos;s first streaming platform for AI-generated cinema.</p>
         </div>
       </footer>
 
       {/* Toast */}
       {toast && (
         <div
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[600] px-5 py-3 rounded-xl bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/[0.08] shadow-2xl"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[600] px-5 py-3 rounded-xl bg-[#1a1a1e]/95 backdrop-blur-2xl border border-white/[0.08] shadow-2xl"
           style={{ animation: "fadeInUp 0.3s cubic-bezier(0.22,1,0.36,1)" }}
         >
           <span className="text-[13px] font-medium tracking-wide text-white/80">{toast}</span>

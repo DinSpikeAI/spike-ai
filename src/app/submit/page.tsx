@@ -204,7 +204,14 @@ export default function SubmitPage() {
   /* ═════════════ SUCCESS SCREEN ═════════════ */
   if (submitted) {
     return (
-      <div className="min-h-screen bg-[#08080a] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-[#060608] relative overflow-hidden flex items-center justify-center px-6">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[10%] left-[50%] -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-[0.04]"
+          style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.7) 0%, transparent 70%)" }} />
+        <div className="absolute inset-0 opacity-[0.025]"
+          style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 512 512\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'1\'/%3E%3C/svg%3E")' }} />
+      </div>
         <div className="text-center max-w-md">
           <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${publishedLive ? "bg-green-500/10 border border-green-500/30" : "bg-white/10 border border-white/30"}`}>
             {publishedLive ? <Zap size={40} className="text-green-400" /> : <CheckCircle size={40} className="text-[#ffffff]" />}
@@ -212,8 +219,8 @@ export default function SubmitPage() {
           <h1 className="text-3xl font-black text-white mb-3">
             {publishedLive ? "Published Live!" : "Film Submitted!"}
           </h1>
-          <p className="text-gray-400 mb-2 text-lg">&ldquo;{form.title}&rdquo;</p>
-          <p className="text-gray-500 text-sm mb-8">
+          <p className="text-white/30 mb-2 text-lg">&ldquo;{form.title}&rdquo;</p>
+          <p className="text-white/20 text-sm mb-8">
             {publishedLive
               ? "Your film is now live on the platform. Visit the home page to see it."
               : "Your film has been submitted for review. Our team will review it within 48 hours."}
@@ -232,7 +239,7 @@ export default function SubmitPage() {
             </button>
             <button
               onClick={() => router.push("/")}
-              className={`px-6 py-3 text-white rounded-lg transition-all font-bold ${publishedLive ? "bg-green-600 hover:bg-green-500" : "bg-white hover:bg-white/90"}`}
+              className={`px-6 py-3 text-white rounded-lg transition-all font-bold ${publishedLive ? "bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400" : "bg-white hover:bg-white/90"}`}
             >
               {publishedLive ? "View on Home" : "Back to Home"}
             </button>
@@ -244,9 +251,9 @@ export default function SubmitPage() {
 
   /* ═════════════ FORM ═════════════ */
   return (
-    <div className="min-h-screen bg-[#08080a] text-white">
+    <div className="min-h-screen bg-[#060608] relative overflow-hidden text-white">
       {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-4 md:px-6 py-3 md:py-4 bg-[#08080a]/95 backdrop-blur-xl border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 px-4 md:px-6 py-3 md:py-4 bg-[#060608]/95 backdrop-blur-2xl border-b border-white/[0.04]">
         <div className="max-w-[900px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3 md:gap-6">
             <button onClick={() => router.push("/")} className="flex items-center gap-1.5 text-gray-300 hover:text-white transition-colors group">
@@ -281,7 +288,7 @@ export default function SubmitPage() {
           <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-4">
             Submit Your Film
           </h1>
-          <p className="text-gray-400 text-base md:text-lg max-w-xl leading-relaxed">
+          <p className="text-white/30 text-base md:text-lg max-w-xl leading-relaxed">
             Share your AI-generated masterpiece with the world.
             {isAdmin ? " As admin, your films go live instantly." : " Our team will review your submission."}
           </p>
@@ -363,7 +370,7 @@ export default function SubmitPage() {
             </label>
             <div className="flex flex-wrap gap-2">
               {AI_MODELS.map((model) => (
-                <button key={model} onClick={() => toggleModel(model)} className={`px-4 py-2 text-sm rounded-lg border transition-all ${selectedModels.includes(model) ? "bg-white/15 border-white text-white" : "bg-white/[0.03] border-white/10 text-gray-400 hover:border-white/20 hover:text-gray-300"}`}>
+                <button key={model} onClick={() => toggleModel(model)} className={`px-4 py-2 text-sm rounded-lg border transition-all ${selectedModels.includes(model) ? "bg-white/15 border-white text-white" : "bg-white/[0.03] border-white/10 text-white/30 hover:border-white/20 hover:text-gray-300"}`}>
                   {selectedModels.includes(model) && <span className="mr-1">✓</span>}
                   {model}
                 </button>
@@ -385,11 +392,11 @@ export default function SubmitPage() {
               {/* Video URL + Smart Preview */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 mb-2">
-                  <Film size={14} className="text-gray-500" />
+                  <Film size={14} className="text-white/20" />
                   Film Video URL
                 </label>
                 <input id="film-video" name="film-video" type="url" value={form.videoUrl} onChange={(e) => handleChange("videoUrl", e.target.value)} placeholder="YouTube or Vimeo link to your full film" className="submit-input" />
-                <p className="text-[11px] text-gray-600 mt-1">Paste any YouTube or Vimeo link — we auto-detect the embed</p>
+                <p className="text-[11px] text-white/15 mt-1">Paste any YouTube or Vimeo link — we auto-detect the embed</p>
 
                 {/* Smart Video Embed Preview */}
                 {videoEmbed && (
@@ -423,7 +430,7 @@ export default function SubmitPage() {
               {/* Trailer URL */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 mb-2">
-                  <Film size={14} className="text-gray-500" />
+                  <Film size={14} className="text-white/20" />
                   Trailer URL (optional)
                 </label>
                 <input id="film-trailer" name="film-trailer" type="url" value={form.trailerUrl} onChange={(e) => handleChange("trailerUrl", e.target.value)} placeholder="Short trailer or teaser link" className="submit-input" />
@@ -432,11 +439,11 @@ export default function SubmitPage() {
               {/* Poster URL */}
               <div>
                 <label className="flex items-center gap-2 text-sm font-semibold text-gray-300 mb-2">
-                  <Image size={14} className="text-gray-500" />
+                  <Image size={14} className="text-white/20" />
                   Poster Image URL (optional)
                 </label>
                 <input id="film-poster" name="film-poster" type="url" value={form.posterUrl} onChange={(e) => handleChange("posterUrl", e.target.value)} placeholder="Direct link to poster image (2:3 ratio recommended)" className="submit-input" />
-                <p className="text-[11px] text-gray-600 mt-1">Paste an image URL and see it instantly in the preview below</p>
+                <p className="text-[11px] text-white/15 mt-1">Paste an image URL and see it instantly in the preview below</p>
               </div>
             </div>
           </div>
@@ -447,9 +454,9 @@ export default function SubmitPage() {
               <Sparkles size={18} className="text-[#ffffff]" />
               Live Preview
             </h3>
-            <div className="bg-white/[0.02] border border-white/5 rounded-xl p-4 md:p-6 flex flex-col sm:flex-row gap-4 md:gap-6">
+            <div className="bg-white/[0.02] border border-white/[0.04] rounded-xl p-4 md:p-6 flex flex-col sm:flex-row gap-4 md:gap-6">
               {/* Poster — real-time from URL */}
-              <div className="w-[100px] sm:w-[140px] flex-shrink-0 aspect-[2/3] rounded-lg overflow-hidden bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center border border-white/5 relative">
+              <div className="w-[100px] sm:w-[140px] flex-shrink-0 aspect-[2/3] rounded-lg overflow-hidden bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center border border-white/[0.04] relative">
                 {form.posterUrl && !posterError ? (
                   <img
                     src={form.posterUrl}
@@ -462,7 +469,7 @@ export default function SubmitPage() {
                 ) : (
                   <div className="text-center p-3">
                     <Image size={24} className="text-gray-700 mx-auto mb-2" />
-                    <span className="text-[10px] text-gray-600">{posterError ? "Invalid URL" : "No poster"}</span>
+                    <span className="text-[10px] text-white/15">{posterError ? "Invalid URL" : "No poster"}</span>
                   </div>
                 )}
               </div>
@@ -470,20 +477,20 @@ export default function SubmitPage() {
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <h4 className="text-xl font-black text-white mb-1 truncate">{form.title || "Your Film Title"}</h4>
-                {form.creatorName && <p className="text-sm text-gray-400 mb-2">by {form.creatorName}</p>}
+                {form.creatorName && <p className="text-sm text-white/30 mb-2">by {form.creatorName}</p>}
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   {form.genre && (
                     <span className="px-2 py-0.5 text-xs font-medium bg-white/10 text-[#ffffff] rounded-full border border-white/20">{form.genre}</span>
                   )}
                   {form.category && (
-                    <span className="px-2 py-0.5 text-xs font-medium bg-white/5 text-gray-400 rounded-full border border-white/10">{form.category}</span>
+                    <span className="px-2 py-0.5 text-xs font-medium bg-white/5 text-white/30 rounded-full border border-white/10">{form.category}</span>
                   )}
                   {form.duration && (
-                    <span className="text-xs text-gray-500 flex items-center gap-1"><Clock size={10} /> {form.duration}</span>
+                    <span className="text-xs text-white/20 flex items-center gap-1"><Clock size={10} /> {form.duration}</span>
                   )}
                 </div>
                 {form.description ? (
-                  <p className="text-sm text-gray-500 leading-relaxed line-clamp-3">{form.description.slice(0, 150)}{form.description.length > 150 ? "..." : ""}</p>
+                  <p className="text-sm text-white/20 leading-relaxed line-clamp-3">{form.description.slice(0, 150)}{form.description.length > 150 ? "..." : ""}</p>
                 ) : (
                   <p className="text-sm text-gray-700 italic">Start typing to see your description here...</p>
                 )}
@@ -517,7 +524,7 @@ export default function SubmitPage() {
               disabled={submitting}
               className={`w-full py-4 text-white font-bold text-lg rounded-xl transition-all shadow-lg flex items-center justify-center gap-3 disabled:opacity-60 disabled:cursor-not-allowed ${
                 isAdmin
-                  ? "bg-green-600 hover:bg-green-500 shadow-green-500/20 hover:shadow-green-500/40"
+                  ? "bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 shadow-green-500/20 hover:shadow-green-500/40"
                   : "bg-white hover:bg-white/90 shadow-black/20 hover:shadow-black/40"
               }`}
             >
@@ -529,7 +536,7 @@ export default function SubmitPage() {
                 <><Upload size={20} /> Submit Film for Review</>
               )}
             </button>
-            <p className="text-center text-[11px] text-gray-600 mt-3">
+            <p className="text-center text-[11px] text-white/15 mt-3">
               {isAdmin
                 ? "Admin mode — film will appear on the home page immediately after publish."
                 : "By submitting, you confirm this is your original AI-generated work."}
@@ -539,14 +546,14 @@ export default function SubmitPage() {
       </div>
 
       {/* FOOTER */}
-      <footer className="py-8 px-4 md:px-6 border-t border-white/5">
+      <footer className="py-8 px-4 md:px-6 border-t border-white/[0.04]">
         <div className="max-w-[900px] mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             
             <span className="text-lg font-semibold tracking-[0.15em] text-white/80">spike</span>
             <span className="text-lg font-semibold tracking-[0.15em] text-white" >AI</span>
           </div>
-          <p className="text-gray-500 text-xs">&copy; {new Date().getFullYear()} Spike AI. The world&apos;s first streaming platform for AI-generated cinema.</p>
+          <p className="text-white/20 text-xs">&copy; {new Date().getFullYear()} Spike AI. The world&apos;s first streaming platform for AI-generated cinema.</p>
         </div>
       </footer>
     </div>
