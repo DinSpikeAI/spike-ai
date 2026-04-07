@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft, Loader2, LogIn, Bell, BellOff, Moon,
-  Globe, Shield, Trash2, LogOut, ChevronRight, Monitor,
+  ArrowLeft, Loader2, LogIn, Bell, Globe, Shield,
+  LogOut, ChevronRight, Monitor,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -13,9 +13,6 @@ export default function SettingsPage() {
   const [user, setUser] = useState<any>(null);
   const [authChecking, setAuthChecking] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
-  // Local prefs (stored in localStorage)
   const [notificationsOn, setNotificationsOn] = useState(true);
   const [autoplay, setAutoplay] = useState(true);
 
@@ -29,8 +26,6 @@ export default function SettingsPage() {
       setAuthChecking(false);
     }
     check();
-
-    // Load prefs
     try {
       const n = localStorage.getItem("spike_notifs");
       if (n !== null) setNotificationsOn(n === "true");
@@ -62,22 +57,22 @@ export default function SettingsPage() {
   if (authChecking) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-white/30 animate-spin" />
+        <Loader2 className="w-6 h-6 text-white/20 animate-spin" />
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center gap-6 px-6">
-        <div className="w-16 h-16 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
-          <LogIn size={24} className="text-white/30" />
+      <div className="min-h-screen bg-[#0a0a0a] flex flex-col items-center justify-center gap-8 px-6">
+        <div className="w-24 h-24 rounded-3xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center">
+          <LogIn size={36} className="text-white/15" />
         </div>
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-white tracking-wide">Sign in to access settings</h2>
-          <p className="text-sm text-white/40 mt-2 tracking-wide">Manage your preferences and account.</p>
+          <h2 className="text-3xl font-semibold text-white tracking-tight">Settings</h2>
+          <p className="text-[16px] text-white/30 mt-3 tracking-wide">Sign in to manage your preferences.</p>
         </div>
-        <button onClick={() => router.push("/auth")} className="px-8 py-3 bg-white text-black text-sm font-semibold tracking-wide rounded-full hover:bg-white/90 transition-all">
+        <button onClick={() => router.push("/auth")} className="px-10 py-4 bg-white text-black text-[15px] font-semibold tracking-wide rounded-full hover:bg-white/90 transition-all cursor-pointer">
           Sign In
         </button>
       </div>
@@ -85,100 +80,111 @@ export default function SettingsPage() {
   }
 
   const Toggle = ({ on, onToggle }: { on: boolean; onToggle: () => void }) => (
-    <button
-      onClick={onToggle}
-      className={`w-12 h-7 rounded-full transition-all duration-300 cursor-pointer relative ${on ? "bg-white" : "bg-white/10"}`}
-    >
-      <span className={`absolute top-0.5 w-6 h-6 rounded-full transition-all duration-300 ${on ? "left-[22px] bg-black" : "left-0.5 bg-white/40"}`} />
+    <button onClick={onToggle}
+      className={`w-14 h-8 rounded-full transition-all duration-300 cursor-pointer relative ${on ? "bg-white" : "bg-white/[0.08]"}`}>
+      <span className={`absolute top-1 w-6 h-6 rounded-full transition-all duration-300 shadow-sm ${on ? "left-[26px] bg-black" : "left-1 bg-white/30"}`} />
     </button>
   );
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Top bar */}
+      {/* Header */}
       <div className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-2xl border-b border-white/[0.04]">
-        <div className="max-w-2xl mx-auto px-6 h-14 flex items-center gap-4">
-          <button onClick={() => router.push("/")} className="text-white/40 hover:text-white transition-colors cursor-pointer">
+        <div className="max-w-2xl mx-auto px-6 h-16 flex items-center gap-4">
+          <button onClick={() => router.push("/")} className="text-white/30 hover:text-white transition-colors cursor-pointer">
             <ArrowLeft size={20} />
           </button>
-          <span className="text-[15px] font-semibold tracking-wide">Settings</span>
+          <span className="text-[17px] font-semibold tracking-wide">Settings</span>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-10 space-y-8">
+      <div className="max-w-2xl mx-auto px-6 pt-12 pb-20">
 
-        {/* ── Preferences ── */}
-        <div>
-          <h2 className="text-[11px] font-medium tracking-widest text-white/30 uppercase mb-3 px-1">Preferences</h2>
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden divide-y divide-white/[0.04]">
-            <div className="flex items-center justify-between px-5 py-4">
-              <div className="flex items-center gap-3">
-                <Bell size={18} className="text-white/30" />
-                <div>
-                  <p className="text-[14px] font-medium tracking-wide">Notifications</p>
-                  <p className="text-[11px] text-white/30 tracking-wide">Show new film alerts</p>
-                </div>
-              </div>
-              <Toggle on={notificationsOn} onToggle={toggleNotifs} />
-            </div>
-            <div className="flex items-center justify-between px-5 py-4">
-              <div className="flex items-center gap-3">
-                <Monitor size={18} className="text-white/30" />
-                <div>
-                  <p className="text-[14px] font-medium tracking-wide">Autoplay Trailers</p>
-                  <p className="text-[11px] text-white/30 tracking-wide">Play trailers on hover</p>
-                </div>
-              </div>
-              <Toggle on={autoplay} onToggle={toggleAutoplay} />
-            </div>
-          </div>
+        {/* Page Title */}
+        <div className="mb-12">
+          <h1 className="text-4xl font-semibold tracking-tight">Preferences</h1>
+          <p className="text-[16px] text-white/25 mt-2">Customize your spike AI experience.</p>
         </div>
 
-        {/* ── Account ── */}
-        <div>
-          <h2 className="text-[11px] font-medium tracking-widest text-white/30 uppercase mb-3 px-1">Account</h2>
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden divide-y divide-white/[0.04]">
-            <div className="flex items-center justify-between px-5 py-4">
-              <div className="flex items-center gap-3">
-                <Globe size={18} className="text-white/30" />
-                <div>
-                  <p className="text-[14px] font-medium tracking-wide">Email</p>
-                  <p className="text-[11px] text-white/30 tracking-wide">{user.email}</p>
+        <div className="space-y-10">
+
+          {/* Preferences */}
+          <div>
+            <h2 className="text-[12px] font-semibold tracking-[0.2em] text-white/20 uppercase mb-4 px-1">General</h2>
+            <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden divide-y divide-white/[0.04]">
+              <div className="flex items-center justify-between px-6 py-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center">
+                    <Bell size={18} className="text-white/30" />
+                  </div>
+                  <div>
+                    <p className="text-[15px] font-medium tracking-wide">Notifications</p>
+                    <p className="text-[13px] text-white/25 tracking-wide mt-0.5">Show new film alerts</p>
+                  </div>
+                </div>
+                <Toggle on={notificationsOn} onToggle={toggleNotifs} />
+              </div>
+              <div className="flex items-center justify-between px-6 py-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center">
+                    <Monitor size={18} className="text-white/30" />
+                  </div>
+                  <div>
+                    <p className="text-[15px] font-medium tracking-wide">Autoplay Trailers</p>
+                    <p className="text-[13px] text-white/25 tracking-wide mt-0.5">Play trailers on hover</p>
+                  </div>
+                </div>
+                <Toggle on={autoplay} onToggle={toggleAutoplay} />
+              </div>
+            </div>
+          </div>
+
+          {/* Account */}
+          <div>
+            <h2 className="text-[12px] font-semibold tracking-[0.2em] text-white/20 uppercase mb-4 px-1">Account</h2>
+            <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden divide-y divide-white/[0.04]">
+              <div className="flex items-center justify-between px-6 py-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center">
+                    <Globe size={18} className="text-white/30" />
+                  </div>
+                  <div>
+                    <p className="text-[15px] font-medium tracking-wide">Email</p>
+                    <p className="text-[13px] text-white/25 tracking-wide mt-0.5">{user.email}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div
-              onClick={() => router.push("/profile")}
-              className="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-white/[0.02] transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Shield size={18} className="text-white/30" />
-                <p className="text-[14px] font-medium tracking-wide">Edit Profile</p>
+              <div onClick={() => router.push("/profile")} className="flex items-center justify-between px-6 py-5 cursor-pointer hover:bg-white/[0.02] transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center">
+                    <Shield size={18} className="text-white/30" />
+                  </div>
+                  <p className="text-[15px] font-medium tracking-wide">Edit Profile</p>
+                </div>
+                <ChevronRight size={18} className="text-white/15" />
               </div>
-              <ChevronRight size={16} className="text-white/20" />
             </div>
           </div>
-        </div>
 
-        {/* ── Danger Zone ── */}
-        <div>
-          <h2 className="text-[11px] font-medium tracking-widest text-white/30 uppercase mb-3 px-1">Account Actions</h2>
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl overflow-hidden divide-y divide-white/[0.04]">
-            <div
-              onClick={handleSignOut}
-              className="flex items-center gap-3 px-5 py-4 cursor-pointer hover:bg-white/[0.02] transition-colors"
-            >
-              <LogOut size={18} className="text-white/40" />
-              <p className="text-[14px] font-medium tracking-wide text-white/60">Sign Out</p>
+          {/* Sign Out */}
+          <div>
+            <h2 className="text-[12px] font-semibold tracking-[0.2em] text-white/20 uppercase mb-4 px-1">Session</h2>
+            <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl overflow-hidden">
+              <div onClick={handleSignOut} className="flex items-center gap-4 px-6 py-5 cursor-pointer hover:bg-white/[0.02] transition-colors">
+                <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center">
+                  <LogOut size={18} className="text-white/30" />
+                </div>
+                <p className="text-[15px] font-medium tracking-wide text-white/50">Sign Out</p>
+              </div>
             </div>
           </div>
-        </div>
 
+        </div>
       </div>
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/10 backdrop-blur-xl border border-white/[0.08] text-white text-sm tracking-wide px-6 py-3 rounded-full z-[300]" style={{ animation: "fadeInUp 0.3s ease" }}>
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/[0.08] backdrop-blur-2xl border border-white/[0.06] text-white text-[14px] tracking-wide px-8 py-4 rounded-full z-[300] font-medium" style={{ animation: "fadeInUp 0.3s ease" }}>
           {toast}
         </div>
       )}
