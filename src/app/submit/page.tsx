@@ -153,7 +153,7 @@ export default function SubmitPage() {
       </nav>
 
       {/* ═══ CENTERED CONTENT ═══ */}
-      <div className="max-w-[960px] mx-auto px-6 pt-24 pb-20 relative z-10" style={{ animation: "reveal 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
+      <div className="max-w-[960px] mx-auto px-6 pt-32 pb-20 relative z-10" style={{ animation: "reveal 0.6s cubic-bezier(0.16,1,0.3,1)" }}>
 
         {/* Header — centered */}
         <div className="text-center mb-16">
@@ -171,10 +171,10 @@ export default function SubmitPage() {
         </div>
 
         {/* ═══ TWO COLUMN LAYOUT ═══ */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-12 items-start">
 
           {/* ═══ LEFT — Form Fields ═══ */}
-          <div className="space-y-7">
+          <div className="space-y-8">
 
             {/* Title */}
             <div>
@@ -226,10 +226,10 @@ export default function SubmitPage() {
               <div className="flex flex-wrap gap-2">
                 {AI_MODELS.map((model) => (
                   <button key={model} onClick={() => toggleModel(model)}
-                    className={`px-4 py-2.5 text-[13px] font-medium rounded-full border transition-all cursor-pointer ${
+                    className={`px-5 py-3 text-[13px] font-semibold rounded-full border-2 transition-all cursor-pointer ${
                       selectedModels.includes(model)
-                        ? "bg-indigo-500/20 border-indigo-400/30 text-indigo-200 shadow-lg shadow-indigo-500/10"
-                        : "bg-white/[0.02] border-white/[0.06] text-white/25 hover:border-white/[0.12] hover:text-white/40"
+                        ? "bg-indigo-500/25 border-indigo-400/40 text-indigo-200 shadow-lg shadow-indigo-500/15"
+                        : "bg-white/[0.03] border-white/[0.08] text-white/30 hover:border-white/[0.15] hover:text-white/50 hover:bg-white/[0.05]"
                     }`}>
                     {selectedModels.includes(model) && <span className="mr-1.5">✓</span>}
                     {model}
@@ -355,15 +355,16 @@ export default function SubmitPage() {
       <style jsx>{`
         .s-input {
           width: 100%;
-          padding: 16px 20px;
-          background: rgba(255,255,255,0.025);
-          border: 1px solid rgba(255,255,255,0.06);
+          padding: 18px 22px;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.07);
           border-radius: 16px;
           color: white;
           font-size: 16px;
           letter-spacing: 0.02em;
           transition: all 0.3s ease;
           outline: none;
+          backdrop-filter: blur(12px);
         }
         .s-input::placeholder { color: rgba(255,255,255,0.1); }
         .s-input:focus {
@@ -373,10 +374,10 @@ export default function SubmitPage() {
         }
         .s-input option { background: #111; color: white; }
         .preview-card {
-          background: rgba(255,255,255,0.02);
-          border: 1px solid rgba(255,255,255,0.06);
-          backdrop-filter: blur(20px);
-          box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 80px rgba(99,102,241,0.03);
+          background: rgba(255,255,255,0.025);
+          border: 1px solid rgba(255,255,255,0.07);
+          backdrop-filter: blur(24px);
+          box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 100px rgba(99,102,241,0.05);
         }
         .admin-btn {
           background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
