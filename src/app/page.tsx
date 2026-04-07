@@ -598,7 +598,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
         <div className="hidden md:flex items-center gap-10">
           {[
             { label: "Home", href: "/" },
-            { label: "Films", href: "/#" },
+            { label: "Blog", href: "/blog" },
             { label: "My List", href: "/my-list" },
             { label: "Creators", href: "/creators" },
             { label: "Submit Film", href: "/submit", special: true },
@@ -820,7 +820,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
             <div className="py-3">
               {[
                 { label: "Home", href: "/", icon: "🏠" },
-                { label: "Films", href: "/#", icon: "🎬" },
+                { label: "Blog", href: "/blog", icon: "📝" },
                 { label: "My List", href: "/my-list", icon: "📋" },
                 { label: "Creators", href: "/creators", icon: "🎭" },
                 { label: "Submit Film", href: "/submit", icon: "🎥" },
