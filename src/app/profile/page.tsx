@@ -23,7 +23,6 @@ const AVATARS = [
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
   const [authChecking, setAuthChecking] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -44,7 +43,7 @@ export default function ProfilePage() {
       setUser(u); setAuthChecking(false);
       if (u) {
         const { data } = await supabase!.from("profiles").select("*").eq("id", u.id).single();
-        if (data) { setProfile(data); setDisplayName(data.display_name || ""); setBio(data.bio || ""); }
+        if (data) { setDisplayName(data.display_name || ""); setBio(data.bio || ""); }
         else setDisplayName(u.user_metadata?.display_name || u.user_metadata?.full_name || "");
       }
       setLoading(false);
@@ -64,83 +63,79 @@ export default function ProfilePage() {
   const [stats, setStats] = useState({ watchlist: 0, upvotes: 0, films: 0 });
   useEffect(() => {
     if (!supabase || !user) return;
-    async function loadStats() {
+    async function s() {
       const { count: w } = await supabase!.from("watchlist").select("*", { count: "exact", head: true }).eq("user_id", user.id);
       const { count: u } = await supabase!.from("user_votes").select("*", { count: "exact", head: true }).eq("user_id", user.id);
       const { count: f } = await supabase!.from("movies").select("*", { count: "exact", head: true }).eq("creator_id", user.id).eq("status", "approved");
       setStats({ watchlist: w || 0, upvotes: u || 0, films: f || 0 });
     }
-    loadStats();
+    s();
   }, [user]);
 
   const initial = (displayName || user?.email || "U")[0].toUpperCase();
   const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "";
   const selAv = AVATARS.find(a => a.id === selectedAvatar);
 
-  if (authChecking || loading) return <div className="min-h-screen bg-[#060608] flex items-center justify-center"><Loader2 className="w-6 h-6 text-white/15 animate-spin" /></div>;
+  if (authChecking || loading) return <div className="min-h-screen bg-[#060608] flex items-center justify-center"><Loader2 className="w-6 h-6 text-indigo-400/30 animate-spin" /></div>;
 
   if (!user) return (
-    <div className="min-h-screen bg-[#060608] flex flex-col items-center justify-center gap-8 px-6 text-center">
-      <div className="w-24 h-24 rounded-[26px] bg-gradient-to-br from-violet-500/20 to-indigo-500/10 border border-violet-400/10 flex items-center justify-center">
-        <LogIn size={36} className="text-violet-300/40" />
+    <div className="min-h-screen bg-[#060608] flex items-center justify-center relative overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none"><div className="absolute top-[30%] left-[50%] -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-[0.06]" style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.8) 0%, transparent 70%)" }} /></div>
+      <div className="text-center relative z-10" style={{ animation: "reveal 0.7s cubic-bezier(0.16,1,0.3,1)" }}>
+        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-violet-500/20 to-indigo-500/10 border border-violet-400/10 flex items-center justify-center mx-auto mb-8"><LogIn size={36} className="text-violet-300/40" /></div>
+        <h2 className="text-[40px] font-bold text-white tracking-[-0.02em] mb-3">Your Profile</h2>
+        <p className="text-[16px] text-white/20 mb-10 max-w-sm mx-auto">Sign in to manage your profile and see your stats.</p>
+        <button onClick={() => router.push("/auth")} className="cta-btn px-10 py-4 text-black text-[15px] font-bold rounded-full cursor-pointer">Sign In</button>
       </div>
-      <h2 className="text-[36px] font-bold text-white tracking-tight">Your Profile</h2>
-      <p className="text-[16px] text-white/25 max-w-sm">Sign in to manage your profile and see your stats.</p>
-      <button onClick={() => router.push("/auth")} className="px-10 py-4 bg-white text-black text-[15px] font-semibold rounded-full hover:bg-white/90 transition-all cursor-pointer">Sign In</button>
+      <style jsx>{`.cta-btn{background:linear-gradient(180deg,#fff 0%,#e4e4e7 100%);box-shadow:0 4px 24px rgba(255,255,255,0.08),0 0 60px rgba(99,102,241,0.06),inset 0 1px 0 rgba(255,255,255,0.9)} @keyframes reveal{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}`}</style>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#060608] text-white">
-      {/* ── Nav ── */}
+    <div className="min-h-screen bg-[#060608] text-white relative overflow-hidden">
+      {/* Noise */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.025]"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")` }} />
+
+      {/* Nav */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-[#060608]/60 backdrop-blur-2xl border-b border-white/[0.04]">
-        <div className="max-w-[900px] mx-auto px-6 h-14 flex items-center gap-4">
-          <button onClick={() => router.push("/")} className="w-9 h-9 rounded-full border border-white/[0.08] flex items-center justify-center text-white/25 hover:text-white transition-all cursor-pointer">
-            <ArrowLeft size={15} />
-          </button>
-          <span className="text-[15px] font-semibold tracking-wide text-white/50">Profile</span>
+        <div className="max-w-[850px] mx-auto px-6 h-14 flex items-center gap-4">
+          <button onClick={() => router.push("/")} className="w-9 h-9 rounded-full border border-white/[0.08] flex items-center justify-center text-white/25 hover:text-white transition-all cursor-pointer"><ArrowLeft size={15} /></button>
+          <span className="text-[15px] font-semibold tracking-wide text-white/40">Profile</span>
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════════
-           CINEMATIC BANNER
-         ═══════════════════════════════════════════ */}
-      <div className="relative h-[220px] md:h-[280px] overflow-hidden">
-        {/* Banner gradient — changes with avatar color */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${selAv?.gradient || "from-zinc-800 to-zinc-900"} opacity-40 transition-all duration-1000`} />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#060608]" />
-        {/* Subtle pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.04]"
-          style={{ backgroundImage: "radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)", backgroundSize: "32px 32px" }} />
-        {/* Ambient glow */}
-        <div className={`absolute top-[20%] left-[50%] -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[120px] opacity-[0.15] bg-gradient-to-r ${selAv?.gradient || "from-zinc-600 to-zinc-700"} transition-all duration-1000`} />
-      </div>
+      {/* ═══ CENTERED CONTAINER — 850px ═══ */}
+      <div className="max-w-[850px] mx-auto relative" style={{ animation: "reveal 0.7s cubic-bezier(0.16,1,0.3,1)" }}>
 
-      {/* ═══════════════════════════════════════════
-           AVATAR — overlapping the banner
-         ═══════════════════════════════════════════ */}
-      <div className="relative max-w-[900px] mx-auto px-6" style={{ marginTop: "-72px" }}>
-        <div className="flex flex-col items-center text-center">
-          {/* Avatar */}
+        {/* ═══ CINEMATIC BANNER ═══ */}
+        <div className="relative h-[240px] md:h-[300px] overflow-hidden rounded-b-3xl">
+          <div className={`absolute inset-0 bg-gradient-to-br ${selAv?.gradient || "from-zinc-800 to-zinc-900"} opacity-50 transition-all duration-1000`} />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#060608]" />
+          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)", backgroundSize: "24px 24px" }} />
+          <div className={`absolute top-[30%] left-[50%] -translate-x-1/2 w-[500px] h-[300px] rounded-full blur-[100px] opacity-30 bg-gradient-to-r ${selAv?.gradient || "from-zinc-600 to-zinc-700"} transition-all duration-1000`} />
+        </div>
+
+        {/* ═══ AVATAR — Circle, centered, neon glow, overlapping banner ═══ */}
+        <div className="flex flex-col items-center text-center" style={{ marginTop: "-80px" }}>
           <button onClick={() => setShowAvatarPicker(!showAvatarPicker)} className="relative group cursor-pointer mb-6">
-            <div className={`w-[120px] h-[120px] md:w-[140px] md:h-[140px] rounded-[32px] md:rounded-[36px] flex items-center justify-center text-5xl md:text-6xl border-[3px] border-[#060608] ring-2 ring-white/[0.08] transition-all duration-500 shadow-2xl bg-gradient-to-br ${selAv?.gradient || "from-zinc-700 to-zinc-900"}`}
-              style={{ boxShadow: "0 16px 64px rgba(0,0,0,0.7)" }}>
+            {/* Neon rim glow */}
+            <div className={`absolute -inset-1 rounded-full bg-gradient-to-br ${selAv?.gradient || "from-zinc-600 to-zinc-700"} opacity-60 blur-sm transition-all duration-500 group-hover:opacity-80`} />
+            {/* Avatar circle */}
+            <div className={`relative w-[130px] h-[130px] md:w-[150px] md:h-[150px] rounded-full flex items-center justify-center text-5xl md:text-6xl border-[4px] border-[#060608] transition-all duration-500 bg-gradient-to-br ${selAv?.gradient || "from-zinc-700 to-zinc-900"}`}
+              style={{ boxShadow: "0 12px 48px rgba(0,0,0,0.7)" }}>
               {selAv ? selAv.emoji : <span className="text-4xl font-bold">{initial}</span>}
             </div>
-            {/* Edit overlay */}
-            <div className="absolute inset-0 rounded-[32px] md:rounded-[36px] bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all">
-              <Pencil size={22} className="text-white/80" />
-            </div>
+            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"><Pencil size={24} className="text-white/80" /></div>
           </button>
 
           {/* Avatar Picker */}
           {showAvatarPicker && (
-            <div className="mb-8 p-5 bg-white/[0.03] border border-white/[0.06] rounded-2xl backdrop-blur-xl" style={{ animation: "reveal 0.4s cubic-bezier(0.16,1,0.3,1)" }}>
-              <p className="text-[10px] font-bold tracking-[0.3em] text-white/15 uppercase mb-4">Choose Avatar</p>
+            <div className="mb-8 p-5 bg-white/[0.03] border border-white/[0.06] rounded-2xl backdrop-blur-xl" style={{ animation: "reveal 0.3s ease" }}>
               <div className="grid grid-cols-6 gap-2.5">
                 {AVATARS.map((av) => (
                   <button key={av.id} onClick={() => { setSelectedAvatar(av.id); setShowAvatarPicker(false); }}
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl cursor-pointer transition-all duration-300 bg-gradient-to-br ${av.gradient} ${selectedAvatar === av.id ? "ring-2 ring-white/50 scale-110" : "opacity-50 hover:opacity-100 hover:scale-110"}`}>
+                    className={`w-12 h-12 rounded-full flex items-center justify-center text-xl cursor-pointer transition-all duration-300 bg-gradient-to-br ${av.gradient} ${selectedAvatar === av.id ? "ring-2 ring-white/50 scale-110" : "opacity-50 hover:opacity-100 hover:scale-110"}`}>
                     {av.emoji}
                   </button>
                 ))}
@@ -148,81 +143,76 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Name + Badge */}
+          {/* Name + Verified */}
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-[36px] md:text-[44px] font-bold tracking-tight">{displayName || "User"}</h1>
-            <BadgeCheck size={24} className="text-blue-400/70 mt-1" />
+            <h1 className="text-[38px] md:text-[48px] font-bold tracking-[-0.02em]">{displayName || "User"}</h1>
+            <div className="relative">
+              <BadgeCheck size={26} className="text-blue-400" />
+              <div className="absolute -inset-1 bg-blue-400/20 rounded-full blur-md -z-10" />
+            </div>
           </div>
+          <p className="text-[15px] text-white/20 tracking-wide">{user.email}</p>
 
-          {/* Email + Member date */}
-          <p className="text-[14px] text-white/20 tracking-wide">{user.email}</p>
-
-          {/* ── Inline Stats Row ── */}
-          <div className="flex items-center gap-6 mt-5 mb-2">
+          {/* ═══ GLASS STAT CARDS ═══ */}
+          <div className="flex items-center gap-4 mt-8 mb-3">
             {[
-              { value: stats.films, label: "Films" },
-              { value: stats.upvotes, label: "Upvotes" },
-              { value: stats.watchlist, label: "Watchlist" },
-            ].map((s, i) => (
-              <div key={s.label} className="flex items-center gap-1.5">
-                {i > 0 && <span className="text-white/[0.06] mr-4">·</span>}
-                <span className="text-[18px] font-bold text-white/80">{s.value}</span>
-                <span className="text-[13px] text-white/20">{s.label}</span>
+              { value: stats.films, label: "Films", icon: Film },
+              { value: stats.upvotes, label: "Upvotes", icon: Heart },
+              { value: stats.watchlist, label: "Watchlist", icon: Bookmark },
+            ].map((s) => (
+              <div key={s.label} className="glass-card px-6 py-4 rounded-2xl text-center min-w-[110px]">
+                <s.icon size={16} className="text-white/20 mx-auto mb-2" />
+                <p className="text-[24px] font-bold tracking-tight">{s.value}</p>
+                <p className="text-[11px] text-white/20 tracking-[0.15em] uppercase mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
 
           {memberSince && (
-            <p className="text-[11px] text-white/10 tracking-[0.15em] mt-1 flex items-center gap-1.5">
-              <Calendar size={10} /> Joined {memberSince}
-            </p>
+            <p className="text-[11px] text-white/10 tracking-[0.15em] mt-2 flex items-center gap-1.5"><Calendar size={10} /> Joined {memberSince}</p>
           )}
         </div>
-      </div>
 
-      {/* ═══════════════════════════════════════════
-           TABS
-         ═══════════════════════════════════════════ */}
-      <div className="max-w-[900px] mx-auto px-6 mt-10">
-        <div className="flex items-center gap-1 border-b border-white/[0.04] mb-10">
+        {/* ═══ TABS — centered, purple indicator ═══ */}
+        <div className="flex items-center justify-center gap-1 mt-10 mb-10">
           {[
             { id: "edit" as const, label: "Edit Profile", icon: Pencil },
             { id: "films" as const, label: "My Films", icon: Film },
           ].map((tab) => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-3.5 text-[13px] font-semibold tracking-wide transition-all cursor-pointer border-b-2 -mb-px ${activeTab === tab.id ? "text-white border-white" : "text-white/20 border-transparent hover:text-white/40"}`}>
-              <tab.icon size={14} />
+              className={`flex items-center gap-2 px-6 py-3 text-[14px] font-semibold tracking-wide transition-all cursor-pointer rounded-full ${activeTab === tab.id ? "text-white bg-white/[0.06] shadow-lg shadow-indigo-500/5" : "text-white/20 hover:text-white/40"}`}>
+              <tab.icon size={15} />
               {tab.label}
             </button>
           ))}
         </div>
 
-        {/* ── Edit Tab ── */}
+        {/* ═══ EDIT TAB ═══ */}
         {activeTab === "edit" && (
-          <div className="max-w-[480px] mx-auto pb-20" style={{ animation: "reveal 0.5s ease" }}>
+          <div className="max-w-[500px] mx-auto px-6 pb-20" style={{ animation: "reveal 0.5s ease" }}>
             <div className="space-y-6">
               <div>
-                <label className="block text-[10px] font-bold tracking-[0.3em] text-white/10 uppercase mb-2.5 ml-1">Display Name</label>
+                <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Display Name</label>
                 <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-[15px] text-[17px] text-white placeholder-white/10 focus:outline-none focus:border-indigo-500/30 focus:bg-white/[0.05] focus:shadow-[0_0_20px_rgba(99,102,241,0.05)] transition-all tracking-wide"
+                  className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[16px] text-[17px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 focus:bg-white/[0.05] focus:shadow-[0_0_30px_rgba(99,102,241,0.08)] transition-all tracking-wide"
                   placeholder="Your name" />
               </div>
               <div>
-                <label className="block text-[10px] font-bold tracking-[0.3em] text-white/10 uppercase mb-2.5 ml-1">Bio</label>
+                <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Bio</label>
                 <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3}
-                  className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-[15px] text-[17px] text-white placeholder-white/10 focus:outline-none focus:border-indigo-500/30 focus:bg-white/[0.05] focus:shadow-[0_0_20px_rgba(99,102,241,0.05)] transition-all resize-none tracking-wide"
+                  className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[16px] text-[17px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 focus:bg-white/[0.05] focus:shadow-[0_0_30px_rgba(99,102,241,0.08)] transition-all resize-none tracking-wide"
                   placeholder="AI filmmaker, visual storyteller..." />
               </div>
               <div>
-                <label className="block text-[10px] font-bold tracking-[0.3em] text-white/10 uppercase mb-2.5 ml-1">Email</label>
-                <div className="w-full bg-white/[0.015] border border-white/[0.04] rounded-xl px-5 py-[15px] text-[16px] text-white/15 tracking-wide">{user.email}</div>
+                <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Email</label>
+                <div className="w-full bg-white/[0.015] border border-white/[0.04] rounded-2xl px-6 py-[16px] text-[16px] text-white/15 tracking-wide">{user.email}</div>
               </div>
 
-              {/* Save — not full width, gradient, right-aligned */}
-              <div className="flex justify-end pt-2">
+              {/* Save — pill, centered, not full width */}
+              <div className="flex justify-center pt-4">
                 <button onClick={handleSave} disabled={saving}
-                  className="save-btn px-8 py-[13px] text-[14px] font-semibold rounded-full flex items-center gap-2.5 disabled:opacity-30 cursor-pointer transition-all active:scale-[0.97]">
-                  {saving ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+                  className="save-btn px-10 py-[15px] text-[14px] font-bold rounded-full flex items-center gap-2.5 disabled:opacity-30 cursor-pointer transition-all active:scale-[0.97]">
+                  {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
                   {saving ? "Saving..." : "Save Changes"}
                 </button>
               </div>
@@ -230,17 +220,17 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {/* ── Films Tab ── */}
+        {/* ═══ FILMS TAB ═══ */}
         {activeTab === "films" && (
-          <div className="text-center py-20" style={{ animation: "reveal 0.5s ease" }}>
-            <div className="w-20 h-20 rounded-2xl bg-white/[0.02] border border-white/[0.04] flex items-center justify-center mx-auto mb-6">
-              <Film size={32} className="text-white/10" />
+          <div className="text-center py-24 px-6" style={{ animation: "reveal 0.5s ease" }}>
+            <div className="w-20 h-20 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mx-auto mb-6">
+              <Film size={32} className="text-white/12" />
             </div>
-            <h3 className="text-[20px] font-semibold mb-2">No films yet</h3>
-            <p className="text-[14px] text-white/20 max-w-sm mx-auto mb-8">Submit your first AI film and it will appear here with full stats and analytics.</p>
+            <h3 className="text-[22px] font-bold mb-3">No films yet</h3>
+            <p className="text-[14px] text-white/20 max-w-sm mx-auto mb-10">Submit your first AI film and it will appear here.</p>
             <button onClick={() => router.push("/submit")}
-              className="save-btn px-8 py-[13px] text-[14px] font-semibold rounded-full inline-flex items-center gap-2 cursor-pointer">
-              Submit a Film <Film size={14} />
+              className="save-btn px-8 py-[14px] text-[14px] font-bold rounded-full inline-flex items-center gap-2.5 cursor-pointer">
+              Submit a Film <Film size={15} />
             </button>
           </div>
         )}
@@ -248,22 +238,27 @@ export default function ProfilePage() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-white/[0.08] backdrop-blur-2xl border border-white/[0.06] text-white text-[14px] px-8 py-4 rounded-full z-[300] font-medium shadow-2xl" style={{ animation: "reveal 0.3s ease" }}>
-          {toast}
-        </div>
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] bg-white/[0.06] backdrop-blur-2xl border border-white/[0.06] text-white text-[14px] px-8 py-4 rounded-full font-medium shadow-2xl" style={{ animation: "reveal 0.3s ease" }}>{toast}</div>
       )}
 
       <style jsx>{`
+        .glass-card {
+          background: rgba(255,255,255,0.025);
+          border: 1px solid rgba(255,255,255,0.05);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+        }
         .save-btn {
           background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
           color: white;
-          box-shadow: 0 2px 12px rgba(99,102,241,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+          box-shadow: 0 4px 20px rgba(99,102,241,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
         }
         .save-btn:hover:not(:disabled) {
-          box-shadow: 0 4px 24px rgba(99,102,241,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+          box-shadow: 0 6px 30px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
           transform: translateY(-1px);
         }
-        @keyframes reveal { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
+        .cta-btn{background:linear-gradient(180deg,#fff 0%,#e4e4e7 100%);box-shadow:0 4px 24px rgba(255,255,255,0.08),inset 0 1px 0 rgba(255,255,255,0.9)}
+        @keyframes reveal { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
       `}</style>
     </div>
   );
