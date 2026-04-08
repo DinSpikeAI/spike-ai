@@ -298,7 +298,7 @@ function SearchOverlay({
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
-  const allMovies = categories.flatMap((c) => c.movies);
+  const allMovies = categories.flatMap((c) => c.movies).filter((m, i, arr) => arr.findIndex((x) => x.id === m.id) === i);
   const results = query.length > 0
     ? allMovies.filter((m) =>
         m.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -549,7 +549,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
     }
   };
 
-  const allMovies = categories.flatMap((c) => c.movies);
+  const allMovies = categories.flatMap((c) => c.movies).filter((m, i, arr) => arr.findIndex((x) => x.id === m.id) === i);
   const quickResults = quickSearch.length > 1
     ? allMovies.filter((m) =>
         m.title.toLowerCase().includes(quickSearch.toLowerCase()) ||
