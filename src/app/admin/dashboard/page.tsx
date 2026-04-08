@@ -311,25 +311,25 @@ export default function AdminDashboard() {
 
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8">
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-10">
           {[
-            { label: "Total Films", value: stats.total, color: "text-white", filter: "all" },
-            { label: "Approved", value: stats.approved, color: "text-green-400", filter: "approved" },
-            { label: "Pending", value: stats.pending, color: "text-yellow-400", filter: "pending" },
-            { label: "Rejected", value: stats.rejected, color: "text-red-400", filter: "rejected" },
-            { label: "Users", value: userCount, color: "text-purple-400", filter: null },
-            { label: "Total Upvotes", value: totalUpvotes, color: "text-blue-400", filter: null },
+            { label: "Total Films", value: stats.total, color: "text-white", filter: "all", accent: "border-white/[0.08]" },
+            { label: "Approved", value: stats.approved, color: "text-green-400", filter: "approved", accent: "border-green-500/20" },
+            { label: "Pending", value: stats.pending, color: "text-yellow-400", filter: "pending", accent: "border-yellow-500/20" },
+            { label: "Rejected", value: stats.rejected, color: "text-red-400", filter: "rejected", accent: "border-red-500/20" },
+            { label: "Users", value: userCount, color: "text-purple-400", filter: null, accent: "border-purple-500/20" },
+            { label: "Total Upvotes", value: totalUpvotes, color: "text-blue-400", filter: null, accent: "border-blue-500/20" },
           ].map((s) => (
             <div
               key={s.label}
               onClick={() => s.filter !== null && setStatusFilter(s.filter)}
-              className={`bg-white/[0.02] border rounded-xl p-4 transition-all hover:bg-white/[0.04] ${s.filter !== null ? "cursor-pointer" : ""} ${
-                statusFilter === s.filter ? "border-white/[0.12]" : "border-white/[0.05]"
+              className={`bg-[#111114] border rounded-2xl p-5 transition-all hover:bg-[#161619] ${s.filter !== null ? "cursor-pointer" : ""} ${
+                statusFilter === s.filter ? "border-white/[0.15] bg-[#161619]" : s.accent
               } ${s.filter === "pending" && stats.pending > 0 ? "ring-1 ring-yellow-500/20" : ""}`}
             >
-              <p className="text-[11px] text-gray-500 uppercase tracking-wider font-medium">{s.label}</p>
+              <p className="text-[11px] text-gray-500 uppercase tracking-wider font-medium mb-2">{s.label}</p>
               <div className="flex items-center gap-2">
-                <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
+                <p className={`text-3xl font-black ${s.color}`}>{s.value}</p>
                 {s.filter === "pending" && stats.pending > 0 && (
                   <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
                 )}
@@ -338,87 +338,86 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* ═══════ Recent Users ═══════ */}
-        {recentUsers.length > 0 && (
-          <div className="mb-8">
-            <button
-              onClick={() => setShowUsers(!showUsers)}
-              className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-white/50 hover:text-white transition-colors mb-3 cursor-pointer"
-            >
-              <Eye size={14} />
-              Recent Users ({userCount})
-              <ChevronDown size={14} className={`transition-transform ${showUsers ? "rotate-180" : ""}`} />
-            </button>
-            {showUsers && (
-              <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-white/[0.06]">
-                      <th className="text-left px-4 py-3 text-[11px] text-gray-500 uppercase tracking-wider font-medium">Email</th>
-                      <th className="text-left px-4 py-3 text-[11px] text-gray-500 uppercase tracking-wider font-medium">Joined</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {recentUsers.map((u) => (
-                      <tr key={u.id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
-                        <td className="px-4 py-3 text-white/70">{u.email || "No email"}</td>
-                        <td className="px-4 py-3 text-white/30">{new Date(u.created_at).toLocaleDateString()}</td>
-                      </tr>
+        {/* ═══════ Users & Notifications — Side by Side ═══════ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
+          {/* Recent Users */}
+          <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Users size={14} className="text-purple-400" />
+                <span className="text-[13px] font-semibold tracking-wide text-white/70">Recent Users</span>
+                <span className="text-[11px] text-purple-400 font-bold">{userCount}</span>
+              </div>
+              <button onClick={() => setShowUsers(!showUsers)} className="text-white/30 hover:text-white transition-colors cursor-pointer">
+                <ChevronDown size={14} className={`transition-transform ${showUsers ? "rotate-180" : ""}`} />
+              </button>
+            </div>
+            {showUsers && recentUsers.length > 0 ? (
+              <div className="space-y-1">
+                {recentUsers.map((u) => (
+                  <div key={u.id} className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-white/[0.03] transition-colors">
+                    <span className="text-[13px] text-white/60">{u.email || "No email"}</span>
+                    <span className="text-[11px] text-white/20">{new Date(u.created_at).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
+            ) : !showUsers ? (
+              <p className="text-[12px] text-white/20 text-center py-2">Click to expand</p>
+            ) : (
+              <p className="text-[12px] text-white/20 text-center py-2">No users yet</p>
+            )}
+          </div>
+
+          {/* Notifications */}
+          <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Bell size={14} className="text-yellow-400" />
+                <span className="text-[13px] font-semibold tracking-wide text-white/70">Notifications</span>
+                <span className="text-[11px] text-yellow-400 font-bold">{notifs.length}</span>
+              </div>
+              <button onClick={() => setShowNotifPanel(!showNotifPanel)} className="text-white/30 hover:text-white transition-colors cursor-pointer">
+                <ChevronDown size={14} className={`transition-transform ${showNotifPanel ? "rotate-180" : ""}`} />
+              </button>
+            </div>
+            {showNotifPanel && (
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <input
+                    value={newNotif}
+                    onChange={(e) => setNewNotif(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && addNotif()}
+                    placeholder="Write a notification..."
+                    className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/20 transition-colors"
+                  />
+                  <button
+                    onClick={addNotif}
+                    disabled={!newNotif.trim()}
+                    className="px-4 py-2.5 bg-white text-black text-sm font-bold rounded-lg hover:bg-white/90 transition-all disabled:opacity-30 cursor-pointer"
+                  >
+                    Send
+                  </button>
+                </div>
+                {notifs.length === 0 ? (
+                  <p className="text-[12px] text-white/20 text-center py-3">No notifications yet</p>
+                ) : (
+                  <div className="space-y-1 max-h-[200px] overflow-y-auto">
+                    {notifs.map((n) => (
+                      <div key={n.id} className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg hover:bg-white/[0.03] group">
+                        <div className="min-w-0">
+                          <p className="text-[13px] text-white/70 truncate">{n.title}</p>
+                          <p className="text-[10px] text-white/20">{new Date(n.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <button onClick={() => deleteNotif(n.id)} className="text-white/10 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer flex-shrink-0">
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                )}
               </div>
             )}
           </div>
-        )}
-
-        {/* ═══════ Notifications Panel ═══════ */}
-        <div className="mb-8">
-          <button
-            onClick={() => setShowNotifPanel(!showNotifPanel)}
-            className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-white/50 hover:text-white transition-colors mb-3 cursor-pointer"
-          >
-            <Bell size={14} />
-            Notifications ({notifs.length})
-            <ChevronDown size={14} className={`transition-transform ${showNotifPanel ? "rotate-180" : ""}`} />
-          </button>
-          {showNotifPanel && (
-            <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 space-y-3">
-              <div className="flex gap-2">
-                <input
-                  value={newNotif}
-                  onChange={(e) => setNewNotif(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addNotif()}
-                  placeholder="Write a notification for all users..."
-                  className="flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-white/20 transition-colors"
-                />
-                <button
-                  onClick={addNotif}
-                  disabled={!newNotif.trim()}
-                  className="px-4 py-2.5 bg-white text-black text-sm font-bold rounded-lg hover:bg-white/90 transition-all disabled:opacity-30 cursor-pointer"
-                >
-                  Send
-                </button>
-              </div>
-              {notifs.length === 0 ? (
-                <p className="text-[12px] text-white/20 text-center py-3">No notifications yet</p>
-              ) : (
-                <div className="space-y-1 max-h-[200px] overflow-y-auto">
-                  {notifs.map((n) => (
-                    <div key={n.id} className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg hover:bg-white/[0.03] group">
-                      <div className="min-w-0">
-                        <p className="text-[13px] text-white/70 truncate">{n.title}</p>
-                        <p className="text-[10px] text-white/20">{new Date(n.created_at).toLocaleDateString()}</p>
-                      </div>
-                      <button onClick={() => deleteNotif(n.id)} className="text-white/10 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer flex-shrink-0">
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* ═══════ REVIEW QUEUE — Pending Submissions ═══════ */}
@@ -546,7 +545,7 @@ export default function AdminDashboard() {
               return (
                 <div
                   key={movie.id}
-                  className="flex items-center gap-4 p-3 md:p-4 bg-white/[0.02] border border-white/[0.04] rounded-xl hover:border-white/[0.08] transition-colors group"
+                  className="flex items-center gap-4 p-4 md:p-5 bg-[#111114] border border-white/[0.04] rounded-2xl hover:bg-[#161619] hover:border-white/[0.08] transition-all group"
                 >
                   {/* Poster Thumbnail — auto YouTube thumbnail */}
                   <div className="flex items-center gap-3 flex-shrink-0">
