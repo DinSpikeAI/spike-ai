@@ -51,7 +51,7 @@ function getEmbedUrl(url: string, quality: "auto" | "hd" | "4k"): string | null 
    MOVIE DATA (standalone fallback)
    ═══════════════════════════════════════════════════════════════ */
 
-interface Movie { id: string; title: string; year: number; rating: number; duration: string; poster: string; image?: string; aiModels: string[]; genre?: string; description?: string; tagline?: string; maturity?: string; director?: string; creator?: string; video_url?: string; upvotes_count?: number; }
+interface Movie { id: string; title: string; year: number; rating: number; duration: string; poster: string; image?: string; aiModels: string[]; genre?: string; description?: string; tagline?: string; maturity?: string; director?: string; creator?: string; creator_name?: string; video_url?: string; upvotes_count?: number; }
 interface Creator { id: string; name: string; bio: string; avatar: string; followers: number; films: number; joined: string; specialties: string[]; }
 
 const CREATORS: Creator[] = [
@@ -62,7 +62,12 @@ const CREATORS: Creator[] = [
   { id: "cr-default", name: "Independent Creator", bio: "An independent AI filmmaker.", avatar: "https://picsum.photos/seed/creator0/200/200", followers: 0, films: 1, joined: "2025", specialties: ["Film"] },
 ];
 
-function getCreatorForMovie(m: Movie): Creator { return (m.creator && CREATORS.find(c => c.id === m.creator)) || CREATORS[CREATORS.length - 1]; }
+function getCreatorForMovie(m: Movie): Creator {
+  if (m.creator_name) {
+    return { id: "cr-db", name: m.creator_name, bio: "AI filmmaker on Spike AI.", avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(m.creator_name)}&background=8B5CF6&color=fff&size=200`, followers: 0, films: 1, joined: "2026", specialties: [m.genre || "Film"] };
+  }
+  return (m.creator && CREATORS.find(c => c.id === m.creator)) || CREATORS[CREATORS.length - 1];
+}
 
 const ALL_MOVIES: Movie[] = [
   { id: "feat-1", title: "GENESIS PROTOCOL", year: 2026, rating: 9.2, duration: "2h 14m", poster: "https://picsum.photos/seed/genesis-poster/400/600", image: "https://picsum.photos/seed/genesis-wide/1920/1080", aiModels: ["Runway Gen-4", "Stable Diffusion XL"], genre: "Sci-Fi", description: "In a world where AI has surpassed human intelligence, a rogue neural network begins rewriting reality itself.", tagline: "When the code becomes conscious, humanity faces its final test.", maturity: "16+", creator: "cr1" },
@@ -119,7 +124,7 @@ export default function MoviePage() {
       if (supabase && looksLikeUuid) {
         const { data, error } = await supabase.from("movies").select("*").eq("id", movieId).single();
         if (!error && data) {
-          setMovie({ id: data.id, title: data.title, year: data.year || 2026, rating: Number(data.rating) || 0, duration: data.duration || "", poster: getSmartPoster(data.poster_url, data.video_url, data.id), image: getSmartHeroImage(data.hero_image, data.video_url, data.poster_url, data.id), aiModels: data.ai_models || [], genre: data.genre || "Sci-Fi", description: data.description || "", tagline: data.tagline || "", maturity: data.maturity || "16+", director: data.creator_name || "AI Creator", video_url: data.video_url, upvotes_count: data.upvotes_count || 0 });
+          setMovie({ id: data.id, title: data.title, year: data.year || 2026, rating: Number(data.rating) || 0, duration: data.duration || "", poster: getSmartPoster(data.poster_url, data.video_url, data.id), image: getSmartHeroImage(data.hero_image, data.video_url, data.poster_url, data.id), aiModels: data.ai_models || [], genre: data.genre || "Sci-Fi", description: data.description || "", tagline: data.tagline || "", maturity: data.maturity || "16+", director: data.creator_name || "AI Creator", creator_name: data.creator_name || "", video_url: data.video_url, upvotes_count: data.upvotes_count || 0 });
           setVotes(data.upvotes_count || 0);
           setIsDbMovie(true);
           setLoading(false);
