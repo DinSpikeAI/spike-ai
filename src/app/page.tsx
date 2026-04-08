@@ -73,8 +73,8 @@ const HERO_SLIDES = [
 const FEATURED = HERO_SLIDES[0];
 
 const COLLECTIONS = [
-  { id: "col-anime", title: "AI Anime", subtitle: "Neural-powered animation", image: "https://images.unsplash.com/photo-1560972550-aba3456b5564?w=800&h=450&fit=crop", genre: "Anime" },
-  { id: "col-horror", title: "AI Horror", subtitle: "Fear generated frame by frame", image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=450&fit=crop", genre: "Horror" },
+  { id: "col-anime", title: "AI Anime", subtitle: "Neural-powered animation", image: "/anime.jpg", genre: "Anime" },
+  { id: "col-horror", title: "AI Horror", subtitle: "Fear generated frame by frame", image: "/horror.jpg", genre: "Horror" },
   { id: "col-scifi", title: "Sci-Fi Visions", subtitle: "Tomorrow rendered today", image: "https://images.unsplash.com/photo-1534996858221-380b92700493?w=800&h=450&fit=crop", genre: "Sci-Fi" },
   { id: "col-award", title: "Award Winners", subtitle: "The best of AI cinema", image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=450&fit=crop", genre: "Award Winning" },
   { id: "col-sora", title: "Made with Runway", subtitle: "Runway's finest works", image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&h=450&fit=crop", genre: "Runway Gen-4" },
