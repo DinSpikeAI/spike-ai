@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   Shield, Film, Trash2, Pencil, Check, X, Loader2, RefreshCw,
   ArrowLeft, ChevronDown, Search, Zap, Clock, XCircle, Eye,
-  Save, Plus, AlertTriangle, Inbox, CheckCircle, Ban, Bell,
+  Save, Plus, AlertTriangle, Inbox, CheckCircle, Ban, Bell, Users,
 } from "lucide-react";
 import { supabase, getSmartPoster, checkIsAdmin } from "@/lib/supabase";
 
@@ -68,11 +68,15 @@ export default function AdminDashboard() {
   const [deleteTarget, setDeleteTarget] = useState<Movie | null>(null);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [userCount, setUserCount] = useState(0);
+  const [totalUpvotes, setTotalUpvotes] = useState(0);
+  const [recentUsers, setRecentUsers] = useState<{ id: string; email: string; created_at: string }[]>([]);
 
   // ── Notifications Management ──
   const [notifs, setNotifs] = useState<{ id: string; title: string; created_at: string }[]>([]);
   const [newNotif, setNewNotif] = useState("");
   const [showNotifPanel, setShowNotifPanel] = useState(false);
+  const [showUsers, setShowUsers] = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -107,13 +111,23 @@ export default function AdminDashboard() {
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false });
 
-    if (!error && data) setMovies(data as Movie[]);
+    if (!error && data) {
+      setMovies(data as Movie[]);
+      setTotalUpvotes(data.reduce((sum: number, m: any) => sum + (m.upvotes_count || 0), 0));
+    }
     setLoading(false);
   }, []);
 
+  const fetchStats = useCallback(async () => {
+    if (!supabase) return;
+    const { data: profiles, count } = await supabase.from("profiles").select("id, email, created_at", { count: "exact" }).order("created_at", { ascending: false }).limit(10);
+    if (count !== null) setUserCount(count);
+    if (profiles) setRecentUsers(profiles as any);
+  }, []);
+
   useEffect(() => {
-    if (!authChecking && isAdmin) fetchMovies();
-  }, [isAdmin, authChecking, fetchMovies]);
+    if (!authChecking && isAdmin) { fetchMovies(); fetchStats(); }
+  }, [isAdmin, authChecking, fetchMovies, fetchStats]);
 
   /* ── Notifications CRUD ── */
   const fetchNotifs = useCallback(async () => {
@@ -297,17 +311,19 @@ export default function AdminDashboard() {
 
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8">
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
           {[
             { label: "Total Films", value: stats.total, color: "text-white", filter: "all" },
             { label: "Approved", value: stats.approved, color: "text-green-400", filter: "approved" },
             { label: "Pending", value: stats.pending, color: "text-yellow-400", filter: "pending" },
             { label: "Rejected", value: stats.rejected, color: "text-red-400", filter: "rejected" },
+            { label: "Users", value: userCount, color: "text-purple-400", filter: null },
+            { label: "Total Upvotes", value: totalUpvotes, color: "text-blue-400", filter: null },
           ].map((s) => (
             <div
               key={s.label}
-              onClick={() => setStatusFilter(s.filter)}
-              className={`bg-white/[0.02] border rounded-xl p-4 cursor-pointer transition-all hover:bg-white/[0.04] ${
+              onClick={() => s.filter !== null && setStatusFilter(s.filter)}
+              className={`bg-white/[0.02] border rounded-xl p-4 transition-all hover:bg-white/[0.04] ${s.filter !== null ? "cursor-pointer" : ""} ${
                 statusFilter === s.filter ? "border-white/[0.12]" : "border-white/[0.05]"
               } ${s.filter === "pending" && stats.pending > 0 ? "ring-1 ring-yellow-500/20" : ""}`}
             >
@@ -321,6 +337,40 @@ export default function AdminDashboard() {
             </div>
           ))}
         </div>
+
+        {/* ═══════ Recent Users ═══════ */}
+        {recentUsers.length > 0 && (
+          <div className="mb-8">
+            <button
+              onClick={() => setShowUsers(!showUsers)}
+              className="flex items-center gap-2 text-[13px] font-semibold tracking-wide text-white/50 hover:text-white transition-colors mb-3 cursor-pointer"
+            >
+              <Eye size={14} />
+              Recent Users ({userCount})
+              <ChevronDown size={14} className={`transition-transform ${showUsers ? "rotate-180" : ""}`} />
+            </button>
+            {showUsers && (
+              <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-white/[0.06]">
+                      <th className="text-left px-4 py-3 text-[11px] text-gray-500 uppercase tracking-wider font-medium">Email</th>
+                      <th className="text-left px-4 py-3 text-[11px] text-gray-500 uppercase tracking-wider font-medium">Joined</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentUsers.map((u) => (
+                      <tr key={u.id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
+                        <td className="px-4 py-3 text-white/70">{u.email || "No email"}</td>
+                        <td className="px-4 py-3 text-white/30">{new Date(u.created_at).toLocaleDateString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* ═══════ Notifications Panel ═══════ */}
         <div className="mb-8">
