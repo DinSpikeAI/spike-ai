@@ -73,11 +73,11 @@ const HERO_SLIDES = [
 const FEATURED = HERO_SLIDES[0];
 
 const COLLECTIONS = [
-  { id: "col-anime", title: "AI Anime", subtitle: "Neural-powered animation", image: "https://picsum.photos/seed/col-anime/800/450", genre: "Anime" },
-  { id: "col-horror", title: "AI Horror", subtitle: "Fear generated frame by frame", image: "https://picsum.photos/seed/col-horror/800/450", genre: "Horror" },
-  { id: "col-scifi", title: "Sci-Fi Visions", subtitle: "Tomorrow rendered today", image: "https://picsum.photos/seed/col-scifi/800/450", genre: "Sci-Fi" },
-  { id: "col-award", title: "Award Winners", subtitle: "The best of AI cinema", image: "https://picsum.photos/seed/col-award/800/450", genre: "Award Winning" },
-  { id: "col-sora", title: "Made with Runway", subtitle: "Runway's finest works", image: "https://picsum.photos/seed/col-sora/800/450", genre: "Runway Gen-4" },
+  { id: "col-anime", title: "AI Anime", subtitle: "Neural-powered animation", image: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&h=450&fit=crop", genre: "Anime" },
+  { id: "col-horror", title: "AI Horror", subtitle: "Fear generated frame by frame", image: "https://images.unsplash.com/photo-1509248961085-879a53db1b4a?w=800&h=450&fit=crop", genre: "Horror" },
+  { id: "col-scifi", title: "Sci-Fi Visions", subtitle: "Tomorrow rendered today", image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=450&fit=crop", genre: "Sci-Fi" },
+  { id: "col-award", title: "Award Winners", subtitle: "The best of AI cinema", image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&h=450&fit=crop", genre: "Award Winning" },
+  { id: "col-sora", title: "Made with Runway", subtitle: "Runway's finest works", image: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=450&fit=crop", genre: "Runway Gen-4" },
 ];
 
 const FALLBACK_CATEGORIES = [
@@ -1526,23 +1526,36 @@ function Footer() {
   return (
     <footer className="px-5 md:px-12 py-16 md:py-24 border-t border-white/[0.06] relative overflow-hidden"><div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-purple-600/[0.03] blur-[120px] pointer-events-none" />
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <span className="text-xl font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10">
+          <div className="max-w-sm">
+            <span className="text-xl font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
+            <p className="text-[13px] tracking-wide text-white/30 leading-relaxed mt-4">
+              The first streaming platform dedicated entirely to AI-generated cinema.
+            </p>
+          </div>
+          <div className="flex gap-12 text-[13px] tracking-wide text-white/35">
+            <div className="space-y-3">
+              <p className="text-white/50 font-medium text-[11px] uppercase tracking-[0.15em]">Platform</p>
+              <a href="#" className="block hover:text-white/60 transition-colors">About</a>
+              <a href="/blog" className="block hover:text-white/60 transition-colors">Blog</a>
+              <a href="/submit" className="block hover:text-white/60 transition-colors">Submit Film</a>
+            </div>
+            <div className="space-y-3">
+              <p className="text-white/50 font-medium text-[11px] uppercase tracking-[0.15em]">Legal</p>
+              <a href="#" className="block hover:text-white/60 transition-colors">Terms</a>
+              <a href="#" className="block hover:text-white/60 transition-colors">Privacy</a>
+              <a href="#" className="block hover:text-white/60 transition-colors">Help Center</a>
+            </div>
+          </div>
         </div>
-        <p className="text-sm font-light tracking-wide text-white/30 max-w-md leading-relaxed">
-          The world&apos;s first streaming platform dedicated entirely to
-          AI-generated cinema. Every frame, every voice, every score — crafted
-          by artificial intelligence.
-        </p>
-        <div className="flex gap-8 mt-8 text-xs font-light tracking-wider text-white/25">
-          <a href="#" className="hover:text-white/50 transition-colors">About</a>
-          <a href="#" className="hover:text-white/50 transition-colors">Terms</a>
-          <a href="#" className="hover:text-white/50 transition-colors">Privacy</a>
-          <a href="#" className="hover:text-white/50 transition-colors">Help Center</a>
+        <div className="mt-12 pt-6 border-t border-white/[0.04] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <p className="text-[11px] tracking-wider text-white/15">
+            © 2026 Spike AI. All rights reserved.
+          </p>
+          <p className="text-[11px] tracking-wider text-white/15">
+            All content is AI-generated.
+          </p>
         </div>
-        <p className="text-[11px] font-light tracking-wider text-white/15 mt-10">
-          © 2026 Spike AI. All rights reserved. All content is AI-generated.
-        </p>
       </div>
     </footer>
   );
