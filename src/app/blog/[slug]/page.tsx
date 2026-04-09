@@ -93,7 +93,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         {/* Article body */}
-        <article className="max-w-[720px] mx-auto px-6 -mt-32 relative z-10 pb-12">
+        <article className="max-w-[740px] mx-auto px-6 -mt-28 relative z-10 pb-16">
 
           {/* Meta */}
           <div className="flex items-center gap-3 mb-5 flex-wrap">
@@ -108,12 +108,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl md:text-[44px] font-extrabold tracking-[-0.02em] leading-[1.1] text-white mb-6">
+          <h1 className="text-3xl md:text-[46px] font-extrabold tracking-[-0.025em] leading-[1.08] text-white mb-8">
             {post.title}
           </h1>
 
           {/* Excerpt */}
-          <p className="text-lg text-white/40 leading-relaxed mb-10 border-l-2 border-purple-500/20 pl-5">
+          <p className="text-[17px] text-white/35 leading-[1.9] mb-12 border-l-2 border-purple-500/20 pl-6">
             {post.excerpt}
           </p>
 
@@ -228,16 +228,19 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
       {/* Article typography */}
       <style>{`
-        .prose-spike p { color: rgba(255,255,255,0.55); font-size: 17px; line-height: 1.9; margin-bottom: 1.6em; }
-        .prose-spike h2 { color: #fff; font-size: 26px; font-weight: 800; margin-top: 2.8em; margin-bottom: 0.8em; letter-spacing: -0.025em; scroll-margin-top: 80px; }
-        .prose-spike h3 { color: rgba(255,255,255,0.9); font-size: 20px; font-weight: 700; margin-top: 2.2em; margin-bottom: 0.6em; scroll-margin-top: 80px; }
-        .prose-spike strong { color: rgba(255,255,255,0.85); font-weight: 600; }
-        .prose-spike em { color: rgba(255,255,255,0.6); font-style: italic; }
-        .prose-spike hr { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 3em 0; }
+        .prose-spike p { color: rgba(255,255,255,0.5); font-size: 17.5px; line-height: 2; margin-bottom: 1.8em; letter-spacing: 0.005em; }
+        .prose-spike h2 { color: #fff; font-size: 28px; font-weight: 800; margin-top: 3.2em; margin-bottom: 1em; letter-spacing: -0.025em; scroll-margin-top: 80px; line-height: 1.25; }
+        .prose-spike h3 { color: rgba(255,255,255,0.9); font-size: 21px; font-weight: 700; margin-top: 2.6em; margin-bottom: 0.8em; scroll-margin-top: 80px; line-height: 1.3; }
+        .prose-spike strong { color: rgba(255,255,255,0.82); font-weight: 600; }
+        .prose-spike em { color: rgba(255,255,255,0.55); font-style: italic; }
+        .prose-spike hr { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 3.5em 0; }
         .prose-spike a { color: #a78bfa; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(167,139,250,0.3); transition: all 0.2s; }
         .prose-spike a:hover { color: #c4b5fd; text-decoration-color: rgba(196,181,253,0.5); }
-        .prose-spike img { border-radius: 16px; margin: 2.5em 0; }
-        .prose-spike p:first-child::first-letter { font-size: 3.2em; float: left; line-height: 0.8; margin-right: 0.08em; margin-top: 0.05em; color: rgba(255,255,255,0.8); font-weight: 700; }
+        .prose-spike img { border-radius: 16px; margin: 2.8em 0; }
+        .prose-spike p:first-child::first-letter { font-size: 3.4em; float: left; line-height: 0.8; margin-right: 0.1em; margin-top: 0.06em; color: rgba(255,255,255,0.75); font-weight: 700; }
+        .prose-spike ul, .prose-spike ol { color: rgba(255,255,255,0.5); font-size: 17px; line-height: 2; margin-bottom: 1.8em; padding-left: 1.5em; }
+        .prose-spike li { margin-bottom: 0.5em; }
+        .prose-spike blockquote { border-left: 2px solid rgba(167,139,250,0.3); padding-left: 1.5em; margin: 2em 0; color: rgba(255,255,255,0.45); font-style: italic; }
       `}</style>
     </div>
   )
