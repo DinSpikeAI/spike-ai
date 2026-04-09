@@ -862,16 +862,13 @@ function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
 
       {/* ── Content ── */}
       <div className="relative z-10 w-full px-5 md:px-12 pb-[4vh] max-w-3xl" style={{ zIndex: 10 }}>
-        {/* Top 10 Badge + Spike Original */}
+        {/* Top Badge */}
         <div key={`badge-${activeSlide}`} className="animate-fade-in-up flex items-center gap-2 md:gap-3 mb-4 md:mb-5" style={{ animationDelay: "0.05s", animationFillMode: "backwards" }}>
           {slide.rank && (
             <span className="text-[9px] md:text-[10px] font-black tracking-[0.15em] uppercase px-2.5 py-1 rounded bg-black/60 backdrop-blur-sm text-white/90 border border-white/10">
               TOP {slide.rank}
             </span>
           )}
-          <span className="text-[9px] md:text-[10px] font-medium tracking-[0.2em] uppercase px-2 md:px-3 py-1 rounded border border-white/20 text-white/60/90 bg-white/15/[0.08]">
-            Spike Original
-          </span>
           <span className="text-[9px] md:text-[10px] font-light tracking-[0.2em] uppercase text-white/25">
             {slide.year}
           </span>
@@ -913,12 +910,14 @@ function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
         </p>
 
         {/* AI Models */}
+        {slide.aiModels && slide.aiModels.length > 0 && (
         <div key={`ai-${activeSlide}`} className="animate-fade-in-up hidden sm:flex items-center gap-2 mb-6 flex-wrap" style={{ animationDelay: "0.35s", animationFillMode: "backwards" }}>
           <span className="text-[9px] text-white/25 uppercase tracking-[0.15em] font-light mr-1">Made with</span>
           {slide.aiModels.map((model) => (
             <span key={model} className="ai-tag">{model}</span>
           ))}
         </div>
+        )}
 
         {/* Buttons */}
         <div key={`btns-${activeSlide}`} className="animate-fade-in-up flex items-center gap-3 mb-6" style={{ animationDelay: "0.4s", animationFillMode: "backwards" }}>
