@@ -235,7 +235,7 @@ export default function CreatorPage() {
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles size={14} className="text-[#ffffff]" />
                   <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#ffffff]">
-                    {creator.is_creator ? "Verified Creator" : "Member"}
+                    {creator.is_creator ? "Creator" : "Member"}
                   </span>
                 </div>
               </div>
