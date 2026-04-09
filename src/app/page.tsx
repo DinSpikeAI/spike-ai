@@ -1163,7 +1163,6 @@ function MovieCard({
               }`}
             >
               <Flame size={10} fill={voted ? "currentColor" : "none"} />
-              {votes}
             </button>
           </div>
         </div>
