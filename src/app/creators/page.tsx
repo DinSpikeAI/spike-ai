@@ -58,7 +58,7 @@ export default function CreatorsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-20 max-w-[700px] mx-auto">
             {[
               { icon: Film, title: "Studio Page", desc: "A dedicated profile with your filmography, bio, and links.", color: "from-violet-500 to-indigo-600", glow: "violet" },
-              { icon: Award, title: "Official Selection", desc: "A badge of recognition for your portfolio and social channels.", color: "from-amber-400 to-orange-500", glow: "amber" },
+              { icon: Award, title: "Featured Creator", desc: "Get featured on the homepage and in curated collections.", color: "from-amber-400 to-orange-500", glow: "amber" },
               { icon: Users, title: "Community", desc: "Join a growing network of AI filmmakers and get discovered.", color: "from-cyan-400 to-blue-500", glow: "cyan" },
             ].map((item) => (
               <div key={item.title}

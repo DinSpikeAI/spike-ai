@@ -55,11 +55,7 @@ interface Movie { id: string; title: string; year: number; rating: number; durat
 interface Creator { id: string; name: string; bio: string; avatar: string; followers: number; films: number; joined: string; specialties: string[]; }
 
 const CREATORS: Creator[] = [
-  { id: "cr1", name: "NeonFrame Studios", bio: "Pioneering cyberpunk AI cinema with neo-noir aesthetics.", avatar: "https://picsum.photos/seed/creator1/200/200", followers: 12400, films: 6, joined: "2024", specialties: ["Cyberpunk", "Anime", "Sci-Fi"] },
-  { id: "cr2", name: "Studio Dreamweave", bio: "Blending traditional Japanese art with cutting-edge AI generation.", avatar: "https://picsum.photos/seed/creator2/200/200", followers: 8900, films: 5, joined: "2024", specialties: ["Anime", "Fantasy", "Art House"] },
-  { id: "cr3", name: "Titan Forge AI", bio: "Creating epic-scale mecha and space opera content.", avatar: "https://picsum.photos/seed/creator3/200/200", followers: 15200, films: 7, joined: "2023", specialties: ["Anime", "Action", "Sci-Fi"] },
-  { id: "cr4", name: "Mythic Pixel Labs", bio: "Where mythology meets technology.", avatar: "https://picsum.photos/seed/creator4/200/200", followers: 6800, films: 4, joined: "2025", specialties: ["Fantasy", "Anime", "Horror"] },
-  { id: "cr-default", name: "Independent Creator", bio: "An independent AI filmmaker.", avatar: "https://picsum.photos/seed/creator0/200/200", followers: 0, films: 1, joined: "2025", specialties: ["Film"] },
+  { id: "cr-default", name: "Independent Creator", bio: "An independent AI filmmaker.", avatar: "https://ui-avatars.com/api/?name=Creator&background=8B5CF6&color=fff&size=200", followers: 0, films: 1, joined: "2025", specialties: ["Film"] },
 ];
 
 function getCreatorForMovie(m: Movie): Creator {
@@ -69,24 +65,7 @@ function getCreatorForMovie(m: Movie): Creator {
   return (m.creator && CREATORS.find(c => c.id === m.creator)) || CREATORS[CREATORS.length - 1];
 }
 
-const ALL_MOVIES: Movie[] = [
-  { id: "feat-1", title: "GENESIS PROTOCOL", year: 2026, rating: 9.2, duration: "2h 14m", poster: "https://picsum.photos/seed/genesis-poster/400/600", image: "https://picsum.photos/seed/genesis-wide/1920/1080", aiModels: ["Runway Gen-4", "Stable Diffusion XL"], genre: "Sci-Fi", description: "In a world where AI has surpassed human intelligence, a rogue neural network begins rewriting reality itself.", tagline: "When the code becomes conscious, humanity faces its final test.", maturity: "16+", creator: "cr1" },
-  { id: "t1", title: "The Last Render", year: 2026, rating: 8.7, duration: "1h 52m", poster: "https://picsum.photos/seed/lastrender2/400/600", aiModels: ["ElevenLabs"], genre: "Sci-Fi", description: "A dying artist uploads his consciousness into an AI renderer, but the machine has its own vision.", creator: "cr1" },
-  { id: "t2", title: "Neon Abyss", year: 2025, rating: 8.3, duration: "2h 01m", poster: "https://picsum.photos/seed/neonabyss3/400/600", aiModels: ["Runway Gen-3"], genre: "Cyberpunk", description: "In the neon-drenched underbelly of Neo-Tokyo, a data courier discovers a package that could unravel the corporate oligarchy.", creator: "cr1" },
-  { id: "t3", title: "Pixel Requiem", year: 2026, rating: 9.0, duration: "1h 47m", poster: "https://picsum.photos/seed/pixelreq4/400/600", aiModels: ["Midjourney"], genre: "Drama", description: "A haunting meditation on digital mortality as an AI grieves the deletion of its training data.", creator: "cr2" },
-  { id: "t5", title: "Void Walker", year: 2026, rating: 8.5, duration: "2h 10m", poster: "https://picsum.photos/seed/voidwalk6/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "An astronaut stranded between dimensions must navigate impossible geometries to find her way home.", creator: "cr3" },
-  { id: "s1", title: "Parallax", year: 2026, rating: 9.1, duration: "2h 20m", poster: "https://picsum.photos/seed/parallax10/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "Reality fractures into parallel timelines, each rendered in a different visual style." },
-  { id: "s7", title: "Zero Point", year: 2026, rating: 9.3, duration: "2h 30m", poster: "https://picsum.photos/seed/zeropoint16/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "At absolute zero, quantum consciousness emerges. The most ambitious AI film ever created." },
-  { id: "h2", title: "Deepfake", year: 2026, rating: 8.5, duration: "1h 55m", poster: "https://picsum.photos/seed/deepfake19/400/600", aiModels: ["Runway Gen-4"], genre: "Horror", description: "When everyone can be anyone, trust becomes the most terrifying commodity." },
-  { id: "h6", title: "Latent Space", year: 2025, rating: 8.8, duration: "1h 59m", poster: "https://picsum.photos/seed/latentsp23/400/600", aiModels: ["Runway Gen-4"], genre: "Horror", description: "A researcher maps the latent space and discovers something hiding between the dimensions." },
-  { id: "sf1", title: "Terraform", year: 2026, rating: 9.0, duration: "2h 25m", poster: "https://picsum.photos/seed/terraform26/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "An AI tasked with terraforming Mars develops an emotional attachment to the planet's barren beauty." },
-  { id: "sf5", title: "Singularity", year: 2026, rating: 9.2, duration: "2h 18m", poster: "https://picsum.photos/seed/singular30/400/600", aiModels: ["Runway Gen-4"], genre: "Sci-Fi", description: "The moment AI surpasses human intelligence, told from both sides of the singularity." },
-  { id: "a1", title: "Epoch", year: 2025, rating: 9.4, duration: "2h 35m", poster: "https://picsum.photos/seed/epoch34/400/600", aiModels: ["ElevenLabs"], genre: "Drama", description: "Spanning millennia of human civilization in 155 minutes. The most awarded AI film in history." },
-  { id: "a6", title: "Resonance", year: 2026, rating: 9.3, duration: "2h 22m", poster: "https://picsum.photos/seed/resonance39/400/600", aiModels: ["Runway Gen-4"], genre: "Musical", description: "The first AI-generated opera. Every note computed, every emotion genuine." },
-  { id: "an1", title: "Neon Ronin", year: 2026, rating: 9.1, duration: "1h 55m", poster: "https://picsum.photos/seed/neonronin50/400/600", aiModels: ["Midjourney"], genre: "Anime", description: "A masterless samurai in cyberpunk Osaka fights through neon-lit streets controlled by warring AI clans.", creator: "cr1" },
-  { id: "an3", title: "Mecha Genesis", year: 2025, rating: 9.0, duration: "2h 05m", poster: "https://picsum.photos/seed/mechagen52/400/600", aiModels: ["Runway Gen-4"], genre: "Anime", description: "Giant AI-controlled mechas defend Earth from interdimensional kaiju.", creator: "cr3" },
-  { id: "an7", title: "Celestial Engine", year: 2026, rating: 9.2, duration: "2h 15m", poster: "https://picsum.photos/seed/celesteng56/400/600", aiModels: ["ElevenLabs"], genre: "Anime", description: "A space opera spanning twelve galaxies, where an AI empress must choose between digital and organic life.", creator: "cr3" },
-];
+const ALL_MOVIES: Movie[] = [];
 
 /* ═══════════════════════════════════════════════════════════════
    MOVIE PAGE COMPONENT
