@@ -31,7 +31,7 @@ import { supabase, getSmartPoster, getYouTubeThumbnail } from "@/lib/supabase";
    HARDCODED DATA (fallback when Supabase is empty)
    ═══════════════════════════════════════════════════════════════ */
 
-const HERO_SLIDES: HeroSlide[] = [];
+const HERO_SLIDES: any[] = [];
 
 const FEATURED = HERO_SLIDES[0] || null;
 
@@ -43,7 +43,7 @@ const COLLECTIONS = [
   { id: "col-sora", title: "Made with Runway", subtitle: "Runway's finest works", image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&h=450&fit=crop", genre: "Runway Gen-4" },
 ];
 
-const FALLBACK_CATEGORIES: Category[] = [];
+const FALLBACK_CATEGORIES: any[] = [];
 
 const ALL_GENRES = ["All", "Sci-Fi", "Horror", "Drama", "Thriller", "Fantasy", "Action", "Cyberpunk", "Romance", "Art House", "Anime"];
 
