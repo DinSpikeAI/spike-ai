@@ -16,7 +16,7 @@ ElevenLabs changed this equation. Their voice synthesis platform has narrowed th
 
 Early text-to-speech systems operated on concatenative synthesis — stitching together recorded phoneme fragments into words. The results were functional for navigation systems and accessibility tools but immediately recognizable as artificial. No filmmaker could build emotional engagement on a voice that sounded like a GPS unit.
 
-ElevenLabs approached the problem with a generative model trained on the prosodic patterns of human speech — the rhythm, stress, intonation, and emotional coloring that make language feel alive. The difference is not subtle. Their Turbo v2.5 model handles conversational pacing, emotional inflection, and naturalistic breathing in ways that earlier systems could not approximate.
+ElevenLabs approached the problem with a generative model trained on the prosodic patterns of human speech — the rhythm, stress, intonation, and emotional coloring that make language feel alive. The difference is not subtle. Their latest models handle conversational pacing, emotional inflection, and naturalistic breathing in ways that earlier systems could not approximate.
 
 For filmmakers, the practical impact is that a character's voice can now carry narrative weight. A whispered confession, an angry outburst, a resigned acceptance — these emotional registers are expressible through the tool rather than requiring workarounds.
 
@@ -34,15 +34,15 @@ Integrating ElevenLabs into an AI film production pipeline follows a specific se
 
 ## Lip Sync Integration
 
-The partnership between ElevenLabs and Pika Labs for lip-sync is one of the most practically useful developments in the AI filmmaking pipeline. Generated characters can now speak with mouth movements that match the audio — a capability that transforms talking-head scenes from awkward to convincing.
+The integration between ElevenLabs audio and Pika Labs' lip-sync feature is one of the most practically useful developments in the AI filmmaking pipeline. Generated characters can now speak with mouth movements that match the audio — a capability that transforms talking-head scenes from awkward to convincing.
 
 The workflow is straightforward: generate your dialogue audio in ElevenLabs, import it into Pika or Runway's lip-sync feature, and the tool generates video with synchronized mouth movements. The synchronization is not perfect — occasional lag between audio and visual is noticeable on close inspection — but it has crossed the threshold from distracting to acceptable for most narrative contexts.
 
 ## Cost and Accessibility
 
-ElevenLabs' Starter plan (around $5/month as of early 2026) provides approximately 30,000 characters — roughly 20-25 minutes of narration. For a typical three-minute short film with moderate dialogue, this is more than sufficient. The Creator plan offers expanded character limits and higher quality voice options at a higher tier.
+ElevenLabs offers tiered plans starting at a few dollars per month, providing tens of thousands of characters — roughly 20-25 minutes of narration. For a typical three-minute short film with moderate dialogue, this is more than sufficient. The Creator plan offers expanded character limits and higher quality voice options at a higher tier.
 
-Compared to hiring voice talent, the economics are transformative. Hiring professional voice talent for a short film can run several hundred dollars per session. ElevenLabs provides unlimited iteration at a fixed monthly cost, allowing filmmakers to regenerate lines until the performance matches their vision.
+Compared to hiring voice talent, the economics shift significantly. Hiring professional voice talent for a short film can run several hundred dollars per session. ElevenLabs provides unlimited iteration at a fixed monthly cost, allowing filmmakers to regenerate lines until the performance matches their vision.
 
 ## The Ethical Dimension
 
