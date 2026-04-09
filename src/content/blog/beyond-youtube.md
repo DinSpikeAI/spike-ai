@@ -56,7 +56,7 @@ What the medium needs is persistent infrastructure: a place where AI films live 
 
 ## The Creator Economy That Does Not Yet Exist
 
-A critical missing piece is the economic layer. Currently, AI filmmakers have almost no path to revenue from their work. YouTube monetization requires scale that most short-film creators will never reach. Festival prizes are meaningful but sporadic. Brand partnerships exist for the very top tier — top-tier creators like The Dor Brothers, who have accumulated hundreds of millions of views — but are inaccessible to the vast middle of talented filmmakers producing serious work.
+A critical missing piece is the economic layer. Currently, AI filmmakers have almost no path to revenue from their work. YouTube monetization requires scale that most short-film creators will never reach. Festival prizes are meaningful but sporadic. Brand partnerships exist for the very top tier — top-tier creators like The Dor Brothers, whose work has reached tens of millions of viewers — but are inaccessible to the vast middle of talented filmmakers producing serious work.
 
 Dedicated platforms can change this over time. Creator subscriptions, tool-maker sponsorships, and curated collections with revenue sharing are all viable models once the audience aggregation problem is solved. The precedent exists in other creative verticals: Bandcamp built an alternative economy for independent musicians by providing infrastructure that mainstream platforms refused to build. AI cinema needs its equivalent.
 

@@ -10,7 +10,7 @@ featured: false
 
 Two years ago, AI-generated films were silent by default. The visual generation tools had advanced far beyond the audio capabilities available to match them. Filmmakers would produce stunning imagery and then face an impossible choice: add robotic-sounding synthesized speech that undermined the entire production, or release the work without dialogue.
 
-ElevenLabs changed this equation fundamentally. Their voice synthesis platform now produces speech that professional audio engineers struggle to distinguish from human recordings in blind tests. For AI filmmakers, this means dialogue-driven narrative is finally possible without a casting budget.
+ElevenLabs changed this equation. Their voice synthesis platform has narrowed the gap between synthetic and human speech dramatically. For AI filmmakers, this means dialogue-driven narrative is finally possible without a casting budget.
 
 ## The Technical Evolution
 
