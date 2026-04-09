@@ -773,9 +773,8 @@ function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
   const heroRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  if (slides.length === 0) return null;
-  const slide = slides[activeSlide];
-  const prevSlideData = slides[prevSlide];
+  const slide = slides[activeSlide] || slides[0];
+  const prevSlideData = slides[prevSlide] || slides[0];
 
   // Auto-rotate every 6 seconds
   const startTimer = useCallback(() => {
@@ -790,7 +789,7 @@ function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
     setPrevSlide((prev) => prev);
     setActiveSlide((prev) => {
       setPrevSlide(prev);
-      return (prev + 1) % slides.length;
+      return slides.length > 0 ? (prev + 1) % slides.length : 0;
     });
     setTimeout(() => setIsTransitioning(false), 1200);
   }, [slides.length]);
@@ -805,6 +804,7 @@ function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
   };
 
   useEffect(() => {
+    if (slides.length === 0) return;
     startTimer();
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   }, [startTimer]);
@@ -826,12 +826,13 @@ function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
 
   // Preload next image
   useEffect(() => {
+    if (slides.length === 0) return;
     const nextIdx = (activeSlide + 1) % slides.length;
     const img = new Image();
     img.src = slides[nextIdx].image;
   }, [activeSlide, slides]);
 
-  return (
+  return slides.length === 0 ? null : (
     <section className="hero-section" ref={heroRef}>
       {/* ── Dual-Layer Crossfade Background ── */}
       {/* Previous slide — fading out */}
