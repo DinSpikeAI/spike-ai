@@ -252,12 +252,12 @@ export default function MoviePage() {
               {movie.tagline && <p className="text-white/40 text-sm md:text-base font-light italic tracking-wide mb-4">&ldquo;{movie.tagline}&rdquo;</p>}
 
               <div className="flex items-center gap-3 mb-5 flex-wrap">
-                <span className="text-green-400 font-semibold text-sm">{Math.round(movie.rating * 10)}% Match</span>
+                {movie.rating > 0 && <span className="text-green-400 font-semibold text-sm">{Math.round(movie.rating * 10)}% Match</span>}
                 <span className="text-white/40 text-sm">{movie.year}</span>
                 <span className="inline-flex items-center justify-center w-8 h-5 border border-white/20 rounded text-[10px] font-semibold text-white/50">{movie.maturity || "16+"}</span>
                 <span className="text-white/40 text-sm flex items-center gap-1"><Clock size={12} />{movie.duration}</span>
-                <span className="text-[10px] px-2 py-0.5 border border-white/10 rounded text-white/40 font-medium tracking-wider">4K AI</span>
-                <div className="flex items-center gap-1"><Star size={13} className="text-yellow-400" fill="#eab308" /><span className="text-white/60 text-sm font-medium">{movie.rating}</span></div>
+                
+                {movie.rating > 0 && <div className="flex items-center gap-1"><Star size={13} className="text-yellow-400" fill="#eab308" /><span className="text-white/60 text-sm font-medium">{movie.rating}</span></div>}
               </div>
 
               {/* ═══ ACTION BUTTONS ═══ */}
@@ -271,7 +271,7 @@ export default function MoviePage() {
               <p className="text-white/50 text-sm md:text-base leading-relaxed max-w-2xl mb-6">{movie.description || "An AI-generated cinematic experience pushing the boundaries of artificial creativity."}</p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
-                {creator && (<div className="bg-white/[0.03] rounded-xl p-5 border border-white/[0.04] hover:border-white/10 transition-colors"><div className="flex items-center gap-3 mb-3"><img src={creator.avatar} alt={creator.name} className="w-10 h-10 rounded-full object-cover border border-white/10" /><div><p className="text-sm font-semibold text-white">{creator.name}</p><p className="text-[10px] text-white font-medium tracking-wider uppercase">Creator</p></div></div><div className="flex items-center gap-4 mb-3"><span className="text-xs text-white/20"><span className="text-white font-semibold">{creator.followers.toLocaleString()}</span> followers</span><span className="text-xs text-white/20"><span className="text-white font-semibold">{creator.films}</span> films</span></div><button onClick={() => router.push(`/creator/${creator.id}`)} className="flex items-center gap-1 text-white text-xs font-medium hover:text-[#e0e0e0] transition-colors">View Profile <ExternalLink size={11} /></button></div>)}
+                {creator && (<div className="bg-white/[0.03] rounded-xl p-5 border border-white/[0.04] hover:border-white/10 transition-colors"><div className="flex items-center gap-3 mb-3"><img src={creator.avatar} alt={creator.name} className="w-10 h-10 rounded-full object-cover border border-white/10" /><div><p className="text-sm font-semibold text-white">{creator.name}</p><p className="text-[10px] text-white font-medium tracking-wider uppercase">Creator</p></div></div><div className="flex items-center gap-4 mb-3"><span className="text-xs text-white/20"><span className="text-white font-semibold">{creator.followers.toLocaleString()}</span> followers</span><span className="text-xs text-white/20"><span className="text-white font-semibold">{creator.films}</span> {creator.films === 1 ? "film" : "films"}</span></div><button onClick={() => router.push(`/creator/${creator.id}`)} className="flex items-center gap-1 text-white text-xs font-medium hover:text-[#e0e0e0] transition-colors">View Profile <ExternalLink size={11} /></button></div>)}
                 {movie.aiModels && movie.aiModels.length > 0 && (<div className="bg-white/[0.03] rounded-xl p-5 border border-white/[0.04] hover:border-white/10 transition-colors"><div className="flex items-center gap-2 mb-3"><Cpu size={16} className="text-white" /><p className="text-xs text-white/20 uppercase tracking-wider font-medium">AI Models Used</p></div><div className="flex flex-wrap gap-2">{movie.aiModels.map((m, i) => (<span key={i} className="px-3 py-1.5 text-xs font-medium bg-white/5 text-gray-300 rounded-lg border border-white/10">{m}</span>))}</div></div>)}
               </div>
             </div>

@@ -324,7 +324,6 @@ function MovieModal({
                   <Clock size={12} /> {movie.duration}
                 </span>
                 <span className="text-[10px] px-2 py-0.5 border border-white/[0.1] rounded text-white/40 font-medium tracking-[0.1em]">
-                  4K AI
                 </span>
               </div>
               <p className="text-white/55 text-sm font-light leading-relaxed tracking-wide">
