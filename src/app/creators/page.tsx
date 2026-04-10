@@ -44,6 +44,7 @@ const FOUNDERS: Creator[] = [
       { label: "Portfolio", url: "https://www.behance.net/mayas-vision" },
       { label: "LinkedIn", url: "https://www.linkedin.com/in/maya-shoshani-296147164/" },
       { label: "Facebook", url: "https://www.facebook.com/maya.shoshani.9" },
+      { label: "Instagram", url: "https://www.instagram.com/mayas.vision" },
     ],
     stats: [
       { label: "Hours per film", value: "300+" },
@@ -54,7 +55,7 @@ const FOUNDERS: Creator[] = [
 ];
 
 /* ═══════════════════════════════════════════════════════════════
-   CREATOR CARD COMPONENT
+   CREATOR CARD
    ═══════════════════════════════════════════════════════════════ */
 
 function CreatorCard({ creator }: { creator: Creator }) {
@@ -66,104 +67,122 @@ function CreatorCard({ creator }: { creator: Creator }) {
     if (contentRef.current) {
       setContentHeight(contentRef.current.scrollHeight);
     }
+    const handleResize = () => {
+      if (contentRef.current && expanded) {
+        setContentHeight(contentRef.current.scrollHeight);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [expanded]);
 
   return (
-    <div className="w-full max-w-[680px] mx-auto">
-      {/* Collapsed: Avatar + Name */}
+    <div className="flex flex-col items-center">
+      {/* ── Collapsed: Photo + Name + Badge ── */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full group cursor-pointer"
+        className="group cursor-pointer flex flex-col items-center text-center focus:outline-none"
       >
-        <div className="relative flex flex-col items-center text-center py-8 md:py-10">
-          {/* Avatar ring */}
-          <div className="relative mb-6">
-            <div className={`absolute -inset-[3px] rounded-full transition-all duration-700 ${
-              expanded
-                ? "bg-gradient-to-br from-violet-500 via-indigo-500 to-purple-600 opacity-100"
-                : "bg-gradient-to-br from-violet-500/40 via-indigo-500/30 to-purple-600/40 opacity-60 group-hover:opacity-100"
-            }`} />
-            <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden border-[3px] border-[#0a0a0f]">
-              <img
-                src={creator.avatar}
-                alt={creator.name}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        {/* Avatar — premium circular container */}
+        <div className="relative mb-5">
+          {/* Outer glow ring */}
+          <div className={`absolute -inset-1 rounded-full transition-all duration-700 ${
+            expanded
+              ? "opacity-100 shadow-[0_0_30px_rgba(212,168,75,0.25)]"
+              : "opacity-0 group-hover:opacity-100 group-hover:shadow-[0_0_20px_rgba(212,168,75,0.15)]"
+          }`}
+            style={{ background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d, #e8c65a)" }}
+          />
+          {/* Photo container */}
+          <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-[3px] border-[#0c0c12] shadow-2xl shadow-black/60">
+            <img
+              src={creator.avatar}
+              alt={creator.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = "none";
+                target.parentElement!.classList.add("avatar-fallback");
+              }}
+            />
+            {/* Fallback initials (shown if image fails) */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 avatar-initials pointer-events-none">
+              <span className="text-3xl md:text-4xl font-bold text-white/80">
+                {creator.name.split(" ").map(n => n[0]).join("")}
+              </span>
+            </div>
+            {/* Hover overlay */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 flex items-center justify-center">
+              <ChevronDown
+                size={20}
+                className={`text-white/0 group-hover:text-white/60 transition-all duration-500 ${expanded ? "rotate-180" : ""}`}
               />
             </div>
-            {/* Badge — Gold Metal Plaque */}
-            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 gold-badge">
-              <div className="relative flex items-center gap-2 px-4 py-1.5 rounded-[4px]"
-                style={{
-                  background: "linear-gradient(145deg, #d4a84b 0%, #f5d77a 20%, #c9953c 40%, #f5d77a 55%, #b8862d 75%, #e8c65a 100%)",
-                  boxShadow: "0 2px 8px rgba(180,130,40,0.4), 0 1px 2px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,235,170,0.5), inset 0 -1px 1px rgba(120,80,20,0.3)",
-                  border: "1px solid rgba(218,175,80,0.6)",
-                }}>
-                {/* Brushed metal overlay */}
-                <div className="absolute inset-0 rounded-[4px] opacity-[0.08]"
-                  style={{ backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.15) 1px, rgba(255,255,255,0.15) 2px)" }} />
-                {/* Warm reflection */}
-                <div className="absolute inset-0 rounded-[4px] opacity-30"
-                  style={{ background: "linear-gradient(120deg, transparent 30%, rgba(255,245,200,0.4) 45%, transparent 55%)" }} />
-                {/* Diamond */}
-                <div className="absolute top-[3px] right-[5px] w-[5px] h-[5px] rotate-45"
-                  style={{ background: "linear-gradient(135deg, #2a2a2a 0%, #555 40%, #1a1a1a 100%)", boxShadow: "0 0 3px rgba(255,220,120,0.5)" }} />
-                {/* Text — debossed */}
-                <span className="relative text-[9px] font-extrabold tracking-[0.25em] uppercase pr-2"
-                  style={{
-                    color: "#8b6914",
-                    textShadow: "0 1px 0 rgba(255,235,170,0.5), 0 -0.5px 0 rgba(80,50,10,0.4)",
-                  }}>
-                  {creator.badge}
-                </span>
-              </div>
+          </div>
+
+          {/* Gold Badge — positioned below avatar */}
+          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 gold-badge">
+            <div className="relative flex items-center justify-center px-4 py-1.5 rounded-[4px]"
+              style={{
+                background: "linear-gradient(145deg, #d4a84b 0%, #f5d77a 20%, #c9953c 40%, #f5d77a 55%, #b8862d 75%, #e8c65a 100%)",
+                boxShadow: "0 2px 8px rgba(180,130,40,0.4), 0 1px 2px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,235,170,0.5), inset 0 -1px 1px rgba(120,80,20,0.3)",
+                border: "1px solid rgba(218,175,80,0.6)",
+              }}>
+              <div className="absolute inset-0 rounded-[4px] opacity-[0.08]"
+                style={{ backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.15) 1px, rgba(255,255,255,0.15) 2px)" }} />
+              <div className="absolute inset-0 rounded-[4px] opacity-30"
+                style={{ background: "linear-gradient(120deg, transparent 30%, rgba(255,245,200,0.4) 45%, transparent 55%)" }} />
+              <div className="absolute top-[3px] right-[5px] w-[5px] h-[5px] rotate-45"
+                style={{ background: "linear-gradient(135deg, #2a2a2a 0%, #555 40%, #1a1a1a 100%)", boxShadow: "0 0 3px rgba(255,220,120,0.5)" }} />
+              <span className="relative text-[8px] md:text-[9px] font-extrabold tracking-[0.25em] uppercase pr-1"
+                style={{ color: "#8b6914", textShadow: "0 1px 0 rgba(255,235,170,0.5), 0 -0.5px 0 rgba(80,50,10,0.4)" }}>
+                {creator.badge}
+              </span>
             </div>
           </div>
+        </div>
 
-          {/* Name */}
-          <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-white/90 mb-1.5 group-hover:text-white transition-colors">
-            {creator.name}
-          </h3>
-          <p className="text-[13px] text-white/25 tracking-wide mb-5">{creator.role}</p>
+        {/* Name */}
+        <h3 className="text-2xl md:text-[32px] font-bold tracking-tight text-white/90 group-hover:text-white transition-colors mt-2">
+          {creator.name}
+        </h3>
+        <p className="text-[12px] md:text-[13px] text-white/20 tracking-widest uppercase mt-1.5">{creator.role}</p>
 
-          {/* Expand hint */}
-          <div className={`flex items-center gap-2 text-[11px] font-semibold tracking-[0.15em] uppercase transition-all duration-500 ${
-            expanded ? "text-violet-400/60" : "text-white/15 group-hover:text-white/30"
-          }`}>
-            <span>{expanded ? "Collapse" : "View profile"}</span>
-            <ChevronDown
-              size={14}
-              className={`transition-transform duration-500 ${expanded ? "rotate-180" : ""}`}
-            />
-          </div>
+        {/* Tap hint */}
+        <div className={`flex items-center gap-1.5 mt-4 transition-all duration-500 ${
+          expanded ? "text-white/25" : "text-white/10 group-hover:text-white/25"
+        }`}>
+          <span className="text-[10px] font-medium tracking-[0.15em] uppercase">
+            {expanded ? "Tap to close" : "Tap to explore"}
+          </span>
+          <ChevronDown size={12} className={`transition-transform duration-500 ${expanded ? "rotate-180" : "group-hover:translate-y-0.5"}`} />
         </div>
       </button>
 
-      {/* Expanded: Full Profile */}
+      {/* ── Expanded: Full Profile ── */}
       <div
-        className="overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        className="w-full max-w-[620px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{ maxHeight: expanded ? `${contentHeight}px` : "0px", opacity: expanded ? 1 : 0 }}
       >
-        <div ref={contentRef} className="pb-12">
+        <div ref={contentRef} className="pt-10 pb-6">
+
+          {/* Divider */}
           <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mb-10" />
 
-          {/* Stats Row */}
+          {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mb-10">
             {creator.stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="relative bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 text-center overflow-hidden group/stat"
-              >
-                <div className="absolute inset-0 bg-gradient-to-b from-violet-500/[0.04] to-transparent opacity-0 group-hover/stat:opacity-100 transition-opacity duration-500" />
+              <div key={stat.label} className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 text-center">
                 <p className="text-2xl md:text-3xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent mb-1">{stat.value}</p>
                 <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-white/20">{stat.label}</p>
               </div>
             ))}
           </div>
 
-          {/* Highlight Quote */}
-          <div className="relative mb-10 px-6 py-6 rounded-2xl bg-gradient-to-br from-violet-500/[0.06] to-indigo-500/[0.03] border border-violet-500/[0.1]">
-            <Sparkles size={14} className="text-violet-400/50 mb-3" />
-            <p className="text-[15px] md:text-[16px] text-white/60 leading-[1.8] italic">
+          {/* Highlight */}
+          <div className="mb-10 px-6 py-6 rounded-2xl bg-gradient-to-br from-amber-500/[0.04] to-yellow-500/[0.02] border border-amber-500/[0.08]">
+            <Sparkles size={14} className="text-amber-400/40 mb-3" />
+            <p className="text-[15px] text-white/50 leading-[1.8] italic">
               &quot;{creator.highlight}&quot;
             </p>
           </div>
@@ -177,12 +196,9 @@ function CreatorCard({ creator }: { creator: Creator }) {
           {/* Toolkit */}
           <div className="mb-10">
             <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/15 mb-4">AI Toolkit</p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap justify-center gap-2">
               {creator.toolkit.map((tool) => (
-                <span
-                  key={tool}
-                  className="px-3.5 py-1.5 rounded-full text-[12px] font-medium text-white/50 bg-white/[0.04] border border-white/[0.06] hover:border-violet-500/20 hover:text-violet-300/60 transition-all duration-300 cursor-default"
-                >
+                <span key={tool} className="px-3.5 py-1.5 rounded-full text-[12px] font-medium text-white/45 bg-white/[0.04] border border-white/[0.06] hover:border-amber-500/20 hover:text-amber-200/50 transition-all duration-300 cursor-default">
                   {tool}
                 </span>
               ))}
@@ -194,13 +210,10 @@ function CreatorCard({ creator }: { creator: Creator }) {
             <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/15 mb-4">Selected Works</p>
             <div className="space-y-3">
               {creator.works.map((work) => (
-                <div
-                  key={work.title}
-                  className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-all duration-300 group/work"
-                >
+                <div key={work.title} className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-all duration-300 group/work">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500/10 to-indigo-500/10 border border-violet-500/10 flex items-center justify-center flex-shrink-0">
-                      <Film size={16} className="text-violet-400/50" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/10 to-yellow-500/5 border border-amber-500/10 flex items-center justify-center flex-shrink-0">
+                      <Film size={16} className="text-amber-400/40" />
                     </div>
                     <div>
                       <p className="text-[14px] font-semibold text-white/70 group-hover/work:text-white/90 transition-colors">{work.title}</p>
@@ -214,15 +227,10 @@ function CreatorCard({ creator }: { creator: Creator }) {
           </div>
 
           {/* Links */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap justify-center gap-3">
             {creator.links.map((link) => (
-              <a
-                key={link.label}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium text-white/30 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] hover:text-white/50 transition-all duration-300"
-              >
+              <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium text-white/30 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] hover:text-white/50 transition-all duration-300">
                 <ExternalLink size={12} />
                 {link.label}
               </a>
@@ -244,11 +252,11 @@ export default function CreatorsPage() {
   return (
     <div className="min-h-screen bg-[#060608] text-white relative overflow-hidden">
 
-      {/* Ambient Background */}
+      {/* Ambient */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[10%] left-[50%] -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-[0.05]"
+        <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-[0.05]"
           style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.8) 0%, rgba(139,92,246,0.4) 30%, transparent 70%)", animation: "glow 15s ease-in-out infinite" }} />
-        <div className="absolute bottom-[10%] left-[50%] -translate-x-1/2 w-[700px] h-[400px] rounded-full opacity-[0.03]"
+        <div className="absolute bottom-[10%] left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full opacity-[0.03]"
           style={{ background: "radial-gradient(ellipse, rgba(59,130,246,0.6) 0%, transparent 70%)", animation: "glow 20s ease-in-out infinite reverse" }} />
         <div className="absolute inset-0 opacity-[0.02]"
           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")` }} />
@@ -264,11 +272,11 @@ export default function CreatorsPage() {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 px-6">
+      {/* ═══ ALL CONTENT CENTERED ═══ */}
+      <div className="relative z-10 flex flex-col items-center px-6">
 
         {/* Hero */}
-        <div className="max-w-[800px] mx-auto text-center pt-16 md:pt-24 pb-8 md:pb-12" style={{ animation: "reveal 0.8s cubic-bezier(0.16,1,0.3,1)" }}>
+        <div className="text-center pt-16 md:pt-24 pb-10 md:pb-14 max-w-[800px]" style={{ animation: "reveal 0.8s cubic-bezier(0.16,1,0.3,1)" }}>
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-500/[0.08] border border-indigo-400/[0.12] text-[11px] font-bold tracking-[0.25em] text-indigo-300/60 uppercase mb-8 backdrop-blur-sm">
             <Sparkles size={13} className="text-indigo-400/60" />
             Founding Creators
@@ -287,27 +295,24 @@ export default function CreatorsPage() {
         </div>
 
         {/* Divider */}
-        <div className="max-w-[680px] mx-auto">
+        <div className="w-full max-w-[620px]">
           <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         </div>
 
         {/* Founders */}
-        <div className="py-8 md:py-12" style={{ animation: "reveal 1s cubic-bezier(0.16,1,0.3,1) 0.2s both" }}>
+        <div className="py-14 md:py-20 w-full max-w-[620px]" style={{ animation: "reveal 1s cubic-bezier(0.16,1,0.3,1) 0.2s both" }}>
           {FOUNDERS.map((creator) => (
             <CreatorCard key={creator.id} creator={creator} />
           ))}
         </div>
 
-        {/* "More Coming" */}
-        <div className="max-w-[680px] mx-auto text-center py-16 md:py-24">
+        {/* More Coming */}
+        <div className="w-full max-w-[620px] text-center pb-20">
           <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mb-16" />
 
           <div className="flex items-center justify-center gap-4 mb-8">
             {[0, 1, 2].map((i) => (
-              <div
-                key={i}
-                className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-dashed border-white/[0.06] flex items-center justify-center"
-              >
+              <div key={i} className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-dashed border-white/[0.06] flex items-center justify-center">
                 <span className="text-white/[0.08] text-lg font-bold">?</span>
               </div>
             ))}
@@ -336,20 +341,16 @@ export default function CreatorsPage() {
       <style jsx>{`
         .cta-btn {
           background: linear-gradient(180deg, #fff 0%, #e4e4e7 100%);
-          box-shadow:
-            0 0 0 1px rgba(255,255,255,0.1),
-            0 4px 20px rgba(255,255,255,0.06),
-            0 0 60px rgba(99,102,241,0.08),
-            inset 0 1px 0 rgba(255,255,255,0.9);
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 4px 20px rgba(255,255,255,0.06), 0 0 60px rgba(99,102,241,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
         }
         .cta-btn:hover {
-          box-shadow:
-            0 0 0 1px rgba(255,255,255,0.15),
-            0 8px 40px rgba(255,255,255,0.1),
-            0 0 80px rgba(99,102,241,0.12),
-            inset 0 1px 0 rgba(255,255,255,1);
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 8px 40px rgba(255,255,255,0.1), 0 0 80px rgba(99,102,241,0.12), inset 0 1px 0 rgba(255,255,255,1);
           transform: translateY(-2px);
         }
+        .gold-badge { transition: all 0.3s ease; }
+        .gold-badge:hover { filter: brightness(1.1); }
+        .avatar-fallback { background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #8b5cf6 100%); }
+        .avatar-fallback + .avatar-initials, .avatar-fallback ~ .avatar-initials { opacity: 1 !important; }
         @keyframes reveal {
           from { opacity: 0; transform: translateY(30px); }
           to { opacity: 1; transform: translateY(0); }
@@ -357,18 +358,6 @@ export default function CreatorsPage() {
         @keyframes glow {
           0%, 100% { opacity: 0.05; transform: translate(-50%, 0) scale(1); }
           50% { opacity: 0.08; transform: translate(-50%, 0) scale(1.15); }
-        }
-        @keyframes goldGlint {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
-        .gold-badge:hover {
-          filter: brightness(1.1);
-          transform: translate(-50%, -1px);
-          transition: all 0.3s ease;
-        }
-        .gold-badge {
-          transition: all 0.3s ease;
         }
       `}</style>
     </div>
