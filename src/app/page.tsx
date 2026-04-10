@@ -473,6 +473,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
             { label: "My List", href: "/my-list" },
             { label: "Creators", href: "/creators" },
             { label: "Submit Film", href: "/submit", special: true },
+            { label: "Join as Creator", href: "/spike_apply_en.html", special: true },
           ].map((link) => (
             link.special ? (
               <a key={link.label} href={link.href} className="text-[12.5px] font-medium tracking-[0.04em] px-5 py-1.5 rounded-full border border-white/30 text-white/70 hover:bg-white/10 hover:text-white transition-all duration-300 ml-1">{link.label}</a>
@@ -695,6 +696,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                 { label: "My List", href: "/my-list", icon: "📋" },
                 { label: "Creators", href: "/creators", icon: "🎭" },
                 { label: "Submit Film", href: "/submit", icon: "🎥" },
+                { label: "Join as Creator", href: "/spike_apply_en.html", icon: "⭐" },
               ].map((item) => (
                 <a key={item.label} href={item.href} className="flex items-center gap-3 px-5 py-3.5 text-white/60 hover:text-white hover:bg-white/[0.04] transition-colors" onClick={() => setShowMobileMenu(false)}>
                   <span className="text-base">{item.icon}</span>
