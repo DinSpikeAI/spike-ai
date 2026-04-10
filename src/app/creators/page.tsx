@@ -29,15 +29,15 @@ const FOUNDERS: Creator[] = [
   {
     id: "maya-shoshani",
     name: "Maya Shoshani",
-    badge: "Founding Creator",
-    role: "Creative AI Specialist",
-    avatar: "https://ui-avatars.com/api/?name=Maya+Shoshani&background=8B5CF6&color=fff&size=256&font-size=0.35&bold=true",
-    bio: "Independent filmmaker and creative director at the intersection of cinema, emotion, and AI. Currently a Creative AI Specialist at Lightricks. Maya approaches AI as a collaborator \u2013 not a replacement for human creativity.",
-    highlight: "Creator of the cinematic 6-part AI series \"Breakup Letters\". Known for high-end, detail-oriented AI filmmaking (investing 300+ hours per film).",
+    badge: "Pioneer Creator",
+    role: "Filmmaker \u00b7 Lightricks AI Specialist",
+    avatar: "/creators/maya-shoshani.jpg",
+    bio: "Featured in GenAI Magazine as a leading voice in AI cinema. Creative AI Specialist at Lightricks ($1.8B), one of the world's largest AI video companies. Maya directs, writes, edits, designs sound, and collaborates with composers to create films with real emotional depth \u2013 a complete auteur pipeline powered by AI.",
+    highlight: "Invested over 300 hours in a single 14-minute film with an original composed score. Creator of \"Breakup Letters\" \u2013 a 6-part cinematic AI series submitted to major international film festivals.",
     toolkit: ["Kling", "Sora", "Veo3", "Wan 2.6", "Minimax", "Seedance", "After Effects"],
     works: [
-      { title: "Breakup Letters", type: "Series \u00b7 6 Episodes", note: "Selected for international festivals" },
-      { title: "Short Film (14 min)", type: "Drama", note: "300+ hours \u00b7 Original score" },
+      { title: "Breakup Letters", type: "Series \u00b7 6 Episodes", note: "International film festivals" },
+      { title: "14-Min Short Film", type: "Drama \u00b7 Original Score", note: "300+ hours production" },
       { title: "Meditation Gone Very Wrong", type: "Comedy / Experimental", note: "Behance featured" },
     ],
     links: [
@@ -48,7 +48,7 @@ const FOUNDERS: Creator[] = [
     ],
     stats: [
       { label: "Hours per film", value: "300+" },
-      { label: "Series episodes", value: "6" },
+      { label: "Festival submissions", value: "6+" },
       { label: "AI tools mastered", value: "7" },
     ],
   },
@@ -279,7 +279,7 @@ export default function CreatorsPage() {
         <div className="text-center pt-16 md:pt-24 pb-10 md:pb-14 max-w-[800px]" style={{ animation: "reveal 0.8s cubic-bezier(0.16,1,0.3,1)" }}>
           <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-500/[0.08] border border-indigo-400/[0.12] text-[11px] font-bold tracking-[0.25em] text-indigo-300/60 uppercase mb-8 backdrop-blur-sm">
             <Sparkles size={13} className="text-indigo-400/60" />
-            Founding Creators
+            Pioneer Creators
           </div>
 
           <h1 className="text-[42px] md:text-[60px] lg:text-[72px] font-bold tracking-tight leading-[1.05] mb-6">
