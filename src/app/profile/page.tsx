@@ -4,9 +4,30 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Loader2, LogIn, Check, Heart, Bookmark,
-  Calendar, Film, Sparkles, Camera, ExternalLink, Globe,
+  Calendar, Film, Sparkles, Camera, ExternalLink, Globe, Flame,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+
+function StatRing({ value, label, icon: Icon, color }: { value: number; label: string; icon: any; color: string }) {
+  const r = 38, c = 2 * Math.PI * r;
+  const pct = Math.min(value / Math.max(value, 10), 1);
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <div className="relative w-[100px] h-[100px]">
+        <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
+          <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="3" />
+          <circle cx="50" cy="50" r={r} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round"
+            strokeDasharray={`${c * pct} ${c}`} className="transition-all duration-1000" style={{ filter: `drop-shadow(0 0 6px ${color}40)` }} />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <Icon size={16} style={{ color }} className="mb-1 opacity-60" />
+          <span className="text-[22px] font-bold tracking-tight text-white">{value}</span>
+        </div>
+      </div>
+      <span className="text-[10px] tracking-[0.2em] uppercase text-white/20">{label}</span>
+    </div>
+  );
+}
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -117,17 +138,24 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen w-full bg-[#08080c] text-white relative overflow-hidden">
-      {/* Ambient glow — matches presentation style */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[5%] right-[15%] w-[600px] h-[600px] rounded-full opacity-[0.035]"
+      {/* ── Full-page texture ── */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        {/* Noise grain */}
+        <div className="absolute inset-0 opacity-[0.03]"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")` }} />
+        {/* Dot grid */}
+        <div className="absolute inset-0 opacity-[0.025]"
+          style={{ backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
+        {/* Ambient glow */}
+        <div className="absolute top-[5%] right-[15%] w-[600px] h-[600px] rounded-full opacity-[0.04]"
           style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 65%)" }} />
-        <div className="absolute bottom-[10%] left-[10%] w-[400px] h-[400px] rounded-full opacity-[0.02]"
+        <div className="absolute bottom-[10%] left-[10%] w-[400px] h-[400px] rounded-full opacity-[0.025]"
           style={{ background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)" }} />
       </div>
 
       {/* Nav */}
       <nav className="sticky top-0 z-50 bg-[#08080c]/80 backdrop-blur-xl border-b border-white/[0.04]">
-        <div className="max-w-3xl mx-auto px-8 h-14 flex items-center justify-between">
+        <div className="w-full max-w-3xl mx-auto px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={() => router.push("/")} className="text-white/20 hover:text-white/50 transition-colors cursor-pointer"><ArrowLeft size={18} /></button>
             <span className="text-[14px] font-medium text-white/30">Profile</span>
@@ -140,7 +168,7 @@ export default function ProfilePage() {
         </div>
       </nav>
 
-      {/* ═══ MAIN ═══ */}
+      {/* ═══ MAIN (centered) ═══ */}
       <div className="w-full flex justify-center">
       <div className="w-full max-w-3xl px-8 relative z-10 prof-reveal">
 
@@ -160,8 +188,7 @@ export default function ProfilePage() {
         </div>
 
         {/* ── Centered Header ── */}
-        <div className="flex flex-col items-center text-center -mt-16 pt-0 pb-12">
-          {/* Avatar */}
+        <div className="flex flex-col items-center text-center -mt-16 pb-10">
           <div className="w-[128px] h-[128px] rounded-full overflow-hidden border-4 border-[#08080c] shadow-2xl shadow-black/80 mb-6">
             {avatarUrl ? (
               <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
@@ -169,8 +196,6 @@ export default function ProfilePage() {
               <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-white/25" style={{ background: "linear-gradient(135deg, #1a1a22 0%, #111116 100%)" }}>{initial}</div>
             )}
           </div>
-
-          {/* Name + Badge */}
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-[32px] font-bold tracking-tight">{displayName || "User"}</h1>
             {isCreator && (
@@ -181,26 +206,18 @@ export default function ProfilePage() {
           {memberSince && <p className="text-[12px] text-white/10 flex items-center gap-1.5"><Calendar size={10} /> Joined {memberSince}</p>}
         </div>
 
-        {/* ── Stats (borderless, presentation style) ── */}
-        <div className="flex items-center justify-center gap-0 mb-14">
-          {[
-            { value: stats.films, label: "Films" },
-            { value: stats.upvotes, label: "Upvotes" },
-            { value: stats.watchlist, label: "Watchlist" },
-          ].map((s, i) => (
-            <div key={s.label} className="text-center px-10 py-2" style={i < 2 ? { borderRight: "1px solid rgba(255,255,255,0.06)" } : {}}>
-              <p className="text-[28px] font-bold tracking-tight mb-0.5">{s.value}</p>
-              <p className="text-[10px] text-[#555] tracking-[0.2em] uppercase">{s.label}</p>
-            </div>
-          ))}
+        {/* ── Stats Rings ── */}
+        <div className="flex items-center justify-center gap-10 md:gap-16 mb-14">
+          <StatRing value={stats.films} label="Films" icon={Film} color="#8b5cf6" />
+          <StatRing value={stats.upvotes} label="Upvotes" icon={Flame} color="#f59e0b" />
+          <StatRing value={stats.watchlist} label="Watchlist" icon={Bookmark} color="#3b82f6" />
         </div>
 
-        {/* ── Divider ── */}
+        {/* Divider */}
         <div className="h-px bg-white/[0.04] mb-14" />
 
         {/* ── Form ── */}
         <div className="max-w-xl mx-auto space-y-10 pb-12">
-
           <div>
             <label className="block text-[10px] font-bold tracking-[0.25em] text-white/15 uppercase mb-3">Display Name</label>
             <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)}
@@ -220,14 +237,12 @@ export default function ProfilePage() {
             <div className="w-full bg-white/[0.015] border border-white/[0.03] rounded-2xl px-6 py-4 text-[16px] text-[#555]">{user.email}</div>
           </div>
 
-          {/* ── Creator ── */}
           {isCreator && (
             <div className="pt-6">
               <div className="flex items-center gap-3 mb-10">
                 <div className="w-1.5 h-6 rounded-full bg-[#22c55e]/50" />
                 <span className="text-[10px] font-bold tracking-[0.25em] text-[#22c55e]/50 uppercase">Creator Profile</span>
               </div>
-
               <div className="space-y-10">
                 <div>
                   <label className="block text-[10px] font-bold tracking-[0.25em] text-white/15 uppercase mb-3">Website / Portfolio</label>
@@ -238,7 +253,6 @@ export default function ProfilePage() {
                       placeholder="https://yoursite.com" />
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-[10px] font-bold tracking-[0.25em] text-white/15 uppercase mb-4">Social Links</label>
                   <div className="space-y-4">
@@ -260,7 +274,7 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* ── Save ── */}
+          {/* Save */}
           <div className="pt-8">
             <button onClick={handleSave} disabled={saving}
               className="w-full py-[18px] bg-white text-[#08080c] text-[14px] font-bold rounded-2xl hover:bg-white/90 disabled:opacity-30 transition-all cursor-pointer flex items-center justify-center gap-2.5">
@@ -281,20 +295,20 @@ export default function ProfilePage() {
               </button>
             )}
           </div>
-
           {stats.films === 0 ? (
-            <div className="text-center py-20">
+            <div className="text-center py-20 rounded-2xl bg-white/[0.015] border border-white/[0.03]">
               <Film size={28} className="text-white/[0.06] mx-auto mb-4" />
               <p className="text-[14px] text-white/15 mb-1">No films yet</p>
               <p className="text-[12px] text-white/[0.08]">Submit your first AI film to see it here.</p>
             </div>
           ) : (
-            <div className="text-center py-14">
+            <div className="text-center py-14 rounded-2xl bg-white/[0.015] border border-white/[0.03]">
               <p className="text-[15px] text-white/25">{stats.films} film{stats.films !== 1 ? "s" : ""} published</p>
               <button onClick={() => router.push(`/creator/${user.id}`)} className="mt-4 text-[13px] text-[#8b5cf6]/50 hover:text-[#8b5cf6]/80 transition-colors cursor-pointer">View all films →</button>
             </div>
           )}
         </div>
+
       </div>
       </div>
 
