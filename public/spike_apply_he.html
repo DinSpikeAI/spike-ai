@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הגשת מועמדות — Spike AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Heebo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a12;
+    --surface: #12121f;
+    --border: rgba(255,255,255,0.06);
+    --purple: #7c5cbf;
+    --purple-light: #a78bfa;
+    --purple-glow: rgba(124,92,191,0.15);
+    --text: #e0e0e0;
+    --text-dim: rgba(255,255,255,0.4);
+    --text-dimmer: rgba(255,255,255,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh; overflow-x: hidden; direction: rtl;
+  }
+  .bg-glow {
+    position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 400px; border-radius: 50%;
+    background: var(--purple-glow); filter: blur(150px);
+    pointer-events: none; z-index: 0;
+  }
+  .container {
+    max-width: 640px; margin: 0 auto; padding: 60px 24px 80px;
+    position: relative; z-index: 1;
+  }
+  .logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px; font-weight: 700; letter-spacing: 0.15em;
+    color: #fff; text-align: center; margin-bottom: 50px; direction: ltr;
+  }
+  .logo span { color: var(--purple-light); }
+  .tagline {
+    text-align: center; font-size: 12px; letter-spacing: 0.1em;
+    color: var(--purple-light); margin-bottom: 16px;
+  }
+  h1 {
+    font-family: 'Heebo', sans-serif;
+    text-align: center; font-size: 34px; font-weight: 700;
+    color: #fff; line-height: 1.3; margin-bottom: 16px;
+  }
+  .subtitle {
+    text-align: center; font-size: 15px; color: var(--text-dim);
+    line-height: 1.8; margin-bottom: 40px; max-width: 480px; margin-left: auto; margin-right: auto;
+  }
+  .limited {
+    display: inline-block; background: rgba(124,92,191,0.1);
+    border: 1px solid rgba(124,92,191,0.2); border-radius: 20px;
+    padding: 4px 14px; font-size: 11px; letter-spacing: 0.05em;
+    color: var(--purple-light); margin-bottom: 40px;
+  }
+  .benefits {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px; margin-bottom: 32px;
+  }
+  .benefits-title {
+    font-size: 14px; font-weight: 700; color: var(--purple-light);
+    letter-spacing: 0.05em; margin-bottom: 18px;
+  }
+  .benefit {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .benefit:last-child { border-bottom: none; }
+  .benefit-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--purple); margin-top: 9px; flex-shrink: 0;
+  }
+  .benefit p { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
+  .hint {
+    background: rgba(74,222,128,0.04); border: 1px solid rgba(74,222,128,0.1);
+    border-radius: 12px; padding: 18px; margin-bottom: 40px;
+    font-size: 13px; color: rgba(74,222,128,0.7); line-height: 1.8;
+  }
+  .form-section {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px; margin-bottom: 24px;
+  }
+  .form-title {
+    font-size: 13px; font-weight: 700; color: var(--text-dimmer);
+    letter-spacing: 0.05em; margin-bottom: 20px;
+  }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block; font-size: 13px; color: var(--text-dim);
+    margin-bottom: 6px; font-weight: 500;
+  }
+  .field input {
+    width: 100%; padding: 12px 16px; font-size: 14px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; color: #fff; outline: none;
+    font-family: 'Heebo', sans-serif; transition: border-color 0.2s; direction: rtl;
+  }
+  .field input:focus { border-color: var(--purple); }
+  .field input::placeholder { color: var(--text-dimmer); }
+  .field input[dir="ltr"] { direction: ltr; text-align: left; }
+  .checkbox-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 16px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; margin-bottom: 24px; cursor: pointer;
+  }
+  .checkbox-row input[type="checkbox"] {
+    width: 18px; height: 18px; margin-top: 2px; accent-color: var(--purple); flex-shrink: 0;
+  }
+  .checkbox-row span { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+  .cta {
+    width: 100%; padding: 16px; font-size: 16px; font-weight: 700;
+    font-family: 'Heebo', sans-serif;
+    background: var(--purple); color: #fff; border: none;
+    border-radius: 12px; cursor: pointer; letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .cta:hover { background: #6a4dab; }
+  .cta:active { transform: scale(0.98); }
+  .footer {
+    text-align: center; margin-top: 40px; padding-top: 24px;
+    border-top: 1px solid var(--border); direction: ltr;
+  }
+  .footer p { font-size: 12px; color: var(--text-dimmer); }
+  .footer a { color: var(--purple-light); text-decoration: none; }
+  .success {
+    display: none; text-align: center; padding: 60px 20px;
+  }
+  .success h2 {
+    font-family: 'Heebo', sans-serif;
+    font-size: 28px; color: #fff; margin-bottom: 16px;
+  }
+  .success p { font-size: 15px; color: var(--text-dim); line-height: 1.8; }
+  .success .check {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(74,222,128,0.1); border: 2px solid rgba(74,222,128,0.3);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 24px; font-size: 28px;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="container">
+
+  <div class="logo">spike <span>AI</span></div>
+
+  <!-- FORM VIEW -->
+  <div id="formView">
+    <p class="tagline">פלטפורמת הסטרימינג הראשונה לקולנוע AI</p>
+    <h1>הגישו מועמדות לדור הראשון של יוצרי קולנוע AI</h1>
+    <p class="subtitle">אנחנו בונים את הבית של קולנוע ה-AI. אנחנו מחפשים את היוצרים הראשונים שיעצבו את הפלטפורמה ויקבלו מעמד חלוצי.</p>
+    <div style="text-align: center; margin-bottom: 40px;">
+      <span class="limited">המקומות מוגבלים</span>
+    </div>
+
+    <div class="benefits">
+      <p class="benefits-title">מה מקבלים</p>
+      <div class="benefit"><div class="benefit-dot"></div><p>דף סטודיו אישי — ביו, רשתות חברתיות, פילמוגרפיה. הבית שלך בפלטפורמה.</p></div>
+      <div class="benefit"><div class="benefit-dot"></div><p>תג Pioneer Creator — סימן קבוע שהיית מהראשונים. המעמד הזה לא יינתן שוב.</p></div>
+      <div class="benefit"><div class="benefit-dot"></div><p>קרדיט מלא על כל סרט — השם שלך, הכלים שלך, הסיפור שלך. תמיד נראה.</p></div>
+      <div class="benefit"><div class="benefit-dot"></div><p>פלטפורמה שנבנתה לקולנוע — העבודה שלך מוצגת כמו שמגיע לה, לא קבורה בין ולוגים וסרטוני חתולים.</p></div>
+    </div>
+
+    <div class="hint">
+      אנחנו בדיונים פעילים עם חברות כלי AI מובילות על שותפויות. יוצרים חלוצים יהיו הראשונים ליהנות מבאדג'ים, showcases ואינטגרציות כלים ברגע שהם יעלו לאוויר.
+    </div>
+
+    <form action="https://formsubmit.co/spikeaistudio@gmail.com" method="POST">
+      <!-- FormSubmit config -->
+      <input type="hidden" name="_subject" value="הגשת מועמדות Pioneer Creator חדשה">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_next" value="https://spikeai.studio/spike_apply_he.html?submitted=true">
+      <input type="hidden" name="_autoresponse" value="Thank you for applying to become a Pioneer Creator on Spike AI. We've received your application and will review your work shortly. If selected, we'll reach out with next steps. Welcome to the future of AI cinema. — Dean, Founder of Spike AI | spikeai.studio">
+
+      <div class="form-section">
+        <p class="form-title">טופס הגשת מועמדות</p>
+        <div class="field">
+          <label>שם יוצר</label>
+          <input type="text" name="שם יוצר" placeholder="השם שלך או שם הסטודיו" required>
+        </div>
+        <div class="field">
+          <label>מייל</label>
+          <input type="email" name="מייל" placeholder="you@example.com" dir="ltr" required>
+        </div>
+        <div class="field">
+          <label>לינק לעבודה</label>
+          <input type="url" name="לינק לעבודה" placeholder="ערוץ יוטיוב, אתר או פורטפוליו" dir="ltr" required>
+        </div>
+        <div class="field">
+          <label>רשתות חברתיות</label>
+          <input type="text" name="רשתות חברתיות" placeholder="אינסטגרם, X/טוויטר, טיקטוק (לינקים או שמות)" dir="ltr">
+        </div>
+        <div class="field">
+          <label>אילו כלי AI אתה משתמש?</label>
+          <input type="text" name="כלי AI" placeholder="Runway, Kling, ElevenLabs, Suno, Midjourney...">
+        </div>
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" name="אישור" value="מסכים/ה לתנאי Pioneer Creator" required>
+        <span>אני מסכים/ה שהפרופיל שלי יופיע ב-Spike AI כ-Pioneer Creator</span>
+      </label>
+
+      <div style="margin-top: 8px; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); font-size: 11px; line-height: 1.7; color: rgba(255,255,255,0.25); direction: rtl; text-align: right;">
+        בהגשת טופס זה, אני מאשר/ת כי כל התוכן שאגיש הוא יצירתי המקורית ויש לי את מלוא הזכויות עליו. אני שומר/ת על בעלות מלאה על העבודות שלי ומעניק/ה ל-Spike AI רישיון לא בלעדי וניתן לביטול להצגתן בפלטפורמה. תוכנית זו אינה מהווה יחסי עבודה, שותפות, או זכויות בעלות ב-Spike AI. תנאי מונטיזציה עתידיים, אם יהיו, יהיו כפופים להסכם נפרד. Spike AI שומרת לעצמה את הזכות לשנות תכונות או תנאים בכל עת.
+      </div>
+
+      <button type="submit" class="cta">הגש מועמדות</button>
+    </form>
+  </div>
+
+  <div class="footer">
+    <p><a href="https://spikeai.studio">spikeai.studio</a></p>
+  </div>
+
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('submitted') === 'true') {
+    document.getElementById('formView').innerHTML = `
+      <div class="success" style="display:block">
+        <div class="check">✓</div>
+        <h2>המועמדות התקבלה</h2>
+        <p>תודה על ההגשה! נעבור על העבודה שלך ונחזור אליך בקרוב.<br>ברוכים הבאים לעתיד של קולנוע ה-AI.</p>
+      </div>
+    `;
+  }
+</script>
+
+</body>
+</html>
