@@ -30,9 +30,9 @@ const FOUNDERS: Creator[] = [
     id: "maya-shoshani",
     name: "Maya Shoshani",
     badge: "Pioneer Creator",
-    role: "Filmmaker \u00b7 Lightricks AI Specialist",
+    role: "Independent Filmmaker \u00b7 Former Lightricks AI Specialist",
     avatar: "/creators/maya-shoshani.jpg",
-    bio: "Featured in GenAI Magazine as a leading voice in AI cinema. Creative AI Specialist at Lightricks ($1.8B), one of the world's largest AI video companies. Maya directs, writes, edits, designs sound, and collaborates with composers to create films with real emotional depth \u2013 a complete auteur pipeline powered by AI.",
+    bio: "Featured in GenAI Magazine as a leading voice in AI cinema. Former Creative AI Specialist at Lightricks ($1.8B). Now an independent filmmaker, Maya directs, writes, edits, designs sound, and collaborates with composers to create films with real emotional depth \u2013 a complete auteur pipeline powered by AI.",
     highlight: "Invested over 300 hours in a single 14-minute film with an original composed score. Creator of \"Breakup Letters\" \u2013 a 6-part cinematic AI series submitted to major international film festivals.",
     toolkit: ["Kling", "Sora", "Veo3", "Wan 2.6", "Minimax", "Seedance", "After Effects"],
     works: [
