@@ -53,6 +53,7 @@ export default function AuthPage() {
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
   const [newUser, setNewUser] = useState<any>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
@@ -67,6 +68,7 @@ export default function AuthPage() {
 
   const handleGoogleSignIn = async () => {
     if (!supabase) return;
+    if (view === "signup" && !termsAccepted) { setError("Please accept the Terms of Service to create an account"); return; }
     setGoogleLoading(true);
     setError(null);
     try {
@@ -92,6 +94,7 @@ export default function AuthPage() {
     if (!email) { setError("Please enter your email"); return; }
     if (view !== "magic" && !password) { setError("Please enter your password"); return; }
     if (view === "signup" && password.length < 6) { setError("Min 6 characters"); return; }
+    if (view === "signup" && !termsAccepted) { setError("Please accept the Terms of Service to create an account"); return; }
     setLoading(true); setError(null);
     try {
       if (view === "magic") {
@@ -316,6 +319,25 @@ export default function AuthPage() {
                       </div>
                     )}
 
+                    {/* Terms Checkbox — signup only */}
+                    {view === "signup" && (
+                      <label className="flex items-start gap-3 cursor-pointer group" style={{ animation: "slideIn 0.3s ease" }}>
+                        <input
+                          type="checkbox"
+                          checked={termsAccepted}
+                          onChange={(e) => { setTermsAccepted(e.target.checked); setError(null); }}
+                          className="mt-0.5 w-4 h-4 rounded accent-purple-500 cursor-pointer flex-shrink-0"
+                        />
+                        <span className="text-[11px] text-white/25 leading-[1.6] group-hover:text-white/35 transition-colors">
+                          I agree to the{" "}
+                          <a href="/terms" target="_blank" className="text-purple-400/60 hover:text-purple-400/80 underline">Terms of Service</a>
+                          {" "}and{" "}
+                          <a href="/terms#privacy" target="_blank" className="text-purple-400/60 hover:text-purple-400/80 underline">Privacy Policy</a>.
+                          I confirm I am at least 18 years old.
+                        </span>
+                      </label>
+                    )}
+
                     {/* Error */}
                     {error && (
                       <div className="flex items-start gap-3 p-4 bg-red-500/[0.06] border border-red-500/[0.1] rounded-xl text-left" style={{ animation: "shake 0.4s ease" }}>
@@ -332,6 +354,16 @@ export default function AuthPage() {
                         : view === "signup" ? <>Create Account <Sparkles size={16} /></>
                         : <>Sign In <ArrowRight size={17} strokeWidth={2.5} /></>}
                     </button>
+
+                    {/* Terms note for sign-in */}
+                    {view !== "signup" && (
+                      <p className="text-[10px] text-white/10 text-center mt-3">
+                        By continuing, you agree to our{" "}
+                        <a href="/terms" target="_blank" className="text-white/20 hover:text-white/30 underline">Terms</a>
+                        {" "}and{" "}
+                        <a href="/terms#privacy" target="_blank" className="text-white/20 hover:text-white/30 underline">Privacy Policy</a>.
+                      </p>
+                    )}
                   </div>
 
                   {/* Divider before magic link */}
