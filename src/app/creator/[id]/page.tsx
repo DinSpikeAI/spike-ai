@@ -9,9 +9,9 @@ import {
 } from "lucide-react";
 import { supabase, getSmartPoster } from "@/lib/supabase";
 
-/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+/* ═══════════════════════════════════════════════════════════════
    TYPES
-   ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */
+   ═══════════════════════════════════════════════════════════════ */
 
 interface CreatorProfile {
   id: string;
@@ -43,9 +43,9 @@ interface CreatorMovie {
   video_url?: string;
 }
 
-/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+/* ═══════════════════════════════════════════════════════════════
    CREATOR PAGE
-   ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */
+   ═══════════════════════════════════════════════════════════════ */
 
 export default function CreatorPage() {
   const params = useParams();
@@ -61,7 +61,7 @@ export default function CreatorPage() {
   const [followerCount, setFollowerCount] = useState(0);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
 
-  // ΓöÇΓöÇ Load Creator from DB ΓöÇΓöÇ
+  // ── Load Creator from DB ──
   useEffect(() => {
     async function load() {
       setLoading(true);
@@ -153,7 +153,7 @@ export default function CreatorPage() {
     } catch {}
   };
 
-  // ΓöÇΓöÇ Loading ΓöÇΓöÇ
+  // ── Loading ──
   if (loading) {
     return (
       <div className="min-h-screen bg-[#060608] relative overflow-hidden flex items-center justify-center">
@@ -172,7 +172,7 @@ export default function CreatorPage() {
     );
   }
 
-  // ΓöÇΓöÇ Not Found ΓöÇΓöÇ
+  // ── Not Found ──
   if (notFound || !creator) {
     return (
       <div className="min-h-screen bg-[#060608] relative overflow-hidden flex items-center justify-center">
@@ -362,9 +362,9 @@ export default function CreatorPage() {
                   <p className="text-sm font-medium text-white/80 group-hover:text-white transition-colors truncate">{m.title}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-white/20 text-xs">{m.year}</span>
-                    <span className="text-white/15 text-xs">┬╖</span>
+                    <span className="text-white/15 text-xs">·</span>
                     <span className="text-white/20 text-xs">{m.genre}</span>
-                    <span className="text-white/15 text-xs">┬╖</span>
+                    <span className="text-white/15 text-xs">·</span>
                     <span className="text-white/20 text-xs flex items-center gap-0.5"><Clock size={9} />{m.duration}</span>
                   </div>
                 </div>
@@ -385,6 +385,9 @@ export default function CreatorPage() {
           <p className="text-[10px] tracking-[0.3em] uppercase text-white/15 mb-4">AI Cinema</p>
           <p className="text-white/20 text-xs">&copy; {new Date().getFullYear()} Spike AI. The home for AI-generated cinema.</p>
           <div className="flex justify-center gap-4 mt-3 text-[11px] text-white/15"><a href="/terms" className="hover:text-white/30 transition-colors">Terms</a><a href="/privacy" className="hover:text-white/30 transition-colors">Privacy</a><a href="/community-guidelines" className="hover:text-white/30 transition-colors">Guidelines</a></div>
+        </div>
+      </footer>
+
       {shareMsg && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[600] px-5 py-3 rounded-xl bg-[#1a1a1e]/95 backdrop-blur-2xl border border-white/[0.08] shadow-2xl" style={{ animation: "fadeInUp 0.3s cubic-bezier(0.22,1,0.36,1)" }}>
           <span className="text-[13px] font-medium tracking-wide text-white/80">{shareMsg}</span>
