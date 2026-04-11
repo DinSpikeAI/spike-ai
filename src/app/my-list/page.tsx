@@ -47,7 +47,7 @@ export default function MyListPage() {
           const m = map.get(id)!;
           return { id: m.id, title: m.title, year: m.year || 2026, rating: Number(m.rating) || 0, duration: m.duration || "", poster: getSmartPoster(m.poster_url, m.video_url, m.id), genre: m.genre || "Sci-Fi", description: m.description || "", aiModels: m.ai_models || [], upvotes_count: m.upvotes_count || 0, video_url: m.video_url || undefined };
         }));
-      } catch (err) { console.error(err); }
+      } catch {}
       setLoading(false);
     }
     fetchList();

@@ -95,7 +95,7 @@ export default function SubmitPage() {
       if (error) throw error
       setSubmitted(true)
     } catch (err) {
-      console.error(err)
+
       setToast({ message: 'Submission failed. Please try again.', type: 'error' })
     } finally {
       setSubmitting(false)

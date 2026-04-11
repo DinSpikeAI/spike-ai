@@ -174,7 +174,7 @@ export default function MoviePage() {
       const safe = count ?? 0;
       await supabase.from("movies").update({ upvotes_count: safe }).eq("id", movieId);
       setVotes(safe);
-    } catch (e) { console.error("[Upvote]", e); }
+    } catch {}
   };
 
   const handleWatchlist = async () => {
@@ -184,7 +184,7 @@ export default function MoviePage() {
     try {
       if (was) { await supabase.from("watchlist").delete().eq("user_id", user.id).eq("movie_id", movieId); }
       else { await supabase.from("watchlist").insert({ user_id: user.id, movie_id: movieId }); }
-    } catch (e) { console.error("[Watchlist]", e); }
+    } catch {}
   };
 
   const handleShare = async () => {

@@ -1002,7 +1002,7 @@ function MovieCard({
   const handleUpvote = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("[Upvote] clicked:", movie.title, "| isDb:", isDbMovie, "| voted:", voted);
+
 
     // Optimistic UI — always works, even without DB
     const wasVoted = voted;
@@ -1015,13 +1015,13 @@ function MovieCard({
 
     // DB operations — only for real DB movies with logged-in user
     if (!supabase || !isDbMovie) {
-      console.log("[Upvote] skipping DB — supabase:", !!supabase, "isDb:", isDbMovie);
+
       return;
     }
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) {
-      console.log("[Upvote] not logged in, redirecting");
+
       router.push("/auth");
       return;
     }
@@ -1033,11 +1033,11 @@ function MovieCard({
       if (wasVoted) {
         const { error } = await supabase.from("user_votes").delete()
           .eq("user_id", userId).eq("movie_id", movie.id);
-        console.log("[Upvote] DELETE result:", error ? error.message : "ok");
+
       } else {
         const { error } = await supabase.from("user_votes")
           .insert({ user_id: userId, movie_id: movie.id });
-        console.log("[Upvote] INSERT result:", error ? error.message : "ok");
+
 
         if (error?.code === "23505") { setVoted(true); return; }
       }
@@ -1053,16 +1053,16 @@ function MovieCard({
         .update({ upvotes_count: safeCount })
         .eq("id", movie.id);
 
-      console.log("[Upvote] synced count:", safeCount);
+
       setVotes(safeCount);
-    } catch (err) { console.error("[Upvote] exception:", err); }
+    } catch {}
   };
 
   /* ── SAVE / MY LIST HANDLER ── */
   const handleSave = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("[Save] clicked:", movie.title, "| saved:", saved);
+
     setSaved(!saved);
     onWatchlistToggle?.(movie.id);
   };
@@ -1492,7 +1492,7 @@ export default function HomePage() {
           .select("movie_id")
           .eq("user_id", session.user.id);
         if (voteErr) {
-          console.warn("Votes table may not exist yet:", voteErr.message);
+
         } else if (voteRows) {
           setUserVotedIds(new Set(voteRows.map((r: any) => r.movie_id)));
         }
@@ -1505,7 +1505,7 @@ export default function HomePage() {
           .select("movie_id")
           .eq("user_id", session.user.id);
         if (wlErr) {
-          console.warn("Watchlist table may not exist yet:", wlErr.message);
+
         } else if (wlRows) {
           setWatchlistIds(new Set(wlRows.map((r: any) => r.movie_id)));
         }
@@ -1552,12 +1552,12 @@ export default function HomePage() {
     try {
       if (isInList) {
         const { error } = await supabase.from("watchlist").delete().eq("user_id", session.user.id).eq("movie_id", movieId);
-        if (error) console.error("Watchlist remove error:", error.message);
+
       } else {
         const { error } = await supabase.from("watchlist").insert({ user_id: session.user.id, movie_id: movieId });
-        if (error) console.error("Watchlist add error:", error.message);
+
       }
-    } catch (err) { console.error("Watchlist exception:", err); }
+    } catch {}
   };
 
   // Fetch approved movies from Supabase on mount
