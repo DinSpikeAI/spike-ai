@@ -9,9 +9,9 @@ import {
 } from "lucide-react";
 import { supabase, getSmartPoster } from "@/lib/supabase";
 
-/* ═══════════════════════════════════════════════════════════════
+/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
    TYPES
-   ═══════════════════════════════════════════════════════════════ */
+   ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */
 
 interface CreatorProfile {
   id: string;
@@ -43,9 +43,9 @@ interface CreatorMovie {
   video_url?: string;
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
    CREATOR PAGE
-   ═══════════════════════════════════════════════════════════════ */
+   ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ */
 
 export default function CreatorPage() {
   const params = useParams();
@@ -61,7 +61,7 @@ export default function CreatorPage() {
   const [followerCount, setFollowerCount] = useState(0);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
 
-  // ── Load Creator from DB ──
+  // ΓöÇΓöÇ Load Creator from DB ΓöÇΓöÇ
   useEffect(() => {
     async function load() {
       setLoading(true);
@@ -153,7 +153,7 @@ export default function CreatorPage() {
     } catch {}
   };
 
-  // ── Loading ──
+  // ΓöÇΓöÇ Loading ΓöÇΓöÇ
   if (loading) {
     return (
       <div className="min-h-screen bg-[#060608] relative overflow-hidden flex items-center justify-center">
@@ -172,7 +172,7 @@ export default function CreatorPage() {
     );
   }
 
-  // ── Not Found ──
+  // ΓöÇΓöÇ Not Found ΓöÇΓöÇ
   if (notFound || !creator) {
     return (
       <div className="min-h-screen bg-[#060608] relative overflow-hidden flex items-center justify-center">
@@ -362,9 +362,9 @@ export default function CreatorPage() {
                   <p className="text-sm font-medium text-white/80 group-hover:text-white transition-colors truncate">{m.title}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-white/20 text-xs">{m.year}</span>
-                    <span className="text-white/15 text-xs">·</span>
+                    <span className="text-white/15 text-xs">┬╖</span>
                     <span className="text-white/20 text-xs">{m.genre}</span>
-                    <span className="text-white/15 text-xs">·</span>
+                    <span className="text-white/15 text-xs">┬╖</span>
                     <span className="text-white/20 text-xs flex items-center gap-0.5"><Clock size={9} />{m.duration}</span>
                   </div>
                 </div>
