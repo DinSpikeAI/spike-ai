@@ -1818,6 +1818,7 @@ export default function HomePage() {
         </div>
       )}
 
+      <div className={`transition-opacity duration-500 ${splashChecked ? "opacity-100" : "opacity-0"}`}>
       <Navbar onSearchOpen={() => setSearchOpen(true)} categories={liveCategories} isAdmin={isAdmin} />
       <SearchOverlay active={searchOpen} onClose={() => setSearchOpen(false)} categories={liveCategories} />
 
@@ -1825,8 +1826,12 @@ export default function HomePage() {
 
       {/* Genre Filters + Category Rows */}
       <div className="relative z-10 -mt-2 pt-10">
-        <GenreFilter selected={selectedGenre} onChange={setSelectedGenre} />
-        <AiModelFilter selected={selectedModel} onChange={setSelectedModel} />
+        {dbReady && (
+          <>
+            <GenreFilter selected={selectedGenre} onChange={setSelectedGenre} />
+            <AiModelFilter selected={selectedModel} onChange={setSelectedModel} />
+          </>
+        )}
 
         <div className="mt-8 md:mt-14 px-4 md:px-12">
           {/* Shimmer loading while fetching from DB */}
@@ -1931,6 +1936,7 @@ export default function HomePage() {
           </div>
         </button>
       )}
+      </div>
     </main>
   );
 }
