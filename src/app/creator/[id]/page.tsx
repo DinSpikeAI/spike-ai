@@ -383,7 +383,7 @@ export default function CreatorPage() {
             <span className="text-lg font-semibold tracking-[0.15em] text-white" >AI</span>
           </div>
           <p className="text-[10px] tracking-[0.3em] uppercase text-white/15 mb-4">AI Cinema</p>
-          <p className="text-white/20 text-xs">&copy; {new Date().getFullYear()} Spike AI. The world&apos;s first streaming platform for AI-generated cinema.</p>
+          <p className="text-white/20 text-xs">&copy; {new Date().getFullYear()} Spike AI. The home for AI-generated cinema.</p>
         </div>
       </footer>
 

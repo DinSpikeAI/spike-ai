@@ -130,7 +130,7 @@ export default function BlogPage() {
       <footer className="relative z-10 border-t border-white/[0.04] py-10">
         <div className="max-w-[1300px] mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="text-[20px] font-semibold tracking-[0.18em] text-white/20" style={{ fontFamily: "'Inter', sans-serif" }}>spike AI</Link>
-          <p className="text-[12px] text-white/15 tracking-wide">The world&apos;s first streaming platform for AI-generated cinema.</p>
+          <p className="text-[12px] text-white/15 tracking-wide">The home for AI-generated cinema.</p>
         </div>
       </footer>
     </div>

@@ -10,6 +10,10 @@ export default async function sitemap() {
     { url: `${SITE_URL}/auth`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.5 },
     { url: `${SITE_URL}/submit`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.6 },
     { url: `${SITE_URL}/creators`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
+    { url: `${SITE_URL}/terms`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.3 },
+    { url: `${SITE_URL}/privacy`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.3 },
+    { url: `${SITE_URL}/community-guidelines`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.3 },
+    { url: `${SITE_URL}/help`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.4 },
   ];
 
   // Add blog posts

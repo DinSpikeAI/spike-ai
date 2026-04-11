@@ -37,7 +37,7 @@ export default function TermsPage() {
         <div className="terms-content space-y-10">
 
           <Section title="1. Acceptance of Terms">
-            <p>By accessing or using spikeai.studio (&quot;the Platform&quot;), operated by Spike AI (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, do not use the Platform. We reserve the right to update these Terms at any time. We will notify registered users of material changes via email. Continued use of the Platform after changes constitutes acceptance of the updated Terms.</p>
+            <p>By accessing or using spikeai.studio (&quot;the Platform&quot;), operated by Spike AI (Dean Moshe) (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, do not use the Platform. We reserve the right to update these Terms at any time. We will notify registered users of material changes via email. Continued use of the Platform after changes constitutes acceptance of the updated Terms.</p>
           </Section>
 
           <Section title="2. Platform Description">

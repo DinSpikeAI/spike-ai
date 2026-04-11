@@ -8,13 +8,13 @@ import {
 } from "lucide-react";
 
 const FAQ = [
-  { q: "What is spike AI?", a: "spike AI is the world's first streaming platform dedicated to AI-generated cinema. We showcase films created using tools like Runway, Kling, Midjourney, ElevenLabs, and more.", icon: Film, color: "from-violet-500 to-indigo-600" },
+  { q: "What is spike AI?", a: "spike AI is a streaming platform dedicated to AI-generated cinema. We showcase films created using tools like Runway, Kling, Midjourney, ElevenLabs, and more.", icon: Film, color: "from-violet-500 to-indigo-600" },
   { q: "How do I submit my AI film?", a: "Go to 'Submit Film' from the navigation. Fill in your film details, paste your YouTube or Vimeo link, and submit. Our team reviews and approves quality submissions.", icon: Upload, color: "from-cyan-400 to-blue-600" },
   { q: "How does the upvote system work?", a: "Every approved film can be upvoted once per user. Sign in, find a film you love, and hit the upvote button. The most upvoted films get featured on the homepage.", icon: Heart, color: "from-rose-400 to-pink-600" },
   { q: "What is the Watchlist?", a: "Your personal collection of films to watch later. Click the bookmark icon on any film to save it. Access it anytime from 'My List'.", icon: Bookmark, color: "from-amber-400 to-orange-500" },
   { q: "How do Creator pages work?", a: "Every creator gets a dedicated Studio page showcasing their filmography, bio, and social links. Submit a film and your profile is automatically created.", icon: User, color: "from-emerald-400 to-teal-600" },
-  { q: "Is it free?", a: "Yes. spike AI is completely free for viewers and creators. No subscription, no fees, no revenue share. You keep full credit for your work.", icon: Shield, color: "from-blue-400 to-indigo-600" },
-  { q: "How do I contact the team?", a: "Email us at din6915@gmail.com — we respond within 24 hours. We'd love to hear feature requests or bug reports.", icon: Mail, color: "from-fuchsia-400 to-purple-600" },
+  { q: "Is it free?", a: "Yes. spike AI is currently free for viewers and creators. No subscription, no fees. You keep full ownership and credit for your work.", icon: Shield, color: "from-blue-400 to-indigo-600" },
+  { q: "How do I contact the team?", a: "Email us at spikeaistudio@gmail.com — we typically respond within a few business days. We'd love to hear feature requests or bug reports.", icon: Mail, color: "from-fuchsia-400 to-purple-600" },
 ];
 
 export default function HelpPage() {
@@ -82,7 +82,7 @@ export default function HelpPage() {
         {/* Contact */}
         <div className="mt-20 text-center">
           <p className="text-[15px] text-white/15 mb-7">Still have questions?</p>
-          <a href="mailto:din6915@gmail.com"
+          <a href="mailto:spikeaistudio@gmail.com"
             className="cta-btn inline-flex items-center gap-3 px-10 py-[16px] text-black text-[15px] font-semibold rounded-full transition-all cursor-pointer">
             <Mail size={17} /> Contact Us
           </a>

@@ -72,4 +72,4 @@ And the audience that wants to discover, watch, and follow AI cinema as it matur
 
 ---
 
-*Spike AI is building the first streaming platform dedicated to AI-generated cinema. Submit your work for free at [spikeai.studio](https://spikeai.studio).*
+*Spike AI is building a streaming platform dedicated to AI-generated cinema. Submit your work for free at [spikeai.studio](https://spikeai.studio).*

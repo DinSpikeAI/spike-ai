@@ -20,12 +20,12 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "Spike AI — AI Cinema Streaming",
-  description: "The world's first streaming platform for AI-generated cinema. Watch groundbreaking films created entirely by artificial intelligence.",
+  description: "The home for AI-generated cinema. Watch groundbreaking films created entirely by artificial intelligence.",
   manifest: "/manifest.json",
   metadataBase: new URL("https://www.spikeai.studio"),
   openGraph: {
     title: "Spike AI — AI Cinema Streaming",
-    description: "The world's first streaming platform for AI-generated cinema.",
+    description: "The home for AI-generated cinema.",
     url: "https://www.spikeai.studio",
     siteName: "Spike AI",
     type: "website",
