@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   Shield, Film, Trash2, Pencil, Check, X, Loader2, RefreshCw,
   ArrowLeft, ChevronDown, Search, Zap, Clock, XCircle, Eye,
-  Save, Plus, AlertTriangle, Inbox, CheckCircle, Ban, Bell, Users, Sparkles,
+  Save, Plus, AlertTriangle, Inbox, CheckCircle, Ban, Bell, Users,
 } from "lucide-react";
 import { supabase, getSmartPoster, checkIsAdmin } from "@/lib/supabase";
 
@@ -77,12 +77,6 @@ export default function AdminDashboard() {
   const [newNotif, setNewNotif] = useState("");
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
-  const [activeTab, setActiveTab] = useState<"films" | "creators" | "analytics">("films");
-  const [creators, setCreators] = useState<any[]>([]);
-  const [creatorsLoading, setCreatorsLoading] = useState(false);
-  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
-  const [smartNotifs, setSmartNotifs] = useState<{ id: string; type: string; title: string; time: string; icon: string }[]>([]);
-  const [lastSeenNotif, setLastSeenNotif] = useState<string>("");
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -131,67 +125,9 @@ export default function AdminDashboard() {
     if (profiles) setRecentUsers(profiles as any);
   }, []);
 
-  const fetchCreators = useCallback(async () => {
-    if (!supabase) return;
-    setCreatorsLoading(true);
-    const { data: profiles } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
-    if (profiles) {
-      // Get film counts per creator
-      const { data: allMovies } = await supabase.from("movies").select("creator_name, status");
-      const filmCounts: Record<string, { total: number; approved: number; pending: number }> = {};
-      allMovies?.forEach((m: any) => {
-        const name = m.creator_name || "Unknown";
-        if (!filmCounts[name]) filmCounts[name] = { total: 0, approved: 0, pending: 0 };
-        filmCounts[name].total++;
-        if (m.status === "approved") filmCounts[name].approved++;
-        if (m.status === "pending") filmCounts[name].pending++;
-      });
-      const enriched = profiles.map((p: any) => ({
-        ...p,
-        films: filmCounts[p.display_name] || { total: 0, approved: 0, pending: 0 },
-      }));
-      setCreators(enriched);
-    }
-    setCreatorsLoading(false);
-  }, []);
-
   useEffect(() => {
-    if (!authChecking && isAdmin) { fetchMovies(); fetchStats(); fetchCreators(); }
-  }, [isAdmin, authChecking, fetchMovies, fetchStats, fetchCreators]);
-
-  // ── Smart Notifications (auto-detect events) ──
-  useEffect(() => {
-    const saved = localStorage.getItem("spike_last_seen_notif");
-    if (saved) setLastSeenNotif(saved);
-  }, []);
-
-  useEffect(() => {
-    if (!movies.length && !recentUsers.length) return;
-    const smart: { id: string; type: string; title: string; time: string; icon: string }[] = [];
-
-    // Pending films
-    movies.filter(m => m.status === "pending").forEach(m => {
-      smart.push({ id: `pending-${m.id}`, type: "pending", title: `New submission: "${m.title}" by ${m.creator_name || "Unknown"}`, time: m.created_at, icon: "🎬" });
-    });
-
-    // New users (last 7 days)
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    recentUsers.filter(u => u.created_at > weekAgo).forEach(u => {
-      smart.push({ id: `user-${u.id}`, type: "user", title: `New user signed up: ${u.email}`, time: u.created_at, icon: "👤" });
-    });
-
-    // Sort by time descending
-    smart.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
-    setSmartNotifs(smart);
-  }, [movies, recentUsers]);
-
-  const unreadCount = smartNotifs.filter(n => n.time > lastSeenNotif).length + notifs.filter(n => n.created_at > lastSeenNotif).length;
-
-  const markAllRead = () => {
-    const now = new Date().toISOString();
-    setLastSeenNotif(now);
-    localStorage.setItem("spike_last_seen_notif", now);
-  };
+    if (!authChecking && isAdmin) { fetchMovies(); fetchStats(); }
+  }, [isAdmin, authChecking, fetchMovies, fetchStats]);
 
   /* ── Notifications CRUD ── */
   const fetchNotifs = useCallback(async () => {
@@ -360,61 +296,6 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {/* Notification Bell */}
-            <div className="relative">
-              <button
-                onClick={() => { setShowNotifDropdown(!showNotifDropdown); if (!showNotifDropdown) markAllRead(); }}
-                className="relative p-2 text-gray-400 hover:text-white transition-colors cursor-pointer"
-              >
-                <Bell size={18} />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[9px] font-black text-white animate-pulse">
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {/* Dropdown */}
-              {showNotifDropdown && (
-                <div className="absolute right-0 top-12 w-[380px] max-h-[500px] bg-[#111114] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/60 overflow-hidden z-50">
-                  <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
-                    <span className="text-[13px] font-bold text-white/70">Notifications</span>
-                    <button onClick={markAllRead} className="text-[10px] text-white/20 hover:text-white/40 cursor-pointer">Mark all read</button>
-                  </div>
-                  <div className="max-h-[400px] overflow-y-auto">
-                    {smartNotifs.length === 0 && notifs.length === 0 ? (
-                      <div className="py-10 text-center text-white/15 text-[13px]">No notifications</div>
-                    ) : (
-                      <>
-                        {smartNotifs.map(n => (
-                          <div key={n.id} className={`flex items-start gap-3 px-5 py-3.5 border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors ${n.time > lastSeenNotif ? "bg-white/[0.03]" : ""}`}>
-                            <span className="text-[16px] mt-0.5">{n.icon}</span>
-                            <div className="min-w-0 flex-1">
-                              <p className={`text-[12px] leading-relaxed ${n.time > lastSeenNotif ? "text-white/70" : "text-white/35"}`}>{n.title}</p>
-                              <p className="text-[10px] text-white/15 mt-1">{new Date(n.time).toLocaleDateString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
-                            </div>
-                            {n.type === "pending" && (
-                              <button onClick={() => { setStatusFilter("pending"); setActiveTab("films"); setShowNotifDropdown(false); }} className="text-[10px] text-yellow-400 hover:text-yellow-300 cursor-pointer flex-shrink-0 mt-1">Review</button>
-                            )}
-                          </div>
-                        ))}
-                        {notifs.map(n => (
-                          <div key={n.id} className={`flex items-start gap-3 px-5 py-3.5 border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors ${n.created_at > lastSeenNotif ? "bg-white/[0.03]" : ""}`}>
-                            <span className="text-[16px] mt-0.5">📢</span>
-                            <div className="min-w-0 flex-1">
-                              <p className={`text-[12px] leading-relaxed ${n.created_at > lastSeenNotif ? "text-white/70" : "text-white/35"}`}>{n.title}</p>
-                              <p className="text-[10px] text-white/15 mt-1">{new Date(n.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
-                            </div>
-                            <button onClick={() => deleteNotif(n.id)} className="text-white/10 hover:text-red-400 transition-colors cursor-pointer flex-shrink-0 mt-1"><Trash2 size={12} /></button>
-                          </div>
-                        ))}
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
             <button
               onClick={() => router.push("/submit")}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-500 transition-all"
@@ -456,268 +337,6 @@ export default function AdminDashboard() {
             </div>
           ))}
         </div>
-
-        {/* ═══════ Tabs ═══════ */}
-        <div className="flex items-center gap-2 mb-8">
-          <button onClick={() => setActiveTab("films")} className={`px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all ${activeTab === "films" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50"}`}>
-            <Film size={14} className="inline mr-2" />Films ({movies.length})
-          </button>
-          <button onClick={() => setActiveTab("creators")} className={`px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all ${activeTab === "creators" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50"}`}>
-            <Users size={14} className="inline mr-2" />Creators ({creators.length})
-          </button>
-          <button onClick={() => setActiveTab("analytics")} className={`px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all ${activeTab === "analytics" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50"}`}>
-            <Zap size={14} className="inline mr-2" />Analytics
-          </button>
-        </div>
-
-        {/* ═══════ CREATORS TAB ═══════ */}
-        {activeTab === "creators" && (
-          <div className="space-y-4">
-            {creatorsLoading ? (
-              <div className="flex items-center justify-center py-20"><Loader2 size={24} className="animate-spin text-white/20" /></div>
-            ) : creators.length === 0 ? (
-              <div className="text-center py-20 text-white/20">No creators yet</div>
-            ) : (
-              <div className="bg-[#111114] border border-white/[0.06] rounded-2xl overflow-hidden">
-                <div className="grid grid-cols-12 gap-4 px-5 py-3 text-[10px] font-bold tracking-[0.15em] uppercase text-white/20 border-b border-white/[0.04]">
-                  <div className="col-span-1"></div>
-                  <div className="col-span-3">Name</div>
-                  <div className="col-span-3">Email</div>
-                  <div className="col-span-1 text-center">Films</div>
-                  <div className="col-span-2">Role</div>
-                  <div className="col-span-2">Joined</div>
-                </div>
-                {creators.map((c) => (
-                  <div key={c.id} className="grid grid-cols-12 gap-4 px-5 py-4 items-center border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
-                    <div className="col-span-1">
-                      {c.avatar_url ? (
-                        <img src={c.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover border border-white/[0.06]" />
-                      ) : (
-                        <div className="w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[12px] text-white/30 font-bold">
-                          {(c.display_name || "?")[0].toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                    <div className="col-span-3">
-                      <p className="text-[14px] font-semibold text-white/80 truncate">{c.display_name || "No name"}</p>
-                    </div>
-                    <div className="col-span-3">
-                      <p className="text-[12px] text-white/30 truncate">{c.email || "—"}</p>
-                    </div>
-                    <div className="col-span-1 text-center">
-                      <span className={`text-[13px] font-bold ${c.films.total > 0 ? "text-green-400" : "text-white/15"}`}>{c.films.total}</span>
-                      {c.films.pending > 0 && <span className="text-[10px] text-yellow-400 ml-1">({c.films.pending} pending)</span>}
-                    </div>
-                    <div className="col-span-2">
-                      <select
-                        value={c.role || "user"}
-                        onChange={async (e) => {
-                          const newRole = e.target.value;
-                          await supabase?.from("profiles").update({ role: newRole }).eq("id", c.id);
-                          showToast(`${c.display_name} → ${newRole}`);
-                          fetchCreators();
-                        }}
-                        className="bg-white/[0.04] border border-white/[0.08] text-[11px] text-white/60 rounded-lg px-2 py-1.5 outline-none cursor-pointer"
-                        style={{ colorScheme: "dark" }}
-                      >
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-[11px] text-white/20">{new Date(c.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ═══════ ANALYTICS TAB ═══════ */}
-        {activeTab === "analytics" && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-              {/* Top Films by Upvotes */}
-              <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-6">
-                <h3 className="text-[13px] font-bold tracking-wide text-white/70 mb-5 flex items-center gap-2">
-                  <Zap size={14} className="text-yellow-400" /> Top Films by Upvotes
-                </h3>
-                {(() => {
-                  const top = [...movies].filter(m => m.status === "approved").sort((a, b) => b.upvotes_count - a.upvotes_count).slice(0, 5);
-                  const maxVotes = Math.max(...top.map(m => m.upvotes_count), 1);
-                  return top.length === 0 ? (
-                    <p className="text-white/15 text-[13px] py-4">No upvotes yet</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {top.map((m, i) => (
-                        <div key={m.id} className="flex items-center gap-3">
-                          <span className="text-[11px] text-white/20 w-4 font-bold">{i + 1}</span>
-                          <img src={getSmartPoster(m.poster_url, m.video_url, m.id)} alt="" className="w-8 h-12 rounded object-cover flex-shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[13px] text-white/70 truncate font-medium">{m.title}</p>
-                            <div className="mt-1 h-2 rounded-full bg-white/[0.04] overflow-hidden">
-                              <div className="h-full rounded-full bg-gradient-to-r from-yellow-500/60 to-yellow-400/40 transition-all" style={{ width: `${(m.upvotes_count / maxVotes) * 100}%` }} />
-                            </div>
-                          </div>
-                          <span className="text-[13px] font-bold text-yellow-400 flex-shrink-0">{m.upvotes_count}</span>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })()}
-              </div>
-
-              {/* Top Creators by Film Count */}
-              <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-6">
-                <h3 className="text-[13px] font-bold tracking-wide text-white/70 mb-5 flex items-center gap-2">
-                  <Users size={14} className="text-purple-400" /> Top Creators by Films
-                </h3>
-                {(() => {
-                  const creatorFilms: Record<string, number> = {};
-                  movies.filter(m => m.status === "approved").forEach(m => {
-                    const name = m.creator_name || "Unknown";
-                    creatorFilms[name] = (creatorFilms[name] || 0) + 1;
-                  });
-                  const sorted = Object.entries(creatorFilms).sort((a, b) => b[1] - a[1]).slice(0, 5);
-                  const maxFilms = Math.max(...sorted.map(s => s[1]), 1);
-                  return sorted.length === 0 ? (
-                    <p className="text-white/15 text-[13px] py-4">No approved films yet</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {sorted.map(([name, count], i) => (
-                        <div key={name} className="flex items-center gap-3">
-                          <span className="text-[11px] text-white/20 w-4 font-bold">{i + 1}</span>
-                          <div className="w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[11px] text-white/30 font-bold flex-shrink-0">
-                            {name[0].toUpperCase()}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-[13px] text-white/70 truncate font-medium">{name}</p>
-                            <div className="mt-1 h-2 rounded-full bg-white/[0.04] overflow-hidden">
-                              <div className="h-full rounded-full bg-gradient-to-r from-purple-500/60 to-purple-400/40 transition-all" style={{ width: `${(count / maxFilms) * 100}%` }} />
-                            </div>
-                          </div>
-                          <span className="text-[13px] font-bold text-purple-400 flex-shrink-0">{count} {count === 1 ? "film" : "films"}</span>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })()}
-              </div>
-
-              {/* Genre Distribution */}
-              <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-6">
-                <h3 className="text-[13px] font-bold tracking-wide text-white/70 mb-5 flex items-center gap-2">
-                  <Film size={14} className="text-blue-400" /> Genre Distribution
-                </h3>
-                {(() => {
-                  const genreCounts: Record<string, number> = {};
-                  movies.filter(m => m.status === "approved").forEach(m => {
-                    const g = m.genre || "Uncategorized";
-                    genreCounts[g] = (genreCounts[g] || 0) + 1;
-                  });
-                  const sorted = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
-                  const total = sorted.reduce((sum, [, c]) => sum + c, 0) || 1;
-                  const colors = ["bg-blue-500", "bg-purple-500", "bg-green-500", "bg-yellow-500", "bg-red-500", "bg-cyan-500", "bg-pink-500", "bg-orange-500"];
-                  return sorted.length === 0 ? (
-                    <p className="text-white/15 text-[13px] py-4">No data yet</p>
-                  ) : (
-                    <div className="space-y-2.5">
-                      {sorted.map(([genre, count], i) => (
-                        <div key={genre} className="flex items-center gap-3">
-                          <div className={`w-2.5 h-2.5 rounded-full ${colors[i % colors.length]} flex-shrink-0`} />
-                          <span className="text-[12px] text-white/50 w-28 truncate">{genre}</span>
-                          <div className="flex-1 h-2 rounded-full bg-white/[0.04] overflow-hidden">
-                            <div className={`h-full rounded-full ${colors[i % colors.length]}/40 transition-all`} style={{ width: `${(count / total) * 100}%`, opacity: 0.5 }} />
-                          </div>
-                          <span className="text-[11px] text-white/30 w-8 text-right">{Math.round((count / total) * 100)}%</span>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })()}
-              </div>
-
-              {/* Films Timeline */}
-              <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-6">
-                <h3 className="text-[13px] font-bold tracking-wide text-white/70 mb-5 flex items-center gap-2">
-                  <Clock size={14} className="text-green-400" /> Films Timeline (Last 30 Days)
-                </h3>
-                {(() => {
-                  const days: Record<string, number> = {};
-                  const now = new Date();
-                  for (let i = 29; i >= 0; i--) {
-                    const d = new Date(now); d.setDate(d.getDate() - i);
-                    days[d.toISOString().split("T")[0]] = 0;
-                  }
-                  movies.forEach(m => {
-                    const day = m.created_at.split("T")[0];
-                    if (days[day] !== undefined) days[day]++;
-                  });
-                  const entries = Object.entries(days);
-                  const maxDay = Math.max(...Object.values(days), 1);
-                  return (
-                    <div className="flex items-end gap-[3px] h-[120px]">
-                      {entries.map(([date, count]) => (
-                        <div key={date} className="flex-1 flex flex-col items-center justify-end h-full group relative">
-                          <div
-                            className={`w-full rounded-t transition-all ${count > 0 ? "bg-green-500/50 hover:bg-green-400/60" : "bg-white/[0.03]"}`}
-                            style={{ height: `${Math.max((count / maxDay) * 100, count > 0 ? 8 : 2)}%` }}
-                          />
-                          {count > 0 && (
-                            <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#1a1a20] border border-white/[0.1] rounded-lg px-2 py-1 text-[9px] text-white/70 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
-                              {date.slice(5)} — {count} {count === 1 ? "film" : "films"}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  );
-                })()}
-                <div className="flex justify-between mt-2">
-                  <span className="text-[9px] text-white/15">30 days ago</span>
-                  <span className="text-[9px] text-white/15">Today</span>
-                </div>
-              </div>
-
-            </div>
-
-            {/* AI Models Usage */}
-            <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-6">
-              <h3 className="text-[13px] font-bold tracking-wide text-white/70 mb-5 flex items-center gap-2">
-                <Sparkles size={14} className="text-cyan-400" /> AI Tools Used Across Films
-              </h3>
-              {(() => {
-                const toolCounts: Record<string, number> = {};
-                movies.filter(m => m.status === "approved").forEach(m => {
-                  (m.ai_models || []).forEach((t: string) => { toolCounts[t] = (toolCounts[t] || 0) + 1; });
-                });
-                const sorted = Object.entries(toolCounts).sort((a, b) => b[1] - a[1]);
-                const maxTool = Math.max(...sorted.map(s => s[1]), 1);
-                return sorted.length === 0 ? (
-                  <p className="text-white/15 text-[13px] py-4">No AI tool data yet</p>
-                ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {sorted.map(([tool, count]) => (
-                      <div key={tool} className="bg-white/[0.02] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.04] transition-colors">
-                        <p className="text-[12px] text-white/60 font-medium truncate">{tool}</p>
-                        <div className="flex items-center gap-2 mt-2">
-                          <div className="flex-1 h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
-                            <div className="h-full rounded-full bg-cyan-500/40" style={{ width: `${(count / maxTool) * 100}%` }} />
-                          </div>
-                          <span className="text-[11px] text-cyan-400 font-bold">{count}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "films" && (<>
 
         {/* ═══════ Users & Notifications — Side by Side ═══════ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
@@ -1139,8 +758,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
-
-      </>)}
 
       {/* Toast */}
       {toast && (
