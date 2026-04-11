@@ -1027,7 +1027,7 @@ function MovieCard({
     }
 
     const userId = session.user.id;
-    console.log("[Upvote] DB op — user:", userId, "movie:", movie.id, "wasVoted:", wasVoted);
+    
 
     try {
       if (wasVoted) {
@@ -1417,7 +1417,7 @@ function Footer() {
         {/* Bottom row */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <p className="text-[11px] tracking-wider text-white/20">
-            © 2026 Spike AI. All rights reserved.
+            © {new Date().getFullYear()} Spike AI. All rights reserved.
           </p>
           <p className="text-[11px] tracking-wider text-white/20">
             The home for AI-generated cinema.

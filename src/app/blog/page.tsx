@@ -131,6 +131,7 @@ export default function BlogPage() {
         <div className="max-w-[1300px] mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-4">
           <Link href="/" className="text-[20px] font-semibold tracking-[0.18em] text-white/20" style={{ fontFamily: "'Inter', sans-serif" }}>spike AI</Link>
           <p className="text-[12px] text-white/15 tracking-wide">The home for AI-generated cinema.</p>
+          <div className="flex gap-4 text-[11px] text-white/15"><a href="/terms" className="hover:text-white/30 transition-colors">Terms</a><a href="/privacy" className="hover:text-white/30 transition-colors">Privacy</a><a href="/community-guidelines" className="hover:text-white/30 transition-colors">Guidelines</a></div>
         </div>
       </footer>
     </div>

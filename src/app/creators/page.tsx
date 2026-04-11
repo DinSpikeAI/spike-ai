@@ -346,6 +346,7 @@ export default function CreatorsPage() {
       <footer className="relative z-10 py-10 border-t border-white/[0.03]">
         <div className="text-center">
           <span className="text-[14px] font-semibold tracking-[0.2em] text-white/[0.06]">spike AI</span>
+          <div className="flex justify-center gap-4 mt-3 text-[11px] text-white/15"><a href="/terms" className="hover:text-white/30 transition-colors">Terms</a><a href="/privacy" className="hover:text-white/30 transition-colors">Privacy</a><a href="/community-guidelines" className="hover:text-white/30 transition-colors">Guidelines</a></div>
         </div>
       </footer>
 
