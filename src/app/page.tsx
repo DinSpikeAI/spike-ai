@@ -361,7 +361,7 @@ function MovieModal({
    NAVBAR
    ═══════════════════════════════════════════════════════════════ */
 
-function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => void; categories: Category[]; isAdmin: boolean }) {
+function Navbar({ onSearchOpen, categories, isAdmin, isCreator }: { onSearchOpen: () => void; categories: Category[]; isAdmin: boolean; isCreator: boolean }) {
   const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
@@ -472,8 +472,8 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
             { label: "Blog", href: "/blog" },
             { label: "My List", href: "/my-list" },
             { label: "Creators", href: "/creators" },
-            { label: "Submit Film", href: "/submit", special: true },
-            { label: "Join as Creator", href: "/spike_apply_en.html", special: true },
+            ...(isCreator ? [{ label: "Submit Film", href: "/submit", special: true }] : []),
+            ...(!isCreator ? [{ label: "Join as Creator", href: "/spike_apply_en.html", special: true }] : []),
           ].map((link) => (
             link.special ? (
               <a key={link.label} href={link.href} className="text-[12.5px] font-medium tracking-[0.04em] px-5 py-1.5 rounded-full border border-white/30 text-white/70 hover:bg-white/10 hover:text-white transition-all duration-300 ml-1">{link.label}</a>
@@ -614,8 +614,9 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                     </div>
                   </div>
                   {/* Admin-Only Links — Split Reality */}
-                  {isAdmin && (
+                  {(isAdmin || isCreator) && (
                     <div className="border-b border-white/[0.06]">
+                      {isAdmin && (
                       <div
                         onClick={() => { setShowProfile(false); router.push("/admin/dashboard"); }}
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#ffffff]/[0.06] cursor-pointer transition-colors active:scale-[0.98]"
@@ -623,6 +624,7 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                         <Shield size={14} className="text-[#ffffff]" />
                         <span className="text-[13px] font-semibold tracking-wide text-[#ffffff]">Admin Dashboard</span>
                       </div>
+                      )}
                       <div
                         onClick={() => { setShowProfile(false); router.push("/submit"); }}
                         className="flex items-center gap-3 px-4 py-2.5 hover:bg-green-500/[0.04] cursor-pointer transition-colors active:scale-[0.98]"
@@ -695,8 +697,8 @@ function Navbar({ onSearchOpen, categories, isAdmin }: { onSearchOpen: () => voi
                 { label: "Blog", href: "/blog", icon: "📝" },
                 { label: "My List", href: "/my-list", icon: "📋" },
                 { label: "Creators", href: "/creators", icon: "🎭" },
-                { label: "Submit Film", href: "/submit", icon: "🎥" },
-                { label: "Join as Creator", href: "/spike_apply_en.html", icon: "⭐" },
+                ...(isCreator ? [{ label: "Submit Film", href: "/submit", icon: "🎥" }] : []),
+                ...(!isCreator ? [{ label: "Join as Creator", href: "/spike_apply_en.html", icon: "⭐" }] : []),
               ].map((item) => (
                 <a key={item.label} href={item.href} className="flex items-center gap-3 px-5 py-3.5 text-white/60 hover:text-white hover:bg-white/[0.04] transition-colors" onClick={() => setShowMobileMenu(false)}>
                   <span className="text-base">{item.icon}</span>
@@ -1440,7 +1442,8 @@ let __cache: {
   votedIds: Set<string> | null;
   watchlistIds: Set<string> | null;
   isAdmin: boolean;
-} = { categories: null, heroSlides: null, votedIds: null, watchlistIds: null, isAdmin: false };
+  isCreator: boolean;
+} = { categories: null, heroSlides: null, votedIds: null, watchlistIds: null, isAdmin: false, isCreator: false };
 
 export default function HomePage() {
   const router = useRouter();
@@ -1460,6 +1463,7 @@ export default function HomePage() {
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>(__cache.heroSlides || []);
   const [dbReady, setDbReady] = useState(__cache.categories !== null);
   const [isAdmin, setIsAdmin] = useState(__cache.isAdmin);
+  const [isCreator, setIsCreator] = useState(__cache.isCreator);
   const [userVotedIds, setUserVotedIds] = useState<Set<string>>(__cache.votedIds || new Set());
   const [watchlistIds, setWatchlistIds] = useState<Set<string>>(__cache.watchlistIds || new Set());
 
@@ -1470,7 +1474,8 @@ export default function HomePage() {
     if (userVotedIds.size > 0) __cache.votedIds = userVotedIds;
     if (watchlistIds.size > 0) __cache.watchlistIds = watchlistIds;
     __cache.isAdmin = isAdmin;
-  }, [liveCategories, heroSlides, userVotedIds, watchlistIds, isAdmin]);
+    __cache.isCreator = isCreator;
+  }, [liveCategories, heroSlides, userVotedIds, watchlistIds, isAdmin, isCreator]);
 
   // ─── Admin Role Check + Load User Data ───
   useEffect(() => {
@@ -1480,10 +1485,11 @@ export default function HomePage() {
       if (!session?.user) return;
       const { data: profile } = await supabase!
         .from("profiles")
-        .select("role")
+        .select("role, user_type")
         .eq("id", session.user.id)
         .single();
       if (profile?.role === "admin") setIsAdmin(true);
+      if (profile?.user_type === "creator" || profile?.role === "admin") setIsCreator(true);
 
       // Load user's existing votes (direct query — no RPC needed)
       try {
@@ -1821,7 +1827,7 @@ export default function HomePage() {
       )}
 
       <div className={`transition-opacity duration-500 ${splashChecked ? "opacity-100" : "opacity-0"}`}>
-      <Navbar onSearchOpen={() => setSearchOpen(true)} categories={liveCategories} isAdmin={isAdmin} />
+      <Navbar onSearchOpen={() => setSearchOpen(true)} categories={liveCategories} isAdmin={isAdmin} isCreator={isCreator} />
       <SearchOverlay active={searchOpen} onClose={() => setSearchOpen(false)} categories={liveCategories} />
 
       <HeroSection dbSlides={heroSlides} />

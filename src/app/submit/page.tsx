@@ -60,6 +60,27 @@ export default function SubmitPage() {
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null)
+  const [accessChecking, setAccessChecking] = useState(true)
+  const [hasAccess, setHasAccess] = useState(false)
+
+  // ─── Creator/Admin Gate ───
+  useEffect(() => {
+    async function checkAccess() {
+      if (!supabase) { setAccessChecking(false); return }
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.user) { setAccessChecking(false); return }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role, user_type')
+        .eq('id', session.user.id)
+        .single()
+      if (profile?.role === 'admin' || profile?.user_type === 'creator') {
+        setHasAccess(true)
+      }
+      setAccessChecking(false)
+    }
+    checkAccess()
+  }, [])
 
   const isValid = !!(form.title && form.description && form.genre && form.category && form.creator_name)
 
@@ -135,6 +156,45 @@ export default function SubmitPage() {
   }, [form.video_url])
 
   const posterSrc = form.poster_url || (form.video_url ? (getYtThumb(form.video_url) || vimeoThumb) : null)
+
+  /* ─── Loading Access Check ─── */
+  if (accessChecking) {
+    return (
+      <div className="min-h-screen bg-[#060608] flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-white/20" />
+      </div>
+    )
+  }
+
+  /* ─── Access Denied ─── */
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-[#060608] flex items-center justify-center px-4">
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-violet-500/[0.06] blur-[150px]" />
+        </div>
+        <div className="text-center max-w-md relative z-10">
+          <div className="w-20 h-20 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mx-auto mb-6">
+            <Film className="w-10 h-10 text-violet-400/60" />
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-3">Creator Access Only</h1>
+          <p className="text-white/30 text-[15px] mb-8 leading-relaxed">
+            Submitting films is available to approved creators. Apply to join our creator community and start sharing your AI cinema.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="/spike_apply_en.html" className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold hover:brightness-110 transition-all">
+              <Sparkles className="w-4 h-4" />
+              Apply as Creator
+            </a>
+            <Link href="/" className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 transition-all">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   /* ─── Success ─── */
   if (submitted) {
