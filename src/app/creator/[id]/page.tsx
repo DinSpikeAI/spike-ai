@@ -25,6 +25,7 @@ interface CreatorProfile {
   social_youtube: string;
   social_instagram: string;
   is_creator: boolean;
+  user_type: string;
   creator_slug: string;
   created_at: string;
 }
@@ -103,13 +104,26 @@ export default function CreatorPage() {
 
       setCreator(profile);
 
-      // Load creator's movies
-      const { data: movieData } = await supabase
+      // Load creator's movies (try creator_id first, fallback to creator_name)
+      let movieData: any[] | null = null;
+      const { data: byId } = await supabase
         .from("movies")
         .select("*")
         .eq("creator_id", profile.id)
         .eq("status", "approved")
         .order("upvotes_count", { ascending: false });
+      
+      if (byId && byId.length > 0) {
+        movieData = byId;
+      } else if (profile.display_name) {
+        const { data: byName } = await supabase
+          .from("movies")
+          .select("*")
+          .eq("creator_name", profile.display_name)
+          .eq("status", "approved")
+          .order("upvotes_count", { ascending: false });
+        movieData = byName;
+      }
 
       if (movieData) {
         setMovies(
@@ -235,7 +249,7 @@ export default function CreatorPage() {
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles size={14} className="text-[#ffffff]" />
                   <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#ffffff]">
-                    {creator.is_creator ? "Creator" : "Member"}
+                    {creator.user_type === "creator" ? "Creator" : "Member"}
                   </span>
                 </div>
               </div>
@@ -375,7 +389,7 @@ export default function CreatorPage() {
       </div>
 
       {/* Footer */}
-      <footer className="py-8 md:py-12 px-4 md:px-6 border-t border-white/[0.03][0.04] mt-12 md:mt-16">
+      <footer className="py-8 md:py-12 px-4 md:px-6 border-t border-white/[0.04] mt-12 md:mt-16">
         <div className="max-w-[1200px] mx-auto text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             

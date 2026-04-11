@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, LogIn, Check, Heart, Bookmark, Calendar, User, Film, BadgeCheck, Pencil } from "lucide-react";
+import { ArrowLeft, Loader2, LogIn, Check, Heart, Bookmark, Calendar, User, Film, BadgeCheck, Pencil, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const AVATARS = [
@@ -29,6 +29,11 @@ export default function ProfilePage() {
   const [toast, setToast] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
+  const [website, setWebsite] = useState("");
+  const [socialX, setSocialX] = useState("");
+  const [socialYoutube, setSocialYoutube] = useState("");
+  const [socialInstagram, setSocialInstagram] = useState("");
+  const [userType, setUserType] = useState("viewer");
   const [selectedAvatar, setSelectedAvatar] = useState<string>("a1");
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [activeTab, setActiveTab] = useState<"edit" | "films">("edit");
@@ -43,7 +48,15 @@ export default function ProfilePage() {
       setUser(u); setAuthChecking(false);
       if (u) {
         const { data } = await supabase!.from("profiles").select("*").eq("id", u.id).single();
-        if (data) { setDisplayName(data.display_name || ""); setBio(data.bio || ""); }
+        if (data) {
+          setDisplayName(data.display_name || "");
+          setBio(data.bio || "");
+          setWebsite(data.website || "");
+          setSocialX(data.social_x || "");
+          setSocialYoutube(data.social_youtube || "");
+          setSocialInstagram(data.social_instagram || "");
+          setUserType(data.user_type || "viewer");
+        }
         else setDisplayName(u.user_metadata?.display_name || u.user_metadata?.full_name || "");
       }
       setLoading(false);
@@ -54,7 +67,16 @@ export default function ProfilePage() {
   const handleSave = async () => {
     if (!supabase || !user) return;
     setSaving(true);
-    const { error } = await supabase.from("profiles").upsert({ id: user.id, display_name: displayName.trim(), bio: bio.trim(), email: user.email }, { onConflict: "id" });
+    const { error } = await supabase.from("profiles").upsert({
+      id: user.id,
+      display_name: displayName.trim(),
+      bio: bio.trim(),
+      email: user.email,
+      website: website.trim(),
+      social_x: socialX.trim(),
+      social_youtube: socialYoutube.trim(),
+      social_instagram: socialInstagram.trim(),
+    }, { onConflict: "id" });
     if (!error) { showToast("Profile saved"); await supabase.auth.updateUser({ data: { display_name: displayName.trim() } }); }
     else showToast("Error saving");
     setSaving(false);
@@ -143,15 +165,23 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* Name + Verified */}
+          {/* Name + Verified + Creator Badge */}
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-[38px] md:text-[48px] font-bold tracking-[-0.02em]">{displayName || "User"}</h1>
             <div className="relative">
               <BadgeCheck size={26} className="text-blue-400" />
               <div className="absolute -inset-1 bg-blue-400/20 rounded-full blur-md -z-10" />
             </div>
+            {userType === "creator" && (
+              <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.15em] uppercase bg-green-500/10 border border-green-500/20 text-green-400">Creator</span>
+            )}
           </div>
           <p className="text-[15px] text-white/20 tracking-wide">{user.email}</p>
+          {userType === "creator" && (
+            <button onClick={() => router.push(`/creator/${user.id}`)} className="mt-2 text-[12px] text-indigo-400/50 hover:text-indigo-400/80 tracking-wide transition-colors flex items-center gap-1">
+              View Public Profile →
+            </button>
+          )}
 
           {/* ═══ GLASS STAT CARDS ═══ */}
           <div className="flex items-center gap-4 mt-8 mb-3">
@@ -207,6 +237,43 @@ export default function ProfilePage() {
                 <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Email</label>
                 <div className="w-full bg-white/[0.015] border border-white/[0.04] rounded-2xl px-6 py-[16px] text-[16px] text-white/15 tracking-wide">{user.email}</div>
               </div>
+
+              {/* ═══ Creator Fields (only for creators) ═══ */}
+              {userType === "creator" && (
+                <>
+                  <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent my-2" />
+                  <div className="flex items-center gap-2 mb-1">
+                    <Sparkles size={14} className="text-green-400/60" />
+                    <span className="text-[11px] font-bold tracking-[0.2em] text-green-400/50 uppercase">Creator Profile</span>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Website / Portfolio</label>
+                    <input value={website} onChange={(e) => setWebsite(e.target.value)}
+                      className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[16px] text-[17px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 focus:bg-white/[0.05] focus:shadow-[0_0_30px_rgba(99,102,241,0.08)] transition-all tracking-wide"
+                      placeholder="https://yoursite.com" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">X / Twitter</label>
+                      <input value={socialX} onChange={(e) => setSocialX(e.target.value)}
+                        className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[14px] text-[15px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 transition-all tracking-wide"
+                        placeholder="@username" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">YouTube</label>
+                      <input value={socialYoutube} onChange={(e) => setSocialYoutube(e.target.value)}
+                        className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[14px] text-[15px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 transition-all tracking-wide"
+                        placeholder="@channel" />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Instagram</label>
+                      <input value={socialInstagram} onChange={(e) => setSocialInstagram(e.target.value)}
+                        className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[14px] text-[15px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 transition-all tracking-wide"
+                        placeholder="@username" />
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* Save — pill, centered, not full width */}
               <div className="flex justify-center pt-4">
