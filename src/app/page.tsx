@@ -1396,6 +1396,7 @@ function AiModelFilter({
    ═══════════════════════════════════════════════════════════════ */
 
 function Footer() {
+  const handleNav = (path: string) => { window.location.href = path; };
   return (
     <footer className="px-5 md:px-12 py-14 md:py-20 border-t border-white/[0.06] relative overflow-hidden"><div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-purple-600/[0.03] blur-[120px] pointer-events-none" />
       <div className="max-w-6xl mx-auto relative z-10">
@@ -1403,11 +1404,11 @@ function Footer() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10">
           <span className="text-lg font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
           <div className="flex items-center gap-6 text-[13px] text-white/30">
-            <a href="/blog" className="hover:text-white/60 transition-colors">Blog</a>
-            <a href="/submit" className="hover:text-white/60 transition-colors">Submit Film</a>
-            <a href="#" className="hover:text-white/60 transition-colors">About</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Terms</a>
-            <a href="#" className="hover:text-white/60 transition-colors">Privacy</a>
+            <button onClick={() => handleNav("/blog")} className="hover:text-white/60 transition-colors cursor-pointer">Blog</button>
+            <button onClick={() => handleNav("/submit")} className="hover:text-white/60 transition-colors cursor-pointer">Submit Film</button>
+            <button onClick={() => handleNav("/creators")} className="hover:text-white/60 transition-colors cursor-pointer">About</button>
+            <button onClick={() => handleNav("/terms")} className="hover:text-white/60 transition-colors cursor-pointer">Terms</button>
+            <button onClick={() => handleNav("/terms#privacy")} className="hover:text-white/60 transition-colors cursor-pointer">Privacy</button>
           </div>
         </div>
         {/* Divider */}
