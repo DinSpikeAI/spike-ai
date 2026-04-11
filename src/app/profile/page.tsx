@@ -116,7 +116,7 @@ export default function ProfilePage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#08080c] text-white relative overflow-hidden">
+    <div className="min-h-screen w-full bg-[#08080c] text-white relative overflow-hidden">
       {/* Ambient glow — matches presentation style */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[5%] right-[15%] w-[600px] h-[600px] rounded-full opacity-[0.035]"
@@ -141,7 +141,8 @@ export default function ProfilePage() {
       </nav>
 
       {/* ═══ MAIN ═══ */}
-      <div className="max-w-3xl mx-auto px-8 relative z-10 prof-reveal">
+      <div className="w-full flex justify-center">
+      <div className="w-full max-w-3xl px-8 relative z-10 prof-reveal">
 
         {/* Banner */}
         <div className="relative h-[200px] rounded-2xl overflow-hidden mt-8 group">
@@ -294,6 +295,7 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
+      </div>
       </div>
 
       {/* Toast */}
