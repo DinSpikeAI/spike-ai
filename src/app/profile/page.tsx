@@ -2,23 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, LogIn, Check, Heart, Bookmark, Calendar, User, Film, BadgeCheck, Pencil, Sparkles, Camera } from "lucide-react";
+import {
+  ArrowLeft, Loader2, LogIn, Check, Heart, Bookmark,
+  Calendar, Film, Sparkles, Camera,
+  ExternalLink, Globe,
+} from "lucide-react";
 import { supabase } from "@/lib/supabase";
-
-const AVATARS = [
-  { id: "a1", gradient: "from-violet-500 to-indigo-700", emoji: "🎬" },
-  { id: "a2", gradient: "from-cyan-400 to-blue-600", emoji: "🚀" },
-  { id: "a3", gradient: "from-rose-400 to-pink-600", emoji: "🎭" },
-  { id: "a4", gradient: "from-amber-400 to-orange-600", emoji: "⚡" },
-  { id: "a5", gradient: "from-emerald-400 to-teal-600", emoji: "🌊" },
-  { id: "a6", gradient: "from-fuchsia-400 to-purple-600", emoji: "🔮" },
-  { id: "a7", gradient: "from-red-400 to-rose-700", emoji: "🎯" },
-  { id: "a8", gradient: "from-sky-300 to-indigo-500", emoji: "✨" },
-  { id: "a9", gradient: "from-lime-400 to-green-600", emoji: "🌿" },
-  { id: "a10", gradient: "from-orange-300 to-red-500", emoji: "🔥" },
-  { id: "a11", gradient: "from-indigo-300 to-violet-600", emoji: "🎵" },
-  { id: "a12", gradient: "from-teal-300 to-cyan-600", emoji: "💎" },
-];
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -27,6 +16,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+
   const [displayName, setDisplayName] = useState("");
   const [bio, setBio] = useState("");
   const [website, setWebsite] = useState("");
@@ -35,19 +25,20 @@ export default function ProfilePage() {
   const [socialInstagram, setSocialInstagram] = useState("");
   const [userType, setUserType] = useState("viewer");
   const [bannerUrl, setBannerUrl] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [uploadingBanner, setUploadingBanner] = useState(false);
-  const [selectedAvatar, setSelectedAvatar] = useState<string>("a1");
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
-  const [activeTab, setActiveTab] = useState<"edit" | "films">("edit");
+  const [stats, setStats] = useState({ watchlist: 0, upvotes: 0, films: 0 });
 
-  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
+  const isCreator = userType === "creator";
 
   useEffect(() => {
     if (!supabase) { setAuthChecking(false); setLoading(false); return; }
     async function load() {
       const { data: { session } } = await supabase!.auth.getSession();
       const u = session?.user || null;
-      setUser(u); setAuthChecking(false);
+      setUser(u);
+      setAuthChecking(false);
       if (u) {
         const { data } = await supabase!.from("profiles").select("*").eq("id", u.id).single();
         if (data) {
@@ -59,27 +50,35 @@ export default function ProfilePage() {
           setSocialInstagram(data.social_instagram || "");
           setUserType(data.user_type || "viewer");
           setBannerUrl(data.banner_url || "");
+          setAvatarUrl(data.avatar_url || u.user_metadata?.avatar_url || "");
+        } else {
+          setDisplayName(u.user_metadata?.display_name || u.user_metadata?.full_name || "");
+          setAvatarUrl(u.user_metadata?.avatar_url || "");
         }
-        else setDisplayName(u.user_metadata?.display_name || u.user_metadata?.full_name || "");
       }
       setLoading(false);
     }
     load();
   }, []);
 
+  useEffect(() => {
+    if (!supabase || !user) return;
+    async function s() {
+      const { count: w } = await supabase!.from("watchlist").select("*", { count: "exact", head: true }).eq("user_id", user.id);
+      const { count: u } = await supabase!.from("user_votes").select("*", { count: "exact", head: true }).eq("user_id", user.id);
+      const { count: f } = await supabase!.from("movies").select("*", { count: "exact", head: true }).eq("creator_name", displayName).eq("status", "approved");
+      setStats({ watchlist: w || 0, upvotes: u || 0, films: f || 0 });
+    }
+    s();
+  }, [user, displayName]);
+
   const handleSave = async () => {
     if (!supabase || !user) return;
     setSaving(true);
     const { error } = await supabase.from("profiles").upsert({
-      id: user.id,
-      display_name: displayName.trim(),
-      bio: bio.trim(),
-      email: user.email,
-      website: website.trim(),
-      social_x: socialX.trim(),
-      social_youtube: socialYoutube.trim(),
-      social_instagram: socialInstagram.trim(),
-      banner_url: bannerUrl.trim(),
+      id: user.id, display_name: displayName.trim(), bio: bio.trim(), email: user.email,
+      website: website.trim(), social_x: socialX.trim(), social_youtube: socialYoutube.trim(),
+      social_instagram: socialInstagram.trim(), banner_url: bannerUrl.trim(),
     }, { onConflict: "id" });
     if (!error) { showToast("Profile saved"); await supabase.auth.updateUser({ data: { display_name: displayName.trim() } }); }
     else showToast("Error saving");
@@ -91,273 +90,220 @@ export default function ProfilePage() {
     if (!file || !supabase || !user) return;
     setUploadingBanner(true);
     try {
-      const ext = file.name.split('.').pop();
+      const ext = file.name.split(".").pop();
       const path = `banners/${user.id}.${ext}`;
-      const { error: upErr } = await supabase.storage.from('media').upload(path, file, { upsert: true });
-      if (upErr) { showToast('Upload failed'); setUploadingBanner(false); return; }
-      const { data: urlData } = supabase.storage.from('media').getPublicUrl(path);
-      const url = urlData.publicUrl + '?t=' + Date.now();
+      const { error: upErr } = await supabase.storage.from("media").upload(path, file, { upsert: true });
+      if (upErr) { showToast("Upload failed"); setUploadingBanner(false); return; }
+      const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+      const url = urlData.publicUrl + "?t=" + Date.now();
       setBannerUrl(url);
-      await supabase.from('profiles').update({ banner_url: url }).eq('id', user.id);
-      showToast('Banner updated');
-    } catch { showToast('Upload error'); }
+      await supabase.from("profiles").update({ banner_url: url }).eq("id", user.id);
+      showToast("Banner updated");
+    } catch { showToast("Upload error"); }
     setUploadingBanner(false);
   };
 
-  const [stats, setStats] = useState({ watchlist: 0, upvotes: 0, films: 0 });
-  useEffect(() => {
-    if (!supabase || !user) return;
-    async function s() {
-      const { count: w } = await supabase!.from("watchlist").select("*", { count: "exact", head: true }).eq("user_id", user.id);
-      const { count: u } = await supabase!.from("user_votes").select("*", { count: "exact", head: true }).eq("user_id", user.id);
-      const { count: f } = await supabase!.from("movies").select("*", { count: "exact", head: true }).eq("creator_id", user.id).eq("status", "approved");
-      setStats({ watchlist: w || 0, upvotes: u || 0, films: f || 0 });
-    }
-    s();
-  }, [user]);
-
   const initial = (displayName || user?.email || "U")[0].toUpperCase();
-  const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "";
-  const selAv = AVATARS.find(a => a.id === selectedAvatar);
+  const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "";
 
-  if (authChecking || loading) return <div className="min-h-screen bg-[#060608] flex items-center justify-center"><Loader2 className="w-6 h-6 text-indigo-400/30 animate-spin" /></div>;
+  if (authChecking || loading) return <div className="min-h-screen bg-[#09090b] flex items-center justify-center"><Loader2 className="w-5 h-5 text-white/15 animate-spin" /></div>;
 
   if (!user) return (
-    <div className="min-h-screen bg-[#060608] flex items-center justify-center relative overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none"><div className="absolute top-[30%] left-[50%] -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-[0.06]" style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.8) 0%, transparent 70%)" }} /></div>
-      <div className="text-center relative z-10" style={{ animation: "reveal 0.7s cubic-bezier(0.16,1,0.3,1)" }}>
-        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-violet-500/20 to-indigo-500/10 border border-violet-400/10 flex items-center justify-center mx-auto mb-8"><LogIn size={36} className="text-violet-300/40" /></div>
-        <h2 className="text-[40px] font-bold text-white tracking-[-0.02em] mb-3">Your Profile</h2>
-        <p className="text-[16px] text-white/20 mb-10 max-w-sm mx-auto">Sign in to manage your profile and see your stats.</p>
-        <button onClick={() => router.push("/auth")} className="cta-btn px-10 py-4 text-black text-[15px] font-bold rounded-full cursor-pointer">Sign In</button>
+    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-6">
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-[0.04]"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)" }} />
       </div>
-      <style jsx>{`.cta-btn{background:linear-gradient(180deg,#fff 0%,#e4e4e7 100%);box-shadow:0 4px 24px rgba(255,255,255,0.08),0 0 60px rgba(99,102,241,0.06),inset 0 1px 0 rgba(255,255,255,0.9)} @keyframes reveal{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}`}</style>
+      <div className="text-center relative z-10 prof-reveal">
+        <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mx-auto mb-8">
+          <LogIn size={28} className="text-white/20" />
+        </div>
+        <h2 className="text-3xl font-semibold text-white tracking-tight mb-3">Sign in to continue</h2>
+        <p className="text-[15px] text-white/30 mb-10 max-w-xs mx-auto leading-relaxed">Access your profile, films, and creator tools.</p>
+        <button onClick={() => router.push("/auth")} className="px-8 py-3.5 bg-white text-black text-[14px] font-semibold rounded-xl hover:bg-white/90 transition-all cursor-pointer">Sign In</button>
+      </div>
+      <style jsx>{`@keyframes profReveal { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } } .prof-reveal { animation: profReveal 0.5s cubic-bezier(0.16,1,0.3,1); }`}</style>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#060608] text-white relative overflow-hidden">
-      {/* Noise */}
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-[0.025]"
-        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")` }} />
-
-      {/* Nav */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-[#060608]/60 backdrop-blur-2xl border-b border-white/[0.04]">
-        <div className="max-w-[850px] mx-auto px-6 h-14 flex items-center gap-4">
-          <button onClick={() => router.push("/")} className="w-9 h-9 rounded-full border border-white/[0.08] flex items-center justify-center text-white/25 hover:text-white transition-all cursor-pointer"><ArrowLeft size={15} /></button>
-          <span className="text-[15px] font-semibold tracking-wide text-white/40">Profile</span>
-        </div>
+    <div className="min-h-screen bg-[#09090b] text-white">
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full opacity-[0.03]"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 60%)" }} />
       </div>
 
-      {/* ═══ CENTERED CONTAINER — 850px ═══ */}
-      <div className="max-w-[850px] mx-auto relative" style={{ animation: "reveal 0.7s cubic-bezier(0.16,1,0.3,1)" }}>
+      <nav className="sticky top-0 z-50 bg-[#09090b]/80 backdrop-blur-xl border-b border-white/[0.04]">
+        <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.push("/")} className="text-white/25 hover:text-white/60 transition-colors cursor-pointer"><ArrowLeft size={18} /></button>
+            <span className="text-[14px] font-medium text-white/40">Profile</span>
+          </div>
+          {isCreator && (
+            <button onClick={() => router.push(`/creator/${user.id}`)} className="text-[12px] text-white/20 hover:text-white/40 transition-colors flex items-center gap-1.5 cursor-pointer">
+              <ExternalLink size={11} /> Public Profile
+            </button>
+          )}
+        </div>
+      </nav>
 
-        {/* ═══ BANNER ═══ */}
-        <div className="relative h-[200px] md:h-[260px] overflow-hidden rounded-b-3xl group">
+      <div className="max-w-2xl mx-auto px-6 relative z-10 prof-reveal">
+
+        {/* Banner */}
+        <div className="relative h-[180px] -mx-6 overflow-hidden group">
           {bannerUrl ? (
             <img src={bannerUrl} alt="" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#111118] via-[#0d0d14] to-[#0a0a10]">
-              <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)", backgroundSize: "32px 32px" }} />
-            </div>
+            <div className="w-full h-full bg-gradient-to-br from-[#111113] to-[#09090b]" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#060608]" />
-          {/* Upload Banner Button */}
-          <label className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-sm border border-white/10 text-[11px] font-medium text-white/40 hover:text-white/70 hover:border-white/20 transition-all cursor-pointer opacity-0 group-hover:opacity-100">
-            {uploadingBanner ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
-            {uploadingBanner ? "Uploading..." : "Change Banner"}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/30 to-transparent" />
+          <label className="absolute bottom-4 right-6 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-md border border-white/[0.08] text-[11px] text-white/30 hover:text-white/60 hover:border-white/15 transition-all cursor-pointer opacity-0 group-hover:opacity-100">
+            {uploadingBanner ? <Loader2 size={11} className="animate-spin" /> : <Camera size={11} />}
+            {uploadingBanner ? "Uploading..." : "Edit cover"}
             <input type="file" accept="image/*" onChange={handleBannerUpload} className="hidden" />
           </label>
         </div>
 
-        {/* ═══ AVATAR — Circle, centered, neon glow, overlapping banner ═══ */}
-        <div className="flex flex-col items-center text-center" style={{ marginTop: "-80px" }}>
-          <button onClick={() => setShowAvatarPicker(!showAvatarPicker)} className="relative group cursor-pointer mb-6">
-            {/* Neon rim glow */}
-            <div className={`absolute -inset-1 rounded-full bg-gradient-to-br ${selAv?.gradient || "from-zinc-600 to-zinc-700"} opacity-60 blur-sm transition-all duration-500 group-hover:opacity-80`} />
-            {/* Avatar circle */}
-            <div className={`relative w-[130px] h-[130px] md:w-[150px] md:h-[150px] rounded-full flex items-center justify-center text-5xl md:text-6xl border-[4px] border-[#060608] transition-all duration-500 bg-gradient-to-br ${selAv?.gradient || "from-zinc-700 to-zinc-900"}`}
-              style={{ boxShadow: "0 12px 48px rgba(0,0,0,0.7)" }}>
-              {selAv ? selAv.emoji : <span className="text-4xl font-bold">{initial}</span>}
+        {/* Header */}
+        <div className="flex items-start gap-5 -mt-12 mb-10">
+          <div className="relative flex-shrink-0">
+            <div className="w-24 h-24 rounded-2xl overflow-hidden border-[3px] border-[#09090b] shadow-2xl shadow-black/60 bg-[#18181b]">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white/40 bg-gradient-to-br from-[#1a1a1e] to-[#111114]">{initial}</div>
+              )}
             </div>
-            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"><Pencil size={24} className="text-white/80" /></div>
-          </button>
-
-          {/* Avatar Picker */}
-          {showAvatarPicker && (
-            <div className="mb-8 p-5 bg-white/[0.03] border border-white/[0.06] rounded-2xl backdrop-blur-xl" style={{ animation: "reveal 0.3s ease" }}>
-              <div className="grid grid-cols-6 gap-2.5">
-                {AVATARS.map((av) => (
-                  <button key={av.id} onClick={() => { setSelectedAvatar(av.id); setShowAvatarPicker(false); }}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-xl cursor-pointer transition-all duration-300 bg-gradient-to-br ${av.gradient} ${selectedAvatar === av.id ? "ring-2 ring-white/50 scale-110" : "opacity-50 hover:opacity-100 hover:scale-110"}`}>
-                    {av.emoji}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Name + Verified + Creator Badge */}
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-[38px] md:text-[48px] font-bold tracking-[-0.02em]">{displayName || "User"}</h1>
-            <div className="relative">
-              <BadgeCheck size={26} className="text-blue-400" />
-              <div className="absolute -inset-1 bg-blue-400/20 rounded-full blur-md -z-10" />
-            </div>
-            {userType === "creator" && (
-              <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-[0.15em] uppercase bg-green-500/10 border border-green-500/20 text-green-400">Creator</span>
-            )}
           </div>
-          <p className="text-[15px] text-white/20 tracking-wide">{user.email}</p>
-          {userType === "creator" && (
-            <button onClick={() => router.push(`/creator/${user.id}`)} className="mt-2 text-[12px] text-indigo-400/50 hover:text-indigo-400/80 tracking-wide transition-colors flex items-center gap-1">
-              View Public Profile →
-            </button>
-          )}
-
-          {/* ═══ GLASS STAT CARDS ═══ */}
-          <div className="flex items-center gap-4 mt-8 mb-3">
-            {[
-              { value: stats.films, label: "Films", icon: Film },
-              { value: stats.upvotes, label: "Upvotes", icon: Heart },
-              { value: stats.watchlist, label: "Watchlist", icon: Bookmark },
-            ].map((s) => (
-              <div key={s.label} className="glass-card px-6 py-4 rounded-2xl text-center min-w-[110px]">
-                <s.icon size={16} className="text-white/20 mx-auto mb-2" />
-                <p className="text-[24px] font-bold tracking-tight">{s.value}</p>
-                <p className="text-[11px] text-white/20 tracking-[0.15em] uppercase mt-0.5">{s.label}</p>
-              </div>
-            ))}
+          <div className="pt-14 min-w-0">
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-bold tracking-tight truncate">{displayName || "User"}</h1>
+              {isCreator && (
+                <span className="flex-shrink-0 px-2.5 py-0.5 rounded-md text-[10px] font-semibold tracking-widest uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/15">Creator</span>
+              )}
+            </div>
+            <p className="text-[13px] text-white/25 truncate">{user.email}</p>
+            {memberSince && <p className="text-[12px] text-white/15 mt-1 flex items-center gap-1.5"><Calendar size={10} /> Joined {memberSince}</p>}
           </div>
-
-          {memberSince && (
-            <p className="text-[11px] text-white/10 tracking-[0.15em] mt-2 flex items-center gap-1.5"><Calendar size={10} /> Joined {memberSince}</p>
-          )}
         </div>
 
-        {/* ═══ TABS — centered, purple indicator ═══ */}
-        <div className="flex items-center justify-center gap-1 mt-10 mb-10">
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-12">
           {[
-            { id: "edit" as const, label: "Edit Profile", icon: Pencil },
-            { id: "films" as const, label: "My Films", icon: Film },
-          ].map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 text-[14px] font-semibold tracking-wide transition-all cursor-pointer rounded-full ${activeTab === tab.id ? "text-white bg-white/[0.06] shadow-lg shadow-indigo-500/5" : "text-white/20 hover:text-white/40"}`}>
-              <tab.icon size={15} />
-              {tab.label}
-            </button>
+            { value: stats.films, label: "Films" },
+            { value: stats.upvotes, label: "Upvotes" },
+            { value: stats.watchlist, label: "Watchlist" },
+          ].map((s) => (
+            <div key={s.label} className="text-center py-5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+              <p className="text-xl font-bold tracking-tight">{s.value}</p>
+              <p className="text-[11px] text-white/25 tracking-wider uppercase mt-1">{s.label}</p>
+            </div>
           ))}
         </div>
 
-        {/* ═══ EDIT TAB ═══ */}
-        {activeTab === "edit" && (
-          <div className="max-w-[500px] mx-auto px-6 pb-20" style={{ animation: "reveal 0.5s ease" }}>
-            <div className="space-y-6">
-              <div>
-                <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Display Name</label>
-                <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[16px] text-[17px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 focus:bg-white/[0.05] focus:shadow-[0_0_30px_rgba(99,102,241,0.08)] transition-all tracking-wide"
-                  placeholder="Your name" />
-              </div>
-              <div>
-                <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Bio</label>
-                <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3}
-                  className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[16px] text-[17px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 focus:bg-white/[0.05] focus:shadow-[0_0_30px_rgba(99,102,241,0.08)] transition-all resize-none tracking-wide"
-                  placeholder="AI filmmaker, visual storyteller..." />
-              </div>
-              <div>
-                <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Email</label>
-                <div className="w-full bg-white/[0.015] border border-white/[0.04] rounded-2xl px-6 py-[16px] text-[16px] text-white/15 tracking-wide">{user.email}</div>
-              </div>
+        <div className="h-px bg-white/[0.04] mb-10" />
 
-              {/* ═══ Creator Fields (only for creators) ═══ */}
-              {userType === "creator" && (
-                <>
-                  <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent my-2" />
-                  <div className="flex items-center gap-2 mb-1">
-                    <Sparkles size={14} className="text-green-400/60" />
-                    <span className="text-[11px] font-bold tracking-[0.2em] text-green-400/50 uppercase">Creator Profile</span>
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Website / Portfolio</label>
+        {/* Form */}
+        <div className="space-y-8 pb-24">
+          <div>
+            <label className="block text-[11px] font-medium tracking-widest text-white/25 uppercase mb-2">Display Name</label>
+            <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)}
+              className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.12] focus:bg-white/[0.04] transition-all"
+              placeholder="Your name" />
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-medium tracking-widest text-white/25 uppercase mb-2">Bio</label>
+            <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3}
+              className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.12] focus:bg-white/[0.04] transition-all resize-none"
+              placeholder="Tell the world who you are..." />
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-medium tracking-widest text-white/25 uppercase mb-2">Email</label>
+            <div className="w-full bg-white/[0.015] border border-white/[0.03] rounded-xl px-5 py-4 text-[15px] text-white/20">{user.email}</div>
+          </div>
+
+          {isCreator && (
+            <div className="pt-2">
+              <div className="flex items-center gap-2.5 mb-6">
+                <div className="w-1 h-5 rounded-full bg-emerald-500/40" />
+                <span className="text-[12px] font-semibold tracking-widest text-emerald-400/60 uppercase">Creator Profile</span>
+              </div>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-[11px] font-medium tracking-widest text-white/25 uppercase mb-2">Website / Portfolio</label>
+                  <div className="relative">
+                    <Globe size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/15" />
                     <input value={website} onChange={(e) => setWebsite(e.target.value)}
-                      className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[16px] text-[17px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 focus:bg-white/[0.05] focus:shadow-[0_0_30px_rgba(99,102,241,0.08)] transition-all tracking-wide"
+                      className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-10 pr-5 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.12] focus:bg-white/[0.04] transition-all"
                       placeholder="https://yoursite.com" />
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">X / Twitter</label>
-                      <input value={socialX} onChange={(e) => setSocialX(e.target.value)}
-                        className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[14px] text-[15px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 transition-all tracking-wide"
-                        placeholder="@username" />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">YouTube</label>
-                      <input value={socialYoutube} onChange={(e) => setSocialYoutube(e.target.value)}
-                        className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[14px] text-[15px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 transition-all tracking-wide"
-                        placeholder="@channel" />
-                    </div>
-                    <div>
-                      <label className="block text-[11px] font-bold tracking-[0.3em] text-white/15 uppercase mb-3 ml-1">Instagram</label>
-                      <input value={socialInstagram} onChange={(e) => setSocialInstagram(e.target.value)}
-                        className="w-full bg-white/[0.03] border border-white/[0.07] rounded-2xl px-6 py-[14px] text-[15px] text-white placeholder-white/12 focus:outline-none focus:border-indigo-500/40 transition-all tracking-wide"
-                        placeholder="@username" />
-                    </div>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-medium tracking-widest text-white/25 uppercase mb-3">Social Links</label>
+                  <div className="space-y-3">
+                    {[
+                      { label: "X / Twitter", value: socialX, set: setSocialX, ph: "@username" },
+                      { label: "YouTube", value: socialYoutube, set: setSocialYoutube, ph: "@channel" },
+                      { label: "Instagram", value: socialInstagram, set: setSocialInstagram, ph: "@username" },
+                    ].map((s) => (
+                      <div key={s.label} className="flex items-center gap-3">
+                        <span className="text-[12px] text-white/20 w-20 flex-shrink-0">{s.label}</span>
+                        <input value={s.value} onChange={(e) => s.set(e.target.value)}
+                          className="flex-1 bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.12] transition-all"
+                          placeholder={s.ph} />
+                      </div>
+                    ))}
                   </div>
-                </>
-              )}
-
-              {/* Save — pill, centered, not full width */}
-              <div className="flex justify-center pt-4">
-                <button onClick={handleSave} disabled={saving}
-                  className="save-btn px-10 py-[15px] text-[14px] font-bold rounded-full flex items-center gap-2.5 disabled:opacity-30 cursor-pointer transition-all active:scale-[0.97]">
-                  {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
-                  {saving ? "Saving..." : "Save Changes"}
-                </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* ═══ FILMS TAB ═══ */}
-        {activeTab === "films" && (
-          <div className="text-center py-24 px-6" style={{ animation: "reveal 0.5s ease" }}>
-            <div className="w-20 h-20 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mx-auto mb-6">
-              <Film size={32} className="text-white/12" />
-            </div>
-            <h3 className="text-[22px] font-bold mb-3">No films yet</h3>
-            <p className="text-[14px] text-white/20 max-w-sm mx-auto mb-10">Submit your first AI film and it will appear here.</p>
-            <button onClick={() => router.push("/submit")}
-              className="save-btn px-8 py-[14px] text-[14px] font-bold rounded-full inline-flex items-center gap-2.5 cursor-pointer">
-              Submit a Film <Film size={15} />
+          <div className="pt-4">
+            <button onClick={handleSave} disabled={saving}
+              className="w-full py-4 bg-white text-black text-[14px] font-semibold rounded-xl hover:bg-white/90 disabled:opacity-30 transition-all cursor-pointer flex items-center justify-center gap-2">
+              {saving ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+              {saving ? "Saving..." : "Save Changes"}
             </button>
           </div>
-        )}
+
+          <div className="pt-8">
+            <div className="h-px bg-white/[0.04] mb-10" />
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-[16px] font-semibold tracking-tight">My Films</h2>
+              {isCreator && (
+                <button onClick={() => router.push("/submit")} className="text-[12px] text-white/25 hover:text-white/50 transition-colors flex items-center gap-1.5 cursor-pointer">
+                  <Film size={12} /> Submit Film
+                </button>
+              )}
+            </div>
+            {stats.films === 0 ? (
+              <div className="text-center py-16 rounded-xl bg-white/[0.015] border border-white/[0.03]">
+                <Film size={28} className="text-white/10 mx-auto mb-3" />
+                <p className="text-[14px] text-white/20 mb-1">No films yet</p>
+                <p className="text-[12px] text-white/10">Submit your first AI film to see it here.</p>
+              </div>
+            ) : (
+              <div className="text-center py-12 rounded-xl bg-white/[0.015] border border-white/[0.03]">
+                <p className="text-[14px] text-white/30">{stats.films} film{stats.films !== 1 ? "s" : ""} published</p>
+                <button onClick={() => router.push(`/creator/${user.id}`)} className="mt-3 text-[12px] text-white/20 hover:text-white/40 transition-colors cursor-pointer">View all →</button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Toast */}
       {toast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] bg-white/[0.06] backdrop-blur-2xl border border-white/[0.06] text-white text-[14px] px-8 py-4 rounded-full font-medium shadow-2xl" style={{ animation: "reveal 0.3s ease" }}>{toast}</div>
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] bg-[#18181b] border border-white/[0.06] text-white text-[13px] px-6 py-3 rounded-xl font-medium shadow-2xl shadow-black/60 prof-reveal">
+          <span className="flex items-center gap-2"><Check size={14} className="text-emerald-400" /> {toast}</span>
+        </div>
       )}
 
       <style jsx>{`
-        .glass-card {
-          background: rgba(255,255,255,0.025);
-          border: 1px solid rgba(255,255,255,0.05);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-        }
-        .save-btn {
-          background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-          color: white;
-          box-shadow: 0 4px 20px rgba(99,102,241,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
-        .save-btn:hover:not(:disabled) {
-          box-shadow: 0 6px 30px rgba(99,102,241,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
-          transform: translateY(-1px);
-        }
-        .cta-btn{background:linear-gradient(180deg,#fff 0%,#e4e4e7 100%);box-shadow:0 4px 24px rgba(255,255,255,0.08),inset 0 1px 0 rgba(255,255,255,0.9)}
-        @keyframes reveal { from { opacity:0; transform:translateY(20px) } to { opacity:1; transform:translateY(0) } }
+        @keyframes profReveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .prof-reveal { animation: profReveal 0.5s cubic-bezier(0.16,1,0.3,1); }
       `}</style>
     </div>
   );
