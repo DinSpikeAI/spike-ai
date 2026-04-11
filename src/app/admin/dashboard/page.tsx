@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Shield, Film, Trash2, Pencil, Check, X, Loader2, RefreshCw,
@@ -77,6 +77,12 @@ export default function AdminDashboard() {
   const [newNotif, setNewNotif] = useState("");
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
+  const [activeTab, setActiveTab] = useState("films");
+  const [creators, setCreators] = useState([]);
+  const [creatorsLoading, setCreatorsLoading] = useState(false);
+  const [showNotifDropdown, setShowNotifDropdown] = useState(false);
+  const [smartNotifs, setSmartNotifs] = useState([]);
+  const [lastSeenNotif, setLastSeenNotif] = useState("");
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -125,8 +131,50 @@ export default function AdminDashboard() {
     if (profiles) setRecentUsers(profiles as any);
   }, []);
 
+  const fetchCreators = async () => {
+    if (!supabase) return;
+    setCreatorsLoading(true);
+    const { data: profiles } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+    if (profiles) {
+      const { data: allMovies } = await supabase.from("movies").select("creator_name, status");
+      const filmCounts = {};
+      (allMovies || []).forEach(m => {
+        const name = m.creator_name || "Unknown";
+        if (!filmCounts[name]) filmCounts[name] = { total: 0, approved: 0, pending: 0 };
+        filmCounts[name].total++;
+        if (m.status === "approved") filmCounts[name].approved++;
+        if (m.status === "pending") filmCounts[name].pending++;
+      });
+      setCreators(profiles.map(p => ({ ...p, films: filmCounts[p.display_name] || { total: 0, approved: 0, pending: 0 } })));
+    }
+    setCreatorsLoading(false);
+  };
+
+  // Smart Notifications
+  React.useEffect(() => {
+    const saved = localStorage.getItem("spike_last_seen_notif");
+    if (saved) setLastSeenNotif(saved);
+  }, []);
+
+  React.useEffect(() => {
+    if (!movies.length && !recentUsers.length) return;
+    const smart = [];
+    movies.filter(m => m.status === "pending").forEach(m => {
+      smart.push({ id: "pending-" + m.id, type: "pending", title: 'New submission: "' + m.title + '" by ' + (m.creator_name || "Unknown"), time: m.created_at, icon: "film" });
+    });
+    const weekAgo = new Date(Date.now() - 7*24*60*60*1000).toISOString();
+    recentUsers.filter(u => u.created_at > weekAgo).forEach(u => {
+      smart.push({ id: "user-" + u.id, type: "user", title: "New user: " + u.email, time: u.created_at, icon: "user" });
+    });
+    smart.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+    setSmartNotifs(smart);
+  }, [movies, recentUsers]);
+
+  const unreadCount = smartNotifs.filter(n => n.time > lastSeenNotif).length + notifs.filter(n => n.created_at > lastSeenNotif).length;
+  const markAllRead = () => { const now = new Date().toISOString(); setLastSeenNotif(now); localStorage.setItem("spike_last_seen_notif", now); };
+
   useEffect(() => {
-    if (!authChecking && isAdmin) { fetchMovies(); fetchStats(); }
+    if (!authChecking && isAdmin) { fetchMovies(); fetchStats(); fetchCreators(); }
   }, [isAdmin, authChecking, fetchMovies, fetchStats]);
 
   /* ── Notifications CRUD ── */
@@ -296,6 +344,47 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-3">
+            {/* Bell */}
+            <div className="relative">
+              <button onClick={() => { setShowNotifDropdown(!showNotifDropdown); if (!showNotifDropdown) markAllRead(); }} className="relative p-2 text-gray-400 hover:text-white transition-colors cursor-pointer">
+                <Bell size={18} />
+                {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[9px] font-black text-white animate-pulse">{unreadCount > 9 ? "9+" : unreadCount}</span>}
+              </button>
+              {showNotifDropdown && (
+                <div className="absolute right-0 top-12 w-[380px] max-h-[500px] bg-[#111114] border border-white/[0.08] rounded-2xl shadow-2xl shadow-black/60 overflow-hidden z-50">
+                  <div className="flex items-center justify-between px-5 py-3 border-b border-white/[0.06]">
+                    <span className="text-[13px] font-bold text-white/70">Notifications</span>
+                    <button onClick={markAllRead} className="text-[10px] text-white/20 hover:text-white/40 cursor-pointer">Mark all read</button>
+                  </div>
+                  <div className="max-h-[400px] overflow-y-auto">
+                    {smartNotifs.length === 0 && notifs.length === 0 ? (
+                      <div className="py-10 text-center text-white/15 text-[13px]">No notifications</div>
+                    ) : (<>
+                      {smartNotifs.map(n => (
+                        <div key={n.id} className={"flex items-start gap-3 px-5 py-3.5 border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors " + (n.time > lastSeenNotif ? "bg-white/[0.03]" : "")}>
+                          <span className="text-[14px] mt-0.5">{n.icon === "film" ? <Film size={14} className="text-yellow-400" /> : <Users size={14} className="text-purple-400" />}</span>
+                          <div className="min-w-0 flex-1">
+                            <p className={"text-[12px] leading-relaxed " + (n.time > lastSeenNotif ? "text-white/70" : "text-white/35")}>{n.title}</p>
+                            <p className="text-[10px] text-white/15 mt-1">{new Date(n.time).toLocaleDateString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                          </div>
+                          {n.type === "pending" && <button onClick={() => { setStatusFilter("pending"); setShowNotifDropdown(false); }} className="text-[10px] text-yellow-400 hover:text-yellow-300 cursor-pointer flex-shrink-0 mt-1">Review</button>}
+                        </div>
+                      ))}
+                      {notifs.map(n => (
+                        <div key={n.id} className={"flex items-start gap-3 px-5 py-3.5 border-b border-white/[0.03] hover:bg-white/[0.02] " + (n.created_at > lastSeenNotif ? "bg-white/[0.03]" : "")}>
+                          <Bell size={14} className="text-yellow-400 mt-0.5" />
+                          <div className="min-w-0 flex-1">
+                            <p className={"text-[12px] leading-relaxed " + (n.created_at > lastSeenNotif ? "text-white/70" : "text-white/35")}>{n.title}</p>
+                            <p className="text-[10px] text-white/15 mt-1">{new Date(n.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                          </div>
+                          <button onClick={() => deleteNotif(n.id)} className="text-white/10 hover:text-red-400 transition-colors cursor-pointer flex-shrink-0 mt-1"><Trash2 size={12} /></button>
+                        </div>
+                      ))}
+                    </>)}
+                  </div>
+                </div>
+              )}
+            </div>
             <button
               onClick={() => router.push("/submit")}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-500 transition-all"
