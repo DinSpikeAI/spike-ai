@@ -6,6 +6,7 @@ import {
   Shield, Film, Trash2, Pencil, Check, X, Loader2, RefreshCw,
   ArrowLeft, ChevronDown, Search, Zap, Clock, XCircle, Eye,
   Save, Plus, AlertTriangle, Inbox, CheckCircle, Ban, Bell, Users,
+  Sparkles,
 } from "lucide-react";
 import { supabase, getSmartPoster, checkIsAdmin } from "@/lib/supabase";
 
@@ -77,7 +78,7 @@ export default function AdminDashboard() {
   const [newNotif, setNewNotif] = useState("");
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
-  const [activeTab, setActiveTab] = useState("films");
+  const [activeTab, setActiveTab] = useState("films")  // films | creators | analytics;
   const [creators, setCreators] = useState([]);
   const [creatorsLoading, setCreatorsLoading] = useState(false);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
