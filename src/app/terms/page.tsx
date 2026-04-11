@@ -31,12 +31,13 @@ export default function TermsPage() {
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Terms of Service</h1>
           <p className="text-white/20 text-sm">Last updated: April 11, 2026</p>
           <p className="text-white/20 text-sm mt-1">Spike AI — spikeai.studio</p>
+          <p className="text-white/15 text-xs mt-3">In the event of any conflict between translations of these Terms, the English version shall prevail.</p>
         </div>
 
         <div className="terms-content space-y-10">
 
           <Section title="1. Acceptance of Terms">
-            <p>By accessing or using spikeai.studio (&quot;the Platform&quot;), operated by Spike AI (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, do not use the Platform. We reserve the right to update these Terms at any time. Continued use of the Platform after changes constitutes acceptance of the updated Terms.</p>
+            <p>By accessing or using spikeai.studio (&quot;the Platform&quot;), operated by Spike AI (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you do not agree to these Terms, do not use the Platform. We reserve the right to update these Terms at any time. We will notify registered users of material changes via email. Continued use of the Platform after changes constitutes acceptance of the updated Terms.</p>
           </Section>
 
           <Section title="2. Platform Description">
@@ -55,9 +56,9 @@ export default function TermsPage() {
 
           <Section title="5. Content Ownership & Licensing">
             <p><strong>5.1 Your Content.</strong> You retain full ownership of all intellectual property rights in any content you upload, submit, or display on the Platform (&quot;Your Content&quot;). Spike AI does not claim ownership of Your Content.</p>
-            <p><strong>5.2 License Grant.</strong> By uploading or submitting content to the Platform, you grant Spike AI a non-exclusive, worldwide, royalty-free, revocable license to: (a) host, display, stream, and distribute Your Content on the Platform; (b) create clips, excerpts, thumbnails, and edited versions of Your Content for promotional purposes, including but not limited to trailers, social media posts, advertisements, newsletters, and partner showcases; (c) sublicense these rights to third-party service providers solely for the purpose of operating the Platform. This license exists solely for the purpose of operating and promoting the Platform and Spike AI.</p>
-            <p><strong>5.3 Promotional Use.</strong> You expressly agree that Spike AI may use, edit, crop, remix, and incorporate portions of Your Content into promotional materials for the Platform without additional compensation or approval. Such promotional use will include reasonable attribution to you as the creator where practical.</p>
-            <p><strong>5.4 Revocation.</strong> You may request removal of Your Content from the Platform at any time by contacting us. We will remove the content within a reasonable timeframe. Note that promotional materials created prior to your removal request may continue to exist in already-published form.</p>
+            <p><strong>5.2 License Grant.</strong> By uploading or submitting content to the Platform, you grant Spike AI a non-exclusive, worldwide, royalty-free, revocable license to: (a) host, display, stream, and distribute Your Content on the Platform; (b) create clips, excerpts, thumbnails, and edited versions of Your Content for promotional purposes, including but not limited to trailers, social media posts, advertisements, newsletters, and partner showcases; (c) sublicense these rights to third-party service providers and tool partners solely for the purpose of operating, promoting, and showcasing content on the Platform and in partner channels. This license exists solely for the purpose of operating and promoting the Platform and Spike AI.</p>
+            <p><strong>5.3 Promotional Use.</strong> You expressly agree that Spike AI may use, edit, crop, remix, and incorporate portions of Your Content into promotional materials for the Platform without additional compensation or approval. Such promotional use will include reasonable attribution to you as the creator where practical. This includes sharing Your Content with tool partners (such as AI tool companies) for joint showcases and marketing.</p>
+            <p><strong>5.4 Revocation.</strong> You may request removal of Your Content from the Platform at any time by contacting us. We will remove the content within a reasonable timeframe. Note that promotional materials created prior to your removal request may continue to exist in already-published form. Your consent and license remain in effect until you explicitly request removal.</p>
             <p><strong>5.5 Representations.</strong> You represent and warrant that: (a) you own or have the necessary rights, licenses, and permissions to submit Your Content; (b) Your Content does not infringe, misappropriate, or violate any third party&apos;s intellectual property, privacy, or other rights; (c) you have obtained all necessary consents from any individuals appearing in Your Content; (d) Your Content does not contain unlicensed music, images, or other copyrighted material belonging to third parties.</p>
             <p><strong>5.6 AI-Generated Content.</strong> You acknowledge that the legal status of AI-generated content may vary by jurisdiction. You are solely responsible for ensuring that Your Content complies with all applicable laws and regulations in your jurisdiction, including any requirements related to disclosure of AI generation.</p>
           </Section>
@@ -107,43 +108,51 @@ export default function TermsPage() {
             <p>You agree to defend, indemnify, and hold harmless Spike AI, its founders, employees, and agents from and against any and all claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys&apos; fees) arising out of or related to: (a) Your Content; (b) your use of the Platform; (c) your violation of these Terms; (d) your violation of any rights of a third party; (e) any claim that Your Content caused damage to a third party.</p>
           </Section>
 
-          <Section title="15. Termination">
-            <p><strong>15.1 By You.</strong> You may stop using the Platform at any time and request deletion of your account and content.</p>
-            <p><strong>15.2 By Us.</strong> We reserve the right to suspend, restrict, or terminate your access to the Platform at any time, for any reason, including but not limited to violation of these Terms, at our sole discretion, with or without notice.</p>
-            <p><strong>15.3 Effect.</strong> Upon termination, your right to use the Platform ceases immediately. Sections 5, 6, 7, 13, 14, and 17 shall survive termination.</p>
+          <Section title="15. Dispute Resolution">
+            <p><strong>15.1 Informal Resolution.</strong> Before filing any legal claim, you agree to first contact us at spikeaistudio@gmail.com and attempt to resolve the dispute informally for at least thirty (30) days. Most disputes can be resolved without litigation.</p>
+            <p><strong>15.2 Mediation.</strong> If informal resolution fails, either party may initiate non-binding mediation before a mutually agreed-upon mediator in Tel Aviv, Israel. Each party shall bear its own mediation costs.</p>
+            <p><strong>15.3 Litigation.</strong> If mediation fails or is declined, any dispute shall be resolved exclusively in the competent courts of Tel Aviv-Jaffa, Israel, in accordance with Section 18.</p>
           </Section>
 
-          <Section title="16. Modifications to Platform">
+          <Section title="16. Termination">
+            <p><strong>16.1 By You.</strong> You may stop using the Platform at any time and request deletion of your account and content.</p>
+            <p><strong>16.2 By Us.</strong> We reserve the right to suspend, restrict, or terminate your access to the Platform at any time, for any reason, including but not limited to violation of these Terms, at our sole discretion, with or without notice.</p>
+            <p><strong>16.3 Effect.</strong> Upon termination, your right to use the Platform ceases immediately. Sections 5, 6, 7, 13, 14, 15, and 18 shall survive termination.</p>
+          </Section>
+
+          <Section title="17. Modifications to Platform">
             <p>We reserve the right to modify, suspend, or discontinue any part of the Platform (including any features, content, or services) at any time, temporarily or permanently, with or without notice and without liability to you. We are under no obligation to maintain, support, or update the Platform.</p>
           </Section>
 
-          <Section title="17. Governing Law & Disputes">
-            <p>These Terms shall be governed by and construed in accordance with the laws of the State of Israel, without regard to its conflict of law provisions. Any dispute arising out of or relating to these Terms or the Platform shall be resolved exclusively in the competent courts of Tel Aviv-Jaffa, Israel. You consent to the personal jurisdiction of such courts.</p>
+          <Section title="18. Governing Law & Jurisdiction">
+            <p>These Terms shall be governed by and construed in accordance with the laws of the State of Israel, without regard to its conflict of law provisions. Subject to the dispute resolution process in Section 15, any dispute arising out of or relating to these Terms or the Platform shall be resolved exclusively in the competent courts of Tel Aviv-Jaffa, Israel. You consent to the personal jurisdiction of such courts.</p>
           </Section>
 
-          <Section title="18. Confidentiality">
+          <Section title="19. Confidentiality">
             <p>Any non-public information shared by Spike AI with creators or partners (including but not limited to partnership details, business plans, and financial information) is confidential and may not be disclosed to third parties without our prior written consent.</p>
           </Section>
 
-          <Section title="19. Privacy" id="privacy">
-            <p><strong>19.1 Data Collection.</strong> We collect minimal personal information necessary to operate the Platform, including email addresses, profile information, authentication data, and usage analytics.</p>
-            <p><strong>19.2 Data Use.</strong> Your information is used solely for: (a) operating and improving the Platform; (b) communicating with you about your account and the Platform; (c) complying with legal obligations.</p>
-            <p><strong>19.3 Data Sharing.</strong> We do not sell your personal information to third parties. We may share information with: (a) service providers who assist in operating the Platform (such as Supabase, Vercel, Google); (b) law enforcement when required by law.</p>
-            <p><strong>19.4 Data Security.</strong> We implement reasonable security measures to protect your information. However, no method of electronic storage or transmission is 100% secure.</p>
-            <p><strong>19.5 Cookies.</strong> The Platform may use cookies and similar technologies for authentication and analytics purposes.</p>
-            <p><strong>19.6 Your Rights.</strong> You may request access to, correction of, or deletion of your personal data by contacting us at spikeaistudio@gmail.com.</p>
-            <p><strong>19.7 Children.</strong> We do not knowingly collect personal information from children under 13. See Section 3 for age requirements.</p>
+          <Section title="20. Privacy" id="privacy">
+            <p><strong>20.1 Data Collection.</strong> We collect minimal personal information necessary to operate the Platform, including email addresses, profile information, authentication data, and usage analytics.</p>
+            <p><strong>20.2 Data Use.</strong> Your information is used solely for: (a) operating and improving the Platform; (b) communicating with you about your account and the Platform; (c) complying with legal obligations.</p>
+            <p><strong>20.3 Data Sharing.</strong> We do not sell your personal information to third parties. We may share information with: (a) service providers who assist in operating the Platform (such as Supabase, Vercel, Google); (b) law enforcement when required by law.</p>
+            <p><strong>20.4 Data Security.</strong> We implement reasonable security measures to protect your information. However, no method of electronic storage or transmission is 100% secure.</p>
+            <p><strong>20.5 Cookies.</strong> The Platform may use cookies and similar technologies for authentication and analytics purposes.</p>
+            <p><strong>20.6 Your Rights.</strong> You may request access to, correction of, or deletion of your personal data by contacting us at spikeaistudio@gmail.com. If you are a resident of the European Economic Area (EEA), you have additional rights under the General Data Protection Regulation (GDPR), including the right to data portability, the right to restrict processing, and the right to lodge a complaint with a supervisory authority.</p>
+            <p><strong>20.7 International Transfers.</strong> Your data may be transferred to and processed in countries outside your country of residence, including Israel and the United States. By using the Platform, you consent to such transfers.</p>
+            <p><strong>20.8 Children.</strong> We do not knowingly collect personal information from children under 13. See Section 3 for age requirements.</p>
           </Section>
 
-          <Section title="20. Miscellaneous">
-            <p><strong>20.1 Entire Agreement.</strong> These Terms constitute the entire agreement between you and Spike AI regarding the Platform and supersede all prior agreements and understandings, whether written or oral.</p>
-            <p><strong>20.2 Severability.</strong> If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.</p>
-            <p><strong>20.3 Waiver.</strong> Our failure to enforce any right or provision of these Terms shall not constitute a waiver of such right or provision.</p>
-            <p><strong>20.4 Assignment.</strong> You may not assign or transfer your rights under these Terms. We may assign our rights without restriction.</p>
-            <p><strong>20.5 Force Majeure.</strong> Spike AI shall not be liable for any failure or delay in performance due to circumstances beyond our reasonable control, including but not limited to natural disasters, war, terrorism, pandemics, power outages, or internet disruptions.</p>
+          <Section title="21. Miscellaneous">
+            <p><strong>21.1 Entire Agreement.</strong> These Terms constitute the entire agreement between you and Spike AI regarding the Platform and supersede all prior agreements and understandings, whether written or oral.</p>
+            <p><strong>21.2 Severability.</strong> If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.</p>
+            <p><strong>21.3 Waiver.</strong> Our failure to enforce any right or provision of these Terms shall not constitute a waiver of such right or provision.</p>
+            <p><strong>21.4 Assignment.</strong> You may not assign or transfer your rights under these Terms. We may assign our rights without restriction.</p>
+            <p><strong>21.5 Force Majeure.</strong> Spike AI shall not be liable for any failure or delay in performance due to circumstances beyond our reasonable control, including but not limited to natural disasters, war, terrorism, pandemics, power outages, or internet disruptions.</p>
+            <p><strong>21.6 Language.</strong> These Terms are drafted in English. In the event of any conflict between the English version and any translation, the English version shall prevail.</p>
           </Section>
 
-          <Section title="21. Contact">
+          <Section title="22. Contact">
             <p>For questions about these Terms, contact us at:</p>
             <p className="mt-2">
               <strong>Spike AI</strong><br />
