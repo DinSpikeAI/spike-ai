@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Loader2, LogIn, Check, Heart, Bookmark, Calendar, User, Film, BadgeCheck, Pencil, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, LogIn, Check, Heart, Bookmark, Calendar, User, Film, BadgeCheck, Pencil, Sparkles, Camera } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const AVATARS = [
@@ -34,6 +34,8 @@ export default function ProfilePage() {
   const [socialYoutube, setSocialYoutube] = useState("");
   const [socialInstagram, setSocialInstagram] = useState("");
   const [userType, setUserType] = useState("viewer");
+  const [bannerUrl, setBannerUrl] = useState("");
+  const [uploadingBanner, setUploadingBanner] = useState(false);
   const [selectedAvatar, setSelectedAvatar] = useState<string>("a1");
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [activeTab, setActiveTab] = useState<"edit" | "films">("edit");
@@ -56,6 +58,7 @@ export default function ProfilePage() {
           setSocialYoutube(data.social_youtube || "");
           setSocialInstagram(data.social_instagram || "");
           setUserType(data.user_type || "viewer");
+          setBannerUrl(data.banner_url || "");
         }
         else setDisplayName(u.user_metadata?.display_name || u.user_metadata?.full_name || "");
       }
@@ -76,10 +79,29 @@ export default function ProfilePage() {
       social_x: socialX.trim(),
       social_youtube: socialYoutube.trim(),
       social_instagram: socialInstagram.trim(),
+      banner_url: bannerUrl.trim(),
     }, { onConflict: "id" });
     if (!error) { showToast("Profile saved"); await supabase.auth.updateUser({ data: { display_name: displayName.trim() } }); }
     else showToast("Error saving");
     setSaving(false);
+  };
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !supabase || !user) return;
+    setUploadingBanner(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `banners/${user.id}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('media').upload(path, file, { upsert: true });
+      if (upErr) { showToast('Upload failed'); setUploadingBanner(false); return; }
+      const { data: urlData } = supabase.storage.from('media').getPublicUrl(path);
+      const url = urlData.publicUrl + '?t=' + Date.now();
+      setBannerUrl(url);
+      await supabase.from('profiles').update({ banner_url: url }).eq('id', user.id);
+      showToast('Banner updated');
+    } catch { showToast('Upload error'); }
+    setUploadingBanner(false);
   };
 
   const [stats, setStats] = useState({ watchlist: 0, upvotes: 0, films: 0 });
@@ -130,12 +152,22 @@ export default function ProfilePage() {
       {/* ═══ CENTERED CONTAINER — 850px ═══ */}
       <div className="max-w-[850px] mx-auto relative" style={{ animation: "reveal 0.7s cubic-bezier(0.16,1,0.3,1)" }}>
 
-        {/* ═══ CINEMATIC BANNER ═══ */}
-        <div className="relative h-[240px] md:h-[300px] overflow-hidden rounded-b-3xl">
-          <div className={`absolute inset-0 bg-gradient-to-br ${selAv?.gradient || "from-zinc-800 to-zinc-900"} opacity-50 transition-all duration-1000`} />
+        {/* ═══ BANNER ═══ */}
+        <div className="relative h-[200px] md:h-[260px] overflow-hidden rounded-b-3xl group">
+          {bannerUrl ? (
+            <img src={bannerUrl} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#111118] via-[#0d0d14] to-[#0a0a10]">
+              <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)", backgroundSize: "32px 32px" }} />
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#060608]" />
-          <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)", backgroundSize: "24px 24px" }} />
-          <div className={`absolute top-[30%] left-[50%] -translate-x-1/2 w-[500px] h-[300px] rounded-full blur-[100px] opacity-30 bg-gradient-to-r ${selAv?.gradient || "from-zinc-600 to-zinc-700"} transition-all duration-1000`} />
+          {/* Upload Banner Button */}
+          <label className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/50 backdrop-blur-sm border border-white/10 text-[11px] font-medium text-white/40 hover:text-white/70 hover:border-white/20 transition-all cursor-pointer opacity-0 group-hover:opacity-100">
+            {uploadingBanner ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
+            {uploadingBanner ? "Uploading..." : "Change Banner"}
+            <input type="file" accept="image/*" onChange={handleBannerUpload} className="hidden" />
+          </label>
         </div>
 
         {/* ═══ AVATAR — Circle, centered, neon glow, overlapping banner ═══ */}
