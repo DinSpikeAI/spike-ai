@@ -402,7 +402,8 @@ export default function SubmitPage() {
                 </p>
               )}
               <p className="text-center text-[10px] text-white/8">
-                By submitting, you confirm this is your original AI-generated work.
+                By submitting, you confirm this is your original AI-generated work and agree to our{" "}
+                <a href="/terms" target="_blank" className="text-white/20 hover:text-white/30 underline">Terms of Service</a>.
               </p>
             </div>
           </div>
