@@ -46,11 +46,16 @@ export default function CommunityGuidelinesPage() {
           </Section>
 
           <Section title="Content That Is Not Allowed" emoji="✕">
-            <p><strong>Harmful or Illegal Content.</strong> Content that promotes violence, terrorism, self-harm, or any illegal activity. Content that exploits or endangers minors in any way.</p>
+            <p><strong>Harmful or Illegal Content.</strong> Content that promotes violence, terrorism, self-harm (including glorification of self-harm or eating disorders), or any illegal activity. Content that exploits or endangers minors in any way.</p>
             <p><strong>Hate Speech & Discrimination.</strong> Content that promotes hatred, discrimination, or violence against individuals or groups based on race, ethnicity, religion, gender, sexual orientation, disability, nationality, or any other protected characteristic.</p>
-            <p><strong>Non-Consensual Deepfakes.</strong> Realistic AI-generated depictions of real, identifiable people without their explicit consent. This includes public figures, politicians, and private individuals. Parody and satire that are clearly labeled as such may be permitted at our discretion.</p>
-            <p><strong>Misleading Content.</strong> Content designed to deceive viewers into believing fabricated events actually occurred. Content presented as real footage when it is AI-generated, without disclosure.</p>
+            <p><strong>Harassment & Bullying.</strong> Content that targets individuals or groups with insults, threats, intimidation, or personal attacks — even outside protected classes. This includes persistent unwanted contact, coordinated harassment campaigns, and content designed to humiliate or degrade a specific person.</p>
+            <p><strong>Non-Consensual Deepfakes.</strong> Realistic AI-generated depictions of real, identifiable people without their explicit consent. This includes public figures, politicians, and private individuals. This also applies to deepfake audio. Parody and satire that are clearly labeled as such may be permitted at our discretion.</p>
+            <p><strong>Misleading Content & Disinformation.</strong> Content designed to deceive viewers into believing fabricated events actually occurred. Content presented as real footage when it is AI-generated, without disclosure. Content that spreads harmful misinformation — including false medical claims, dangerous conspiracy theories, or political disinformation — without clear disclosure is not allowed.</p>
             <p><strong>Non-Consensual Intimate Content.</strong> Any sexual or intimate imagery of real or AI-generated individuals created without consent.</p>
+            <p><strong>Defamation.</strong> False or damaging statements about individuals or organizations that could harm their reputation. Content that presents fabricated claims as fact to discredit a person or entity is prohibited. Clearly labeled satire or opinion is not covered by this rule.</p>
+            <p><strong>Personal Data & Doxing.</strong> Sharing anyone&apos;s personal identifying information without their consent — including ID documents, home addresses, phone numbers, private photos, or financial information. This applies regardless of whether the person is a public figure.</p>
+            <p><strong>Illicit Activities.</strong> Content that provides instructions for committing crimes, promotes the sale of illegal goods or substances, or facilitates any unlawful transaction.</p>
+            <p><strong>Extremist Content.</strong> Content featuring extremist symbols, propaganda, or recruitment material that encourages violence, hate, or radicalization — even if not directly calling for a specific act of violence.</p>
             <p><strong>Copyright Infringement.</strong> Content that uses copyrighted music, images, footage, or other material without proper licensing or permission. If it is not yours and you do not have a license — do not upload it.</p>
             <p><strong>Spam & Self-Promotion Abuse.</strong> Uploading duplicate content, fake engagement, or using the platform solely for advertising unrelated products or services.</p>
             <p><strong>Impersonation.</strong> Pretending to be another creator, company, or public figure to mislead others.</p>
@@ -73,7 +78,7 @@ export default function CommunityGuidelinesPage() {
             <p><strong>First Violation (Minor).</strong> Content removal + warning via email. You get a chance to understand the rules and correct course.</p>
             <p><strong>Repeated Violations.</strong> Temporary account suspension (7–30 days) + all flagged content removed.</p>
             <p><strong>Severe Violations.</strong> Immediate permanent ban. This includes: illegal content, CSAM, non-consensual intimate content, and deliberate fraud. We may also report to law enforcement.</p>
-            <p><strong>Appeals.</strong> If you believe your content was removed in error, you may appeal by emailing spikeaistudio@gmail.com with &quot;Appeal&quot; in the subject line. We will review your case within 7 business days.</p>
+            <p><strong>Appeals.</strong> If you believe your content was removed in error, you may appeal by emailing spikeaistudio@gmail.com with &quot;Appeal&quot; in the subject line. We will review your case within 7 business days. Content remains removed during the appeal process. The decision after appeal review is final.</p>
           </Section>
 
           <Section title="Pioneer Creators" emoji="★">
