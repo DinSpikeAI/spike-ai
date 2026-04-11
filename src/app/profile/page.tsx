@@ -36,19 +36,14 @@ export default function ProfilePage() {
     async function load() {
       const { data: { session } } = await supabase!.auth.getSession();
       const u = session?.user || null;
-      setUser(u);
-      setAuthChecking(false);
+      setUser(u); setAuthChecking(false);
       if (u) {
         const { data } = await supabase!.from("profiles").select("*").eq("id", u.id).single();
         if (data) {
-          setDisplayName(data.display_name || "");
-          setBio(data.bio || "");
-          setWebsite(data.website || "");
-          setSocialX(data.social_x || "");
-          setSocialYoutube(data.social_youtube || "");
-          setSocialInstagram(data.social_instagram || "");
-          setUserType(data.user_type || "viewer");
-          setBannerUrl(data.banner_url || "");
+          setDisplayName(data.display_name || ""); setBio(data.bio || "");
+          setWebsite(data.website || ""); setSocialX(data.social_x || "");
+          setSocialYoutube(data.social_youtube || ""); setSocialInstagram(data.social_instagram || "");
+          setUserType(data.user_type || "viewer"); setBannerUrl(data.banner_url || "");
           setAvatarUrl(data.avatar_url || u.user_metadata?.avatar_url || "");
         } else {
           setDisplayName(u.user_metadata?.display_name || u.user_metadata?.full_name || "");
@@ -105,146 +100,146 @@ export default function ProfilePage() {
   const initial = (displayName || user?.email || "U")[0].toUpperCase();
   const memberSince = user?.created_at ? new Date(user.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "";
 
-  if (authChecking || loading) return <div className="min-h-screen bg-[#09090b] flex items-center justify-center"><Loader2 className="w-5 h-5 text-white/15 animate-spin" /></div>;
+  if (authChecking || loading) return <div className="min-h-screen bg-[#08080c] flex items-center justify-center"><Loader2 className="w-5 h-5 text-white/10 animate-spin" /></div>;
 
   if (!user) return (
-    <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-6">
-      <div className="text-center prof-reveal">
-        <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mx-auto mb-8">
-          <LogIn size={28} className="text-white/20" />
-        </div>
-        <h2 className="text-3xl font-semibold text-white tracking-tight mb-3">Sign in to continue</h2>
-        <p className="text-[15px] text-white/30 mb-10 max-w-xs mx-auto leading-relaxed">Access your profile, films, and creator tools.</p>
-        <button onClick={() => router.push("/auth")} className="px-8 py-3.5 bg-white text-black text-[14px] font-semibold rounded-2xl hover:bg-white/90 transition-all cursor-pointer">Sign In</button>
+    <div className="min-h-screen bg-[#08080c] flex items-center justify-center px-6 relative overflow-hidden">
+      <div className="absolute top-[10%] right-[10%] w-[500px] h-[500px] rounded-full opacity-[0.04]" style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 70%)" }} />
+      <div className="text-center relative z-10 prof-reveal">
+        <LogIn size={32} className="text-white/10 mx-auto mb-6" />
+        <h2 className="text-[32px] font-bold text-white tracking-tight mb-3">Sign in to continue</h2>
+        <p className="text-[15px] text-[#555] mb-10 max-w-sm mx-auto leading-relaxed">Access your profile, films, and creator tools.</p>
+        <button onClick={() => router.push("/auth")} className="px-10 py-4 bg-white text-black text-[14px] font-bold rounded-full hover:bg-white/90 transition-all cursor-pointer">Sign In</button>
       </div>
-      <style jsx>{`@keyframes profReveal { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } } .prof-reveal { animation: profReveal 0.5s cubic-bezier(0.16,1,0.3,1); }`}</style>
+      <style jsx>{`@keyframes profReveal { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } } .prof-reveal { animation: profReveal 0.6s cubic-bezier(0.16,1,0.3,1); }`}</style>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
-      {/* Subtle center glow */}
+    <div className="min-h-screen bg-[#08080c] text-white relative overflow-hidden">
+      {/* Ambient glow — matches presentation style */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-[0.025]"
-          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.5) 0%, transparent 55%)" }} />
+        <div className="absolute top-[5%] right-[15%] w-[600px] h-[600px] rounded-full opacity-[0.035]"
+          style={{ background: "radial-gradient(circle, #8b5cf6 0%, transparent 65%)" }} />
+        <div className="absolute bottom-[10%] left-[10%] w-[400px] h-[400px] rounded-full opacity-[0.02]"
+          style={{ background: "radial-gradient(circle, #3b82f6 0%, transparent 70%)" }} />
       </div>
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 bg-[#09090b]/80 backdrop-blur-xl border-b border-white/[0.04]">
+      <nav className="sticky top-0 z-50 bg-[#08080c]/80 backdrop-blur-xl border-b border-white/[0.04]">
         <div className="max-w-3xl mx-auto px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => router.push("/")} className="text-white/25 hover:text-white/60 transition-colors cursor-pointer"><ArrowLeft size={18} /></button>
-            <span className="text-[14px] font-medium text-white/40">Profile</span>
+            <button onClick={() => router.push("/")} className="text-white/20 hover:text-white/50 transition-colors cursor-pointer"><ArrowLeft size={18} /></button>
+            <span className="text-[14px] font-medium text-white/30">Profile</span>
           </div>
           {isCreator && (
-            <button onClick={() => router.push(`/creator/${user.id}`)} className="text-[12px] text-white/20 hover:text-white/40 transition-colors flex items-center gap-1.5 cursor-pointer">
+            <button onClick={() => router.push(`/creator/${user.id}`)} className="text-[12px] text-white/15 hover:text-white/35 transition-colors flex items-center gap-1.5 cursor-pointer">
               <ExternalLink size={11} /> Public Profile
             </button>
           )}
         </div>
       </nav>
 
-      {/* ═══ CENTERED CONTAINER ═══ */}
+      {/* ═══ MAIN ═══ */}
       <div className="max-w-3xl mx-auto px-8 relative z-10 prof-reveal">
 
-        {/* ── Banner ── */}
+        {/* Banner */}
         <div className="relative h-[200px] rounded-2xl overflow-hidden mt-8 group">
           {bannerUrl ? (
             <img src={bannerUrl} alt="" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#141418] via-[#111114] to-[#0d0d10]" />
+            <div className="w-full h-full" style={{ background: "linear-gradient(135deg, #0f0f18 0%, #08080c 50%, #0c0c15 100%)" }} />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#09090b]/80 via-transparent to-transparent" />
-          <label className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 rounded-xl bg-black/50 backdrop-blur-md border border-white/[0.08] text-[12px] text-white/30 hover:text-white/60 hover:border-white/15 transition-all cursor-pointer opacity-0 group-hover:opacity-100">
+          <div className="absolute inset-0 bg-gradient-to-t from-[#08080c] via-transparent to-transparent" />
+          <label className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 rounded-xl bg-black/50 backdrop-blur-md border border-white/[0.06] text-[11px] text-white/25 hover:text-white/50 hover:border-white/[0.12] transition-all cursor-pointer opacity-0 group-hover:opacity-100">
             {uploadingBanner ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
             {uploadingBanner ? "Uploading..." : "Edit cover"}
             <input type="file" accept="image/*" onChange={handleBannerUpload} className="hidden" />
           </label>
         </div>
 
-        {/* ── Avatar + Name (centered) ── */}
-        <div className="flex flex-col items-center text-center -mt-16 mb-10">
+        {/* ── Centered Header ── */}
+        <div className="flex flex-col items-center text-center -mt-16 pt-0 pb-12">
           {/* Avatar */}
-          <div className="w-[120px] h-[120px] rounded-full overflow-hidden border-4 border-[#09090b] shadow-2xl shadow-black/60 bg-[#18181b] mb-5">
+          <div className="w-[128px] h-[128px] rounded-full overflow-hidden border-4 border-[#08080c] shadow-2xl shadow-black/80 mb-6">
             {avatarUrl ? (
               <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-white/30 bg-gradient-to-br from-[#1e1e22] to-[#141416]">{initial}</div>
+              <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-white/25" style={{ background: "linear-gradient(135deg, #1a1a22 0%, #111116 100%)" }}>{initial}</div>
             )}
           </div>
 
           {/* Name + Badge */}
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-[28px] font-bold tracking-tight">{displayName || "User"}</h1>
+            <h1 className="text-[32px] font-bold tracking-tight">{displayName || "User"}</h1>
             {isCreator && (
-              <span className="px-3 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/15">Creator</span>
+              <span className="px-3 py-1 rounded-lg text-[10px] font-bold tracking-[0.15em] uppercase text-[#22c55e] bg-[#22c55e]/10 border border-[#22c55e]/15">Creator</span>
             )}
           </div>
-
-          <p className="text-[14px] text-white/25 mb-1">{user.email}</p>
-          {memberSince && <p className="text-[12px] text-white/15 flex items-center gap-1.5"><Calendar size={10} /> Joined {memberSince}</p>}
+          <p className="text-[14px] text-[#555] mb-1">{user.email}</p>
+          {memberSince && <p className="text-[12px] text-white/10 flex items-center gap-1.5"><Calendar size={10} /> Joined {memberSince}</p>}
         </div>
 
-        {/* ── Stats ── */}
-        <div className="grid grid-cols-3 gap-4 mb-14">
+        {/* ── Stats (borderless, presentation style) ── */}
+        <div className="flex items-center justify-center gap-0 mb-14">
           {[
             { value: stats.films, label: "Films" },
             { value: stats.upvotes, label: "Upvotes" },
             { value: stats.watchlist, label: "Watchlist" },
-          ].map((s) => (
-            <div key={s.label} className="text-center py-6 rounded-2xl bg-white/[0.025] border border-white/[0.05]">
-              <p className="text-2xl font-bold tracking-tight mb-1">{s.value}</p>
-              <p className="text-[11px] text-white/25 tracking-widest uppercase">{s.label}</p>
+          ].map((s, i) => (
+            <div key={s.label} className="text-center px-10 py-2" style={i < 2 ? { borderRight: "1px solid rgba(255,255,255,0.06)" } : {}}>
+              <p className="text-[28px] font-bold tracking-tight mb-0.5">{s.value}</p>
+              <p className="text-[10px] text-[#555] tracking-[0.2em] uppercase">{s.label}</p>
             </div>
           ))}
         </div>
 
         {/* ── Divider ── */}
-        <div className="h-px bg-white/[0.05] mb-12" />
+        <div className="h-px bg-white/[0.04] mb-14" />
 
         {/* ── Form ── */}
-        <div className="space-y-8 pb-12">
+        <div className="max-w-xl mx-auto space-y-10 pb-12">
 
           <div>
-            <label className="block text-[11px] font-semibold tracking-widest text-white/20 uppercase mb-3">Display Name</label>
+            <label className="block text-[10px] font-bold tracking-[0.25em] text-white/15 uppercase mb-3">Display Name</label>
             <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full bg-white/[0.035] border border-white/[0.06] rounded-2xl px-6 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.15] focus:bg-white/[0.05] transition-all"
+              className="w-full bg-white/[0.03] border border-white/[0.05] rounded-2xl px-6 py-4 text-[16px] text-white placeholder-white/10 focus:outline-none focus:border-[#8b5cf6]/30 transition-all"
               placeholder="Your name" />
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold tracking-widest text-white/20 uppercase mb-3">Bio</label>
+            <label className="block text-[10px] font-bold tracking-[0.25em] text-white/15 uppercase mb-3">Bio</label>
             <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3}
-              className="w-full bg-white/[0.035] border border-white/[0.06] rounded-2xl px-6 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.15] focus:bg-white/[0.05] transition-all resize-none"
+              className="w-full bg-white/[0.03] border border-white/[0.05] rounded-2xl px-6 py-4 text-[16px] text-white placeholder-white/10 focus:outline-none focus:border-[#8b5cf6]/30 transition-all resize-none"
               placeholder="Tell the world who you are..." />
           </div>
 
           <div>
-            <label className="block text-[11px] font-semibold tracking-widest text-white/20 uppercase mb-3">Email</label>
-            <div className="w-full bg-white/[0.02] border border-white/[0.04] rounded-2xl px-6 py-4 text-[15px] text-white/20">{user.email}</div>
+            <label className="block text-[10px] font-bold tracking-[0.25em] text-white/15 uppercase mb-3">Email</label>
+            <div className="w-full bg-white/[0.015] border border-white/[0.03] rounded-2xl px-6 py-4 text-[16px] text-[#555]">{user.email}</div>
           </div>
 
-          {/* ── Creator Section ── */}
+          {/* ── Creator ── */}
           {isCreator && (
-            <div className="pt-4">
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-1.5 h-6 rounded-full bg-emerald-500/50" />
-                <span className="text-[12px] font-bold tracking-widest text-emerald-400/60 uppercase">Creator Profile</span>
+            <div className="pt-6">
+              <div className="flex items-center gap-3 mb-10">
+                <div className="w-1.5 h-6 rounded-full bg-[#22c55e]/50" />
+                <span className="text-[10px] font-bold tracking-[0.25em] text-[#22c55e]/50 uppercase">Creator Profile</span>
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-10">
                 <div>
-                  <label className="block text-[11px] font-semibold tracking-widest text-white/20 uppercase mb-3">Website / Portfolio</label>
+                  <label className="block text-[10px] font-bold tracking-[0.25em] text-white/15 uppercase mb-3">Website / Portfolio</label>
                   <div className="relative">
-                    <Globe size={15} className="absolute left-5 top-1/2 -translate-y-1/2 text-white/15" />
+                    <Globe size={15} className="absolute left-5 top-1/2 -translate-y-1/2 text-white/10" />
                     <input value={website} onChange={(e) => setWebsite(e.target.value)}
-                      className="w-full bg-white/[0.035] border border-white/[0.06] rounded-2xl pl-12 pr-6 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.15] focus:bg-white/[0.05] transition-all"
+                      className="w-full bg-white/[0.03] border border-white/[0.05] rounded-2xl pl-12 pr-6 py-4 text-[16px] text-white placeholder-white/10 focus:outline-none focus:border-[#8b5cf6]/30 transition-all"
                       placeholder="https://yoursite.com" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold tracking-widest text-white/20 uppercase mb-4">Social Links</label>
+                  <label className="block text-[10px] font-bold tracking-[0.25em] text-white/15 uppercase mb-4">Social Links</label>
                   <div className="space-y-4">
                     {[
                       { label: "X / Twitter", value: socialX, set: setSocialX, ph: "@username" },
@@ -252,9 +247,9 @@ export default function ProfilePage() {
                       { label: "Instagram", value: socialInstagram, set: setSocialInstagram, ph: "@username" },
                     ].map((s) => (
                       <div key={s.label} className="flex items-center gap-4">
-                        <span className="text-[13px] text-white/25 w-24 flex-shrink-0 text-right">{s.label}</span>
+                        <span className="text-[12px] text-[#555] w-24 flex-shrink-0 text-right">{s.label}</span>
                         <input value={s.value} onChange={(e) => s.set(e.target.value)}
-                          className="flex-1 bg-white/[0.035] border border-white/[0.06] rounded-2xl px-5 py-3.5 text-[14px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.15] transition-all"
+                          className="flex-1 bg-white/[0.03] border border-white/[0.05] rounded-2xl px-5 py-3.5 text-[15px] text-white placeholder-white/10 focus:outline-none focus:border-[#8b5cf6]/30 transition-all"
                           placeholder={s.ph} />
                       </div>
                     ))}
@@ -265,10 +260,9 @@ export default function ProfilePage() {
           )}
 
           {/* ── Save ── */}
-          <div className="pt-6">
+          <div className="pt-8">
             <button onClick={handleSave} disabled={saving}
-              className="w-full py-4.5 bg-white text-[#09090b] text-[14px] font-semibold rounded-2xl hover:bg-white/90 disabled:opacity-30 transition-all cursor-pointer flex items-center justify-center gap-2.5"
-              style={{ paddingTop: "18px", paddingBottom: "18px" }}>
+              className="w-full py-[18px] bg-white text-[#08080c] text-[14px] font-bold rounded-2xl hover:bg-white/90 disabled:opacity-30 transition-all cursor-pointer flex items-center justify-center gap-2.5">
               {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
               {saving ? "Saving..." : "Save Changes"}
             </button>
@@ -276,27 +270,27 @@ export default function ProfilePage() {
         </div>
 
         {/* ── My Films ── */}
-        <div className="pb-20">
-          <div className="h-px bg-white/[0.05] mb-12" />
+        <div className="max-w-xl mx-auto pb-24">
+          <div className="h-px bg-white/[0.04] mb-14" />
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-[18px] font-semibold tracking-tight">My Films</h2>
+            <h2 className="text-[18px] font-bold tracking-tight">My Films</h2>
             {isCreator && (
-              <button onClick={() => router.push("/submit")} className="text-[13px] text-white/25 hover:text-white/50 transition-colors flex items-center gap-2 cursor-pointer">
-                <Film size={13} /> Submit Film
+              <button onClick={() => router.push("/submit")} className="text-[12px] text-[#555] hover:text-white/40 transition-colors flex items-center gap-2 cursor-pointer">
+                <Film size={12} /> Submit Film
               </button>
             )}
           </div>
 
           {stats.films === 0 ? (
-            <div className="text-center py-20 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
-              <Film size={32} className="text-white/8 mx-auto mb-4" />
-              <p className="text-[15px] text-white/20 mb-1">No films yet</p>
-              <p className="text-[13px] text-white/10">Submit your first AI film to see it here.</p>
+            <div className="text-center py-20">
+              <Film size={28} className="text-white/[0.06] mx-auto mb-4" />
+              <p className="text-[14px] text-white/15 mb-1">No films yet</p>
+              <p className="text-[12px] text-white/[0.08]">Submit your first AI film to see it here.</p>
             </div>
           ) : (
-            <div className="text-center py-14 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
-              <p className="text-[15px] text-white/30">{stats.films} film{stats.films !== 1 ? "s" : ""} published</p>
-              <button onClick={() => router.push(`/creator/${user.id}`)} className="mt-4 text-[13px] text-white/20 hover:text-white/40 transition-colors cursor-pointer">View all films →</button>
+            <div className="text-center py-14">
+              <p className="text-[15px] text-white/25">{stats.films} film{stats.films !== 1 ? "s" : ""} published</p>
+              <button onClick={() => router.push(`/creator/${user.id}`)} className="mt-4 text-[13px] text-[#8b5cf6]/50 hover:text-[#8b5cf6]/80 transition-colors cursor-pointer">View all films →</button>
             </div>
           )}
         </div>
@@ -304,14 +298,14 @@ export default function ProfilePage() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] bg-[#18181b] border border-white/[0.06] text-white text-[13px] px-6 py-3 rounded-2xl font-medium shadow-2xl shadow-black/60 prof-reveal">
-          <span className="flex items-center gap-2"><Check size={14} className="text-emerald-400" /> {toast}</span>
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] bg-[#141418] border border-white/[0.06] text-white text-[13px] px-6 py-3 rounded-2xl font-medium shadow-2xl shadow-black/60 prof-reveal">
+          <span className="flex items-center gap-2"><Check size={14} className="text-[#22c55e]" /> {toast}</span>
         </div>
       )}
 
       <style jsx>{`
-        @keyframes profReveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .prof-reveal { animation: profReveal 0.5s cubic-bezier(0.16,1,0.3,1); }
+        @keyframes profReveal { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .prof-reveal { animation: profReveal 0.6s cubic-bezier(0.16,1,0.3,1); }
       `}</style>
     </div>
   );
