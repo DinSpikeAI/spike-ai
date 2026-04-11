@@ -121,7 +121,7 @@ export default function PrivacyPolicyPage() {
           </Section>
 
           <Section title="11. International Data Transfers">
-            <p>Your data may be transferred to and processed in countries outside your country of residence, including Israel and the United States. These countries may have different data protection laws. By using the Platform, you consent to such transfers. Where required (e.g., GDPR), we ensure appropriate safeguards are in place for international transfers.</p>
+            <p>Your data may be transferred to and processed in countries outside your country of residence, including Israel and the United States. These countries may have different data protection laws. By using the Platform, you consent to such transfers. Israel has been recognized by the European Commission as providing an adequate level of data protection (EU Adequacy Decision). For transfers to other countries, where required (e.g., GDPR), we ensure appropriate safeguards are in place, such as Standard Contractual Clauses (SCCs).</p>
           </Section>
 
           <Section title="12. Email Communications">
