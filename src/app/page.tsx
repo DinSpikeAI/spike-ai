@@ -1403,12 +1403,13 @@ function Footer() {
         {/* Top row: logo + links */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-10">
           <span className="text-lg font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
-          <div className="flex items-center gap-6 text-[13px] text-white/30">
+          <div className="flex flex-wrap items-center gap-5 text-[13px] text-white/30">
             <button onClick={() => handleNav("/blog")} className="hover:text-white/60 transition-colors cursor-pointer">Blog</button>
             <button onClick={() => handleNav("/submit")} className="hover:text-white/60 transition-colors cursor-pointer">Submit Film</button>
-            <button onClick={() => handleNav("/creators")} className="hover:text-white/60 transition-colors cursor-pointer">About</button>
+            <button onClick={() => handleNav("/creators")} className="hover:text-white/60 transition-colors cursor-pointer">Creators</button>
             <button onClick={() => handleNav("/terms")} className="hover:text-white/60 transition-colors cursor-pointer">Terms</button>
-            <button onClick={() => handleNav("/terms#privacy")} className="hover:text-white/60 transition-colors cursor-pointer">Privacy</button>
+            <button onClick={() => handleNav("/privacy")} className="hover:text-white/60 transition-colors cursor-pointer">Privacy</button>
+            <button onClick={() => handleNav("/community-guidelines")} className="hover:text-white/60 transition-colors cursor-pointer">Guidelines</button>
           </div>
         </div>
         {/* Divider */}

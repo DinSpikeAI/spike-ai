@@ -332,7 +332,7 @@ export default function AuthPage() {
                           I agree to the{" "}
                           <a href="/terms" target="_blank" className="text-purple-400/60 hover:text-purple-400/80 underline">Terms of Service</a>
                           {" "}and{" "}
-                          <a href="/terms#privacy" target="_blank" className="text-purple-400/60 hover:text-purple-400/80 underline">Privacy Policy</a>.
+                          <a href="/privacy" target="_blank" className="text-purple-400/60 hover:text-purple-400/80 underline">Privacy Policy</a>.
                           I confirm I am at least 18 years old.
                         </span>
                       </label>
@@ -361,7 +361,7 @@ export default function AuthPage() {
                         By continuing, you agree to our{" "}
                         <a href="/terms" target="_blank" className="text-white/20 hover:text-white/30 underline">Terms</a>
                         {" "}and{" "}
-                        <a href="/terms#privacy" target="_blank" className="text-white/20 hover:text-white/30 underline">Privacy Policy</a>.
+                        <a href="/privacy" target="_blank" className="text-white/20 hover:text-white/30 underline">Privacy Policy</a>.
                       </p>
                     )}
                   </div>
