@@ -1,7 +1,7 @@
 {
   "name": "Spike AI — AI Cinema Streaming",
   "short_name": "Spike AI",
-  "description": "The world's first streaming platform for AI-generated cinema.",
+  "description": "The home for AI-generated cinema.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#08080a",
