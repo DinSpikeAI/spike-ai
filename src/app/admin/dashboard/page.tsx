@@ -749,9 +749,8 @@ export default function AdminDashboard() {
             })}
           </div>
         )}
+      </>)}
       </div>
-
-        </>)}
 
       {/* ═══════ EDIT MODAL ═══════ */}
       {editMovie && (
