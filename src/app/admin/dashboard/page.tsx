@@ -77,6 +77,9 @@ export default function AdminDashboard() {
   const [newNotif, setNewNotif] = useState("");
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
+  const [activeTab, setActiveTab] = useState<"films" | "creators">("films");
+  const [creators, setCreators] = useState<any[]>([]);
+  const [creatorsLoading, setCreatorsLoading] = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -125,9 +128,33 @@ export default function AdminDashboard() {
     if (profiles) setRecentUsers(profiles as any);
   }, []);
 
+  const fetchCreators = useCallback(async () => {
+    if (!supabase) return;
+    setCreatorsLoading(true);
+    const { data: profiles } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+    if (profiles) {
+      // Get film counts per creator
+      const { data: allMovies } = await supabase.from("movies").select("creator_name, status");
+      const filmCounts: Record<string, { total: number; approved: number; pending: number }> = {};
+      allMovies?.forEach((m: any) => {
+        const name = m.creator_name || "Unknown";
+        if (!filmCounts[name]) filmCounts[name] = { total: 0, approved: 0, pending: 0 };
+        filmCounts[name].total++;
+        if (m.status === "approved") filmCounts[name].approved++;
+        if (m.status === "pending") filmCounts[name].pending++;
+      });
+      const enriched = profiles.map((p: any) => ({
+        ...p,
+        films: filmCounts[p.display_name] || { total: 0, approved: 0, pending: 0 },
+      }));
+      setCreators(enriched);
+    }
+    setCreatorsLoading(false);
+  }, []);
+
   useEffect(() => {
-    if (!authChecking && isAdmin) { fetchMovies(); fetchStats(); }
-  }, [isAdmin, authChecking, fetchMovies, fetchStats]);
+    if (!authChecking && isAdmin) { fetchMovies(); fetchStats(); fetchCreators(); }
+  }, [isAdmin, authChecking, fetchMovies, fetchStats, fetchCreators]);
 
   /* ── Notifications CRUD ── */
   const fetchNotifs = useCallback(async () => {
@@ -338,6 +365,81 @@ export default function AdminDashboard() {
           ))}
         </div>
 
+        {/* ═══════ Tabs ═══════ */}
+        <div className="flex items-center gap-2 mb-8">
+          <button onClick={() => setActiveTab("films")} className={`px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all ${activeTab === "films" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50"}`}>
+            <Film size={14} className="inline mr-2" />Films ({movies.length})
+          </button>
+          <button onClick={() => setActiveTab("creators")} className={`px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all ${activeTab === "creators" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50"}`}>
+            <Users size={14} className="inline mr-2" />Creators ({creators.length})
+          </button>
+        </div>
+
+        {/* ═══════ CREATORS TAB ═══════ */}
+        {activeTab === "creators" && (
+          <div className="space-y-4">
+            {creatorsLoading ? (
+              <div className="flex items-center justify-center py-20"><Loader2 size={24} className="animate-spin text-white/20" /></div>
+            ) : creators.length === 0 ? (
+              <div className="text-center py-20 text-white/20">No creators yet</div>
+            ) : (
+              <div className="bg-[#111114] border border-white/[0.06] rounded-2xl overflow-hidden">
+                <div className="grid grid-cols-12 gap-4 px-5 py-3 text-[10px] font-bold tracking-[0.15em] uppercase text-white/20 border-b border-white/[0.04]">
+                  <div className="col-span-1"></div>
+                  <div className="col-span-3">Name</div>
+                  <div className="col-span-3">Email</div>
+                  <div className="col-span-1 text-center">Films</div>
+                  <div className="col-span-2">Role</div>
+                  <div className="col-span-2">Joined</div>
+                </div>
+                {creators.map((c) => (
+                  <div key={c.id} className="grid grid-cols-12 gap-4 px-5 py-4 items-center border-b border-white/[0.03] hover:bg-white/[0.02] transition-colors">
+                    <div className="col-span-1">
+                      {c.avatar_url ? (
+                        <img src={c.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover border border-white/[0.06]" />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[12px] text-white/30 font-bold">
+                          {(c.display_name || "?")[0].toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                    <div className="col-span-3">
+                      <p className="text-[14px] font-semibold text-white/80 truncate">{c.display_name || "No name"}</p>
+                    </div>
+                    <div className="col-span-3">
+                      <p className="text-[12px] text-white/30 truncate">{c.email || "—"}</p>
+                    </div>
+                    <div className="col-span-1 text-center">
+                      <span className={`text-[13px] font-bold ${c.films.total > 0 ? "text-green-400" : "text-white/15"}`}>{c.films.total}</span>
+                      {c.films.pending > 0 && <span className="text-[10px] text-yellow-400 ml-1">({c.films.pending} pending)</span>}
+                    </div>
+                    <div className="col-span-2">
+                      <select
+                        value={c.role || "user"}
+                        onChange={async (e) => {
+                          const newRole = e.target.value;
+                          await supabase?.from("profiles").update({ role: newRole }).eq("id", c.id);
+                          showToast(`${c.display_name} → ${newRole}`);
+                          fetchCreators();
+                        }}
+                        className="bg-white/[0.04] border border-white/[0.08] text-[11px] text-white/60 rounded-lg px-2 py-1.5 outline-none cursor-pointer"
+                        style={{ colorScheme: "dark" }}
+                      >
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-[11px] text-white/20">{new Date(c.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === "films" && (<>
         {/* ═══════ Users & Notifications — Side by Side ═══════ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
           {/* Recent Users */}
@@ -758,6 +860,8 @@ export default function AdminDashboard() {
           </div>
         </div>
       )}
+
+      </>)}
 
       {/* Toast */}
       {toast && (
