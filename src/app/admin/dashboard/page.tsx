@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   Shield, Film, Trash2, Pencil, Check, X, Loader2, RefreshCw,
   ArrowLeft, ChevronDown, Search, Zap, Clock, XCircle, Eye,
-  Save, Plus, AlertTriangle, Inbox, CheckCircle, Ban, Bell, Users,
+  Save, Plus, AlertTriangle, Inbox, CheckCircle, Ban, Bell, Users, Sparkles,
 } from "lucide-react";
 import { supabase, getSmartPoster, checkIsAdmin } from "@/lib/supabase";
 
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
   const [newNotif, setNewNotif] = useState("");
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
-  const [activeTab, setActiveTab] = useState<"films" | "creators">("films");
+  const [activeTab, setActiveTab] = useState<"films" | "creators" | "analytics">("films");
   const [creators, setCreators] = useState<any[]>([]);
   const [creatorsLoading, setCreatorsLoading] = useState(false);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
@@ -465,6 +465,9 @@ export default function AdminDashboard() {
           <button onClick={() => setActiveTab("creators")} className={`px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all ${activeTab === "creators" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50"}`}>
             <Users size={14} className="inline mr-2" />Creators ({creators.length})
           </button>
+          <button onClick={() => setActiveTab("analytics")} className={`px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all ${activeTab === "analytics" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50"}`}>
+            <Zap size={14} className="inline mr-2" />Analytics
+          </button>
         </div>
 
         {/* ═══════ CREATORS TAB ═══════ */}
@@ -531,7 +534,191 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* ═══════ ANALYTICS TAB ═══════ */}
+        {activeTab === "analytics" && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+              {/* Top Films by Upvotes */}
+              <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-6">
+                <h3 className="text-[13px] font-bold tracking-wide text-white/70 mb-5 flex items-center gap-2">
+                  <Zap size={14} className="text-yellow-400" /> Top Films by Upvotes
+                </h3>
+                {(() => {
+                  const top = [...movies].filter(m => m.status === "approved").sort((a, b) => b.upvotes_count - a.upvotes_count).slice(0, 5);
+                  const maxVotes = Math.max(...top.map(m => m.upvotes_count), 1);
+                  return top.length === 0 ? (
+                    <p className="text-white/15 text-[13px] py-4">No upvotes yet</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {top.map((m, i) => (
+                        <div key={m.id} className="flex items-center gap-3">
+                          <span className="text-[11px] text-white/20 w-4 font-bold">{i + 1}</span>
+                          <img src={getSmartPoster(m.poster_url, m.video_url, m.id)} alt="" className="w-8 h-12 rounded object-cover flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] text-white/70 truncate font-medium">{m.title}</p>
+                            <div className="mt-1 h-2 rounded-full bg-white/[0.04] overflow-hidden">
+                              <div className="h-full rounded-full bg-gradient-to-r from-yellow-500/60 to-yellow-400/40 transition-all" style={{ width: `${(m.upvotes_count / maxVotes) * 100}%` }} />
+                            </div>
+                          </div>
+                          <span className="text-[13px] font-bold text-yellow-400 flex-shrink-0">{m.upvotes_count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Top Creators by Film Count */}
+              <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-6">
+                <h3 className="text-[13px] font-bold tracking-wide text-white/70 mb-5 flex items-center gap-2">
+                  <Users size={14} className="text-purple-400" /> Top Creators by Films
+                </h3>
+                {(() => {
+                  const creatorFilms: Record<string, number> = {};
+                  movies.filter(m => m.status === "approved").forEach(m => {
+                    const name = m.creator_name || "Unknown";
+                    creatorFilms[name] = (creatorFilms[name] || 0) + 1;
+                  });
+                  const sorted = Object.entries(creatorFilms).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                  const maxFilms = Math.max(...sorted.map(s => s[1]), 1);
+                  return sorted.length === 0 ? (
+                    <p className="text-white/15 text-[13px] py-4">No approved films yet</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {sorted.map(([name, count], i) => (
+                        <div key={name} className="flex items-center gap-3">
+                          <span className="text-[11px] text-white/20 w-4 font-bold">{i + 1}</span>
+                          <div className="w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-[11px] text-white/30 font-bold flex-shrink-0">
+                            {name[0].toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] text-white/70 truncate font-medium">{name}</p>
+                            <div className="mt-1 h-2 rounded-full bg-white/[0.04] overflow-hidden">
+                              <div className="h-full rounded-full bg-gradient-to-r from-purple-500/60 to-purple-400/40 transition-all" style={{ width: `${(count / maxFilms) * 100}%` }} />
+                            </div>
+                          </div>
+                          <span className="text-[13px] font-bold text-purple-400 flex-shrink-0">{count} {count === 1 ? "film" : "films"}</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Genre Distribution */}
+              <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-6">
+                <h3 className="text-[13px] font-bold tracking-wide text-white/70 mb-5 flex items-center gap-2">
+                  <Film size={14} className="text-blue-400" /> Genre Distribution
+                </h3>
+                {(() => {
+                  const genreCounts: Record<string, number> = {};
+                  movies.filter(m => m.status === "approved").forEach(m => {
+                    const g = m.genre || "Uncategorized";
+                    genreCounts[g] = (genreCounts[g] || 0) + 1;
+                  });
+                  const sorted = Object.entries(genreCounts).sort((a, b) => b[1] - a[1]);
+                  const total = sorted.reduce((sum, [, c]) => sum + c, 0) || 1;
+                  const colors = ["bg-blue-500", "bg-purple-500", "bg-green-500", "bg-yellow-500", "bg-red-500", "bg-cyan-500", "bg-pink-500", "bg-orange-500"];
+                  return sorted.length === 0 ? (
+                    <p className="text-white/15 text-[13px] py-4">No data yet</p>
+                  ) : (
+                    <div className="space-y-2.5">
+                      {sorted.map(([genre, count], i) => (
+                        <div key={genre} className="flex items-center gap-3">
+                          <div className={`w-2.5 h-2.5 rounded-full ${colors[i % colors.length]} flex-shrink-0`} />
+                          <span className="text-[12px] text-white/50 w-28 truncate">{genre}</span>
+                          <div className="flex-1 h-2 rounded-full bg-white/[0.04] overflow-hidden">
+                            <div className={`h-full rounded-full ${colors[i % colors.length]}/40 transition-all`} style={{ width: `${(count / total) * 100}%`, opacity: 0.5 }} />
+                          </div>
+                          <span className="text-[11px] text-white/30 w-8 text-right">{Math.round((count / total) * 100)}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Films Timeline */}
+              <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-6">
+                <h3 className="text-[13px] font-bold tracking-wide text-white/70 mb-5 flex items-center gap-2">
+                  <Clock size={14} className="text-green-400" /> Films Timeline (Last 30 Days)
+                </h3>
+                {(() => {
+                  const days: Record<string, number> = {};
+                  const now = new Date();
+                  for (let i = 29; i >= 0; i--) {
+                    const d = new Date(now); d.setDate(d.getDate() - i);
+                    days[d.toISOString().split("T")[0]] = 0;
+                  }
+                  movies.forEach(m => {
+                    const day = m.created_at.split("T")[0];
+                    if (days[day] !== undefined) days[day]++;
+                  });
+                  const entries = Object.entries(days);
+                  const maxDay = Math.max(...Object.values(days), 1);
+                  return (
+                    <div className="flex items-end gap-[3px] h-[120px]">
+                      {entries.map(([date, count]) => (
+                        <div key={date} className="flex-1 flex flex-col items-center justify-end h-full group relative">
+                          <div
+                            className={`w-full rounded-t transition-all ${count > 0 ? "bg-green-500/50 hover:bg-green-400/60" : "bg-white/[0.03]"}`}
+                            style={{ height: `${Math.max((count / maxDay) * 100, count > 0 ? 8 : 2)}%` }}
+                          />
+                          {count > 0 && (
+                            <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#1a1a20] border border-white/[0.1] rounded-lg px-2 py-1 text-[9px] text-white/70 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                              {date.slice(5)} — {count} {count === 1 ? "film" : "films"}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+                <div className="flex justify-between mt-2">
+                  <span className="text-[9px] text-white/15">30 days ago</span>
+                  <span className="text-[9px] text-white/15">Today</span>
+                </div>
+              </div>
+
+            </div>
+
+            {/* AI Models Usage */}
+            <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-6">
+              <h3 className="text-[13px] font-bold tracking-wide text-white/70 mb-5 flex items-center gap-2">
+                <Sparkles size={14} className="text-cyan-400" /> AI Tools Used Across Films
+              </h3>
+              {(() => {
+                const toolCounts: Record<string, number> = {};
+                movies.filter(m => m.status === "approved").forEach(m => {
+                  (m.ai_models || []).forEach((t: string) => { toolCounts[t] = (toolCounts[t] || 0) + 1; });
+                });
+                const sorted = Object.entries(toolCounts).sort((a, b) => b[1] - a[1]);
+                const maxTool = Math.max(...sorted.map(s => s[1]), 1);
+                return sorted.length === 0 ? (
+                  <p className="text-white/15 text-[13px] py-4">No AI tool data yet</p>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {sorted.map(([tool, count]) => (
+                      <div key={tool} className="bg-white/[0.02] border border-white/[0.04] rounded-xl p-3 hover:bg-white/[0.04] transition-colors">
+                        <p className="text-[12px] text-white/60 font-medium truncate">{tool}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <div className="flex-1 h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+                            <div className="h-full rounded-full bg-cyan-500/40" style={{ width: `${(count / maxTool) * 100}%` }} />
+                          </div>
+                          <span className="text-[11px] text-cyan-400 font-bold">{count}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+
         {activeTab === "films" && (<>
+
         {/* ═══════ Users & Notifications — Side by Side ═══════ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
           {/* Recent Users */}
