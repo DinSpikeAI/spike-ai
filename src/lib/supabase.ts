@@ -76,10 +76,31 @@ export function getYouTubeId(url: string | null | undefined): string | null {
   return null;
 }
 
+export function getVimeoId(url: string | null | undefined): string | null {
+  if (!url) return null;
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes("vimeo.com")) {
+      return u.pathname.split("/").pop()?.split("?")[0] || null;
+    }
+  } catch {}
+  return null;
+}
+
 export function getYouTubeThumbnail(url: string | null | undefined): string | null {
   const id = getYouTubeId(url);
   if (!id) return null;
   return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+}
+
+export function getVimeoThumbnail(url: string | null | undefined): string | null {
+  const id = getVimeoId(url);
+  if (!id) return null;
+  return `https://vumbnail.com/${id}_large.jpg`;
+}
+
+export function getVideoThumbnail(url: string | null | undefined): string | null {
+  return getYouTubeThumbnail(url) || getVimeoThumbnail(url);
 }
 
 export function getSmartPoster(
@@ -88,8 +109,8 @@ export function getSmartPoster(
   fallbackId?: string
 ): string {
   if (posterUrl && !posterUrl.includes("picsum.photos")) return posterUrl;
-  const ytThumb = getYouTubeThumbnail(videoUrl);
-  if (ytThumb) return ytThumb;
+  const thumb = getVideoThumbnail(videoUrl);
+  if (thumb) return thumb;
   if (posterUrl) return posterUrl;
   return `https://picsum.photos/seed/${fallbackId || "default"}/400/600`;
 }
@@ -101,8 +122,8 @@ export function getSmartHeroImage(
   fallbackId?: string
 ): string {
   if (heroImage && !heroImage.includes("picsum.photos")) return heroImage;
-  const ytThumb = getYouTubeThumbnail(videoUrl);
-  if (ytThumb) return ytThumb;
+  const thumb = getVideoThumbnail(videoUrl);
+  if (thumb) return thumb;
   if (heroImage) return heroImage;
   if (posterUrl) return posterUrl;
   return `https://picsum.photos/seed/${fallbackId || "default"}-wide/1920/1080`;

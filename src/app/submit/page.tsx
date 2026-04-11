@@ -106,7 +106,9 @@ export default function SubmitPage() {
     }
   }
 
-  // Get YouTube thumbnail
+  // Get video thumbnail (YouTube instant, Vimeo async)
+  const [vimeoThumb, setVimeoThumb] = useState<string | null>(null)
+
   const getYtThumb = (url: string) => {
     try {
       const u = new URL(url)
@@ -117,7 +119,26 @@ export default function SubmitPage() {
     } catch { return null }
   }
 
-  const posterSrc = form.poster_url || (form.video_url ? getYtThumb(form.video_url) : null)
+  const getVimeoId = (url: string) => {
+    try {
+      const u = new URL(url)
+      if (u.hostname.includes('vimeo.com')) return u.pathname.split('/').pop() || null
+      return null
+    } catch { return null }
+  }
+
+  // Fetch Vimeo thumbnail when URL changes
+  useEffect(() => {
+    if (!form.video_url) { setVimeoThumb(null); return }
+    const vid = getVimeoId(form.video_url)
+    if (!vid) { setVimeoThumb(null); return }
+    fetch(`https://vimeo.com/api/oembed.json?url=https://vimeo.com/${vid}`)
+      .then(r => r.json())
+      .then(data => { if (data.thumbnail_url) setVimeoThumb(data.thumbnail_url) })
+      .catch(() => setVimeoThumb(null))
+  }, [form.video_url])
+
+  const posterSrc = form.poster_url || (form.video_url ? (getYtThumb(form.video_url) || vimeoThumb) : null)
 
   /* ─── Success ─── */
   if (submitted) {
