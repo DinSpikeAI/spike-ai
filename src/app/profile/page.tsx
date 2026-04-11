@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Loader2, LogIn, Check, Heart, Bookmark,
-  Calendar, Film, Sparkles, Camera,
-  ExternalLink, Globe,
+  Calendar, Film, Sparkles, Camera, ExternalLink, Globe,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -110,17 +109,13 @@ export default function ProfilePage() {
 
   if (!user) return (
     <div className="min-h-screen bg-[#09090b] flex items-center justify-center px-6">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-[0.04]"
-          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)" }} />
-      </div>
-      <div className="text-center relative z-10 prof-reveal">
+      <div className="text-center prof-reveal">
         <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mx-auto mb-8">
           <LogIn size={28} className="text-white/20" />
         </div>
         <h2 className="text-3xl font-semibold text-white tracking-tight mb-3">Sign in to continue</h2>
         <p className="text-[15px] text-white/30 mb-10 max-w-xs mx-auto leading-relaxed">Access your profile, films, and creator tools.</p>
-        <button onClick={() => router.push("/auth")} className="px-8 py-3.5 bg-white text-black text-[14px] font-semibold rounded-xl hover:bg-white/90 transition-all cursor-pointer">Sign In</button>
+        <button onClick={() => router.push("/auth")} className="px-8 py-3.5 bg-white text-black text-[14px] font-semibold rounded-2xl hover:bg-white/90 transition-all cursor-pointer">Sign In</button>
       </div>
       <style jsx>{`@keyframes profReveal { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } } .prof-reveal { animation: profReveal 0.5s cubic-bezier(0.16,1,0.3,1); }`}</style>
     </div>
@@ -128,13 +123,15 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white">
+      {/* Subtle center glow */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full opacity-[0.03]"
-          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 60%)" }} />
+        <div className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full opacity-[0.025]"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,0.5) 0%, transparent 55%)" }} />
       </div>
 
+      {/* Nav */}
       <nav className="sticky top-0 z-50 bg-[#09090b]/80 backdrop-blur-xl border-b border-white/[0.04]">
-        <div className="max-w-2xl mx-auto px-6 h-14 flex items-center justify-between">
+        <div className="max-w-3xl mx-auto px-8 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={() => router.push("/")} className="text-white/25 hover:text-white/60 transition-colors cursor-pointer"><ArrowLeft size={18} /></button>
             <span className="text-[14px] font-medium text-white/40">Profile</span>
@@ -147,111 +144,117 @@ export default function ProfilePage() {
         </div>
       </nav>
 
-      <div className="max-w-2xl mx-auto px-6 relative z-10 prof-reveal">
+      {/* ═══ CENTERED CONTAINER ═══ */}
+      <div className="max-w-3xl mx-auto px-8 relative z-10 prof-reveal">
 
-        {/* Banner */}
-        <div className="relative h-[180px] -mx-6 overflow-hidden group">
+        {/* ── Banner ── */}
+        <div className="relative h-[200px] rounded-2xl overflow-hidden mt-8 group">
           {bannerUrl ? (
             <img src={bannerUrl} alt="" className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#111113] to-[#09090b]" />
+            <div className="w-full h-full bg-gradient-to-br from-[#141418] via-[#111114] to-[#0d0d10]" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#09090b] via-[#09090b]/30 to-transparent" />
-          <label className="absolute bottom-4 right-6 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/40 backdrop-blur-md border border-white/[0.08] text-[11px] text-white/30 hover:text-white/60 hover:border-white/15 transition-all cursor-pointer opacity-0 group-hover:opacity-100">
-            {uploadingBanner ? <Loader2 size={11} className="animate-spin" /> : <Camera size={11} />}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#09090b]/80 via-transparent to-transparent" />
+          <label className="absolute bottom-4 right-4 flex items-center gap-2 px-4 py-2 rounded-xl bg-black/50 backdrop-blur-md border border-white/[0.08] text-[12px] text-white/30 hover:text-white/60 hover:border-white/15 transition-all cursor-pointer opacity-0 group-hover:opacity-100">
+            {uploadingBanner ? <Loader2 size={12} className="animate-spin" /> : <Camera size={12} />}
             {uploadingBanner ? "Uploading..." : "Edit cover"}
             <input type="file" accept="image/*" onChange={handleBannerUpload} className="hidden" />
           </label>
         </div>
 
-        {/* Header */}
-        <div className="flex items-start gap-5 -mt-12 mb-10">
-          <div className="relative flex-shrink-0">
-            <div className="w-24 h-24 rounded-2xl overflow-hidden border-[3px] border-[#09090b] shadow-2xl shadow-black/60 bg-[#18181b]">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white/40 bg-gradient-to-br from-[#1a1a1e] to-[#111114]">{initial}</div>
-              )}
-            </div>
+        {/* ── Avatar + Name (centered) ── */}
+        <div className="flex flex-col items-center text-center -mt-16 mb-10">
+          {/* Avatar */}
+          <div className="w-[120px] h-[120px] rounded-full overflow-hidden border-4 border-[#09090b] shadow-2xl shadow-black/60 bg-[#18181b] mb-5">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-white/30 bg-gradient-to-br from-[#1e1e22] to-[#141416]">{initial}</div>
+            )}
           </div>
-          <div className="pt-14 min-w-0">
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-2xl font-bold tracking-tight truncate">{displayName || "User"}</h1>
-              {isCreator && (
-                <span className="flex-shrink-0 px-2.5 py-0.5 rounded-md text-[10px] font-semibold tracking-widest uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/15">Creator</span>
-              )}
-            </div>
-            <p className="text-[13px] text-white/25 truncate">{user.email}</p>
-            {memberSince && <p className="text-[12px] text-white/15 mt-1 flex items-center gap-1.5"><Calendar size={10} /> Joined {memberSince}</p>}
+
+          {/* Name + Badge */}
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="text-[28px] font-bold tracking-tight">{displayName || "User"}</h1>
+            {isCreator && (
+              <span className="px-3 py-1 rounded-lg text-[10px] font-bold tracking-widest uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/15">Creator</span>
+            )}
           </div>
+
+          <p className="text-[14px] text-white/25 mb-1">{user.email}</p>
+          {memberSince && <p className="text-[12px] text-white/15 flex items-center gap-1.5"><Calendar size={10} /> Joined {memberSince}</p>}
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-12">
+        {/* ── Stats ── */}
+        <div className="grid grid-cols-3 gap-4 mb-14">
           {[
             { value: stats.films, label: "Films" },
             { value: stats.upvotes, label: "Upvotes" },
             { value: stats.watchlist, label: "Watchlist" },
           ].map((s) => (
-            <div key={s.label} className="text-center py-5 rounded-xl bg-white/[0.02] border border-white/[0.04]">
-              <p className="text-xl font-bold tracking-tight">{s.value}</p>
-              <p className="text-[11px] text-white/25 tracking-wider uppercase mt-1">{s.label}</p>
+            <div key={s.label} className="text-center py-6 rounded-2xl bg-white/[0.025] border border-white/[0.05]">
+              <p className="text-2xl font-bold tracking-tight mb-1">{s.value}</p>
+              <p className="text-[11px] text-white/25 tracking-widest uppercase">{s.label}</p>
             </div>
           ))}
         </div>
 
-        <div className="h-px bg-white/[0.04] mb-10" />
+        {/* ── Divider ── */}
+        <div className="h-px bg-white/[0.05] mb-12" />
 
-        {/* Form */}
-        <div className="space-y-8 pb-24">
+        {/* ── Form ── */}
+        <div className="space-y-8 pb-12">
+
           <div>
-            <label className="block text-[11px] font-medium tracking-widest text-white/25 uppercase mb-2">Display Name</label>
+            <label className="block text-[11px] font-semibold tracking-widest text-white/20 uppercase mb-3">Display Name</label>
             <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.12] focus:bg-white/[0.04] transition-all"
+              className="w-full bg-white/[0.035] border border-white/[0.06] rounded-2xl px-6 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.15] focus:bg-white/[0.05] transition-all"
               placeholder="Your name" />
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium tracking-widest text-white/25 uppercase mb-2">Bio</label>
+            <label className="block text-[11px] font-semibold tracking-widest text-white/20 uppercase mb-3">Bio</label>
             <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3}
-              className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-5 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.12] focus:bg-white/[0.04] transition-all resize-none"
+              className="w-full bg-white/[0.035] border border-white/[0.06] rounded-2xl px-6 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.15] focus:bg-white/[0.05] transition-all resize-none"
               placeholder="Tell the world who you are..." />
           </div>
 
           <div>
-            <label className="block text-[11px] font-medium tracking-widest text-white/25 uppercase mb-2">Email</label>
-            <div className="w-full bg-white/[0.015] border border-white/[0.03] rounded-xl px-5 py-4 text-[15px] text-white/20">{user.email}</div>
+            <label className="block text-[11px] font-semibold tracking-widest text-white/20 uppercase mb-3">Email</label>
+            <div className="w-full bg-white/[0.02] border border-white/[0.04] rounded-2xl px-6 py-4 text-[15px] text-white/20">{user.email}</div>
           </div>
 
+          {/* ── Creator Section ── */}
           {isCreator && (
-            <div className="pt-2">
-              <div className="flex items-center gap-2.5 mb-6">
-                <div className="w-1 h-5 rounded-full bg-emerald-500/40" />
-                <span className="text-[12px] font-semibold tracking-widest text-emerald-400/60 uppercase">Creator Profile</span>
+            <div className="pt-4">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-1.5 h-6 rounded-full bg-emerald-500/50" />
+                <span className="text-[12px] font-bold tracking-widest text-emerald-400/60 uppercase">Creator Profile</span>
               </div>
-              <div className="space-y-6">
+
+              <div className="space-y-8">
                 <div>
-                  <label className="block text-[11px] font-medium tracking-widest text-white/25 uppercase mb-2">Website / Portfolio</label>
+                  <label className="block text-[11px] font-semibold tracking-widest text-white/20 uppercase mb-3">Website / Portfolio</label>
                   <div className="relative">
-                    <Globe size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/15" />
+                    <Globe size={15} className="absolute left-5 top-1/2 -translate-y-1/2 text-white/15" />
                     <input value={website} onChange={(e) => setWebsite(e.target.value)}
-                      className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl pl-10 pr-5 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.12] focus:bg-white/[0.04] transition-all"
+                      className="w-full bg-white/[0.035] border border-white/[0.06] rounded-2xl pl-12 pr-6 py-4 text-[15px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.15] focus:bg-white/[0.05] transition-all"
                       placeholder="https://yoursite.com" />
                   </div>
                 </div>
+
                 <div>
-                  <label className="block text-[11px] font-medium tracking-widest text-white/25 uppercase mb-3">Social Links</label>
-                  <div className="space-y-3">
+                  <label className="block text-[11px] font-semibold tracking-widest text-white/20 uppercase mb-4">Social Links</label>
+                  <div className="space-y-4">
                     {[
                       { label: "X / Twitter", value: socialX, set: setSocialX, ph: "@username" },
                       { label: "YouTube", value: socialYoutube, set: setSocialYoutube, ph: "@channel" },
                       { label: "Instagram", value: socialInstagram, set: setSocialInstagram, ph: "@username" },
                     ].map((s) => (
-                      <div key={s.label} className="flex items-center gap-3">
-                        <span className="text-[12px] text-white/20 w-20 flex-shrink-0">{s.label}</span>
+                      <div key={s.label} className="flex items-center gap-4">
+                        <span className="text-[13px] text-white/25 w-24 flex-shrink-0 text-right">{s.label}</span>
                         <input value={s.value} onChange={(e) => s.set(e.target.value)}
-                          className="flex-1 bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.12] transition-all"
+                          className="flex-1 bg-white/[0.035] border border-white/[0.06] rounded-2xl px-5 py-3.5 text-[14px] text-white placeholder-white/15 focus:outline-none focus:border-white/[0.15] transition-all"
                           placeholder={s.ph} />
                       </div>
                     ))}
@@ -261,42 +264,47 @@ export default function ProfilePage() {
             </div>
           )}
 
-          <div className="pt-4">
+          {/* ── Save ── */}
+          <div className="pt-6">
             <button onClick={handleSave} disabled={saving}
-              className="w-full py-4 bg-white text-black text-[14px] font-semibold rounded-xl hover:bg-white/90 disabled:opacity-30 transition-all cursor-pointer flex items-center justify-center gap-2">
-              {saving ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+              className="w-full py-4.5 bg-white text-[#09090b] text-[14px] font-semibold rounded-2xl hover:bg-white/90 disabled:opacity-30 transition-all cursor-pointer flex items-center justify-center gap-2.5"
+              style={{ paddingTop: "18px", paddingBottom: "18px" }}>
+              {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
               {saving ? "Saving..." : "Save Changes"}
             </button>
           </div>
+        </div>
 
-          <div className="pt-8">
-            <div className="h-px bg-white/[0.04] mb-10" />
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[16px] font-semibold tracking-tight">My Films</h2>
-              {isCreator && (
-                <button onClick={() => router.push("/submit")} className="text-[12px] text-white/25 hover:text-white/50 transition-colors flex items-center gap-1.5 cursor-pointer">
-                  <Film size={12} /> Submit Film
-                </button>
-              )}
-            </div>
-            {stats.films === 0 ? (
-              <div className="text-center py-16 rounded-xl bg-white/[0.015] border border-white/[0.03]">
-                <Film size={28} className="text-white/10 mx-auto mb-3" />
-                <p className="text-[14px] text-white/20 mb-1">No films yet</p>
-                <p className="text-[12px] text-white/10">Submit your first AI film to see it here.</p>
-              </div>
-            ) : (
-              <div className="text-center py-12 rounded-xl bg-white/[0.015] border border-white/[0.03]">
-                <p className="text-[14px] text-white/30">{stats.films} film{stats.films !== 1 ? "s" : ""} published</p>
-                <button onClick={() => router.push(`/creator/${user.id}`)} className="mt-3 text-[12px] text-white/20 hover:text-white/40 transition-colors cursor-pointer">View all →</button>
-              </div>
+        {/* ── My Films ── */}
+        <div className="pb-20">
+          <div className="h-px bg-white/[0.05] mb-12" />
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-[18px] font-semibold tracking-tight">My Films</h2>
+            {isCreator && (
+              <button onClick={() => router.push("/submit")} className="text-[13px] text-white/25 hover:text-white/50 transition-colors flex items-center gap-2 cursor-pointer">
+                <Film size={13} /> Submit Film
+              </button>
             )}
           </div>
+
+          {stats.films === 0 ? (
+            <div className="text-center py-20 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+              <Film size={32} className="text-white/8 mx-auto mb-4" />
+              <p className="text-[15px] text-white/20 mb-1">No films yet</p>
+              <p className="text-[13px] text-white/10">Submit your first AI film to see it here.</p>
+            </div>
+          ) : (
+            <div className="text-center py-14 rounded-2xl bg-white/[0.02] border border-white/[0.04]">
+              <p className="text-[15px] text-white/30">{stats.films} film{stats.films !== 1 ? "s" : ""} published</p>
+              <button onClick={() => router.push(`/creator/${user.id}`)} className="mt-4 text-[13px] text-white/20 hover:text-white/40 transition-colors cursor-pointer">View all films →</button>
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Toast */}
       {toast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] bg-[#18181b] border border-white/[0.06] text-white text-[13px] px-6 py-3 rounded-xl font-medium shadow-2xl shadow-black/60 prof-reveal">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[300] bg-[#18181b] border border-white/[0.06] text-white text-[13px] px-6 py-3 rounded-2xl font-medium shadow-2xl shadow-black/60 prof-reveal">
           <span className="flex items-center gap-2"><Check size={14} className="text-emerald-400" /> {toast}</span>
         </div>
       )}
