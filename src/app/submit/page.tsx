@@ -95,7 +95,7 @@ export default function SubmitPage() {
 
   const handleSubmit = async () => {
     // Validate video URL if provided
-    if (form.video_url && !form.video_url.match(/^https?://(www.)?(youtube.com|youtu.be|vimeo.com)//)) {
+    if (form.video_url && !form.video_url.match(/^https?:\/\/(www\.)?(youtube\.com|youtu\.be|vimeo\.com)\//)) {
       setToast({ message: 'Video URL must be a YouTube or Vimeo link', type: 'warning' });
       return;
     }
