@@ -62,7 +62,18 @@ export default function HomePage() {
     if (!supabase) return;
     async function checkRole() {
       const { data: { session } } = await supabase!.auth.getSession();
-      if (!session?.user) return;
+      if (!session?.user) {
+        // User signed out — clear all user-specific state + cache
+        setIsAdmin(false);
+        setIsCreator(false);
+        setUserVotedIds(new Set());
+        setWatchlistIds(new Set());
+        __cache.votedIds = null;
+        __cache.watchlistIds = null;
+        __cache.isAdmin = false;
+        __cache.isCreator = false;
+        return;
+      }
       const { data: profile } = await supabase!
         .from("profiles")
         .select("role, user_type")
