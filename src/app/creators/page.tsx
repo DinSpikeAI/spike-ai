@@ -1,259 +1,424 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft, Sparkles, Film, ArrowRight, ExternalLink, Loader2,
+  ArrowLeft, Sparkles, Film, ArrowRight,
+  ChevronDown, ExternalLink,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+
+/* ═══════════════════════════════════════════════════════════════
+   FOUNDING CREATORS DATA
+   ═══════════════════════════════════════════════════════════════ */
 
 interface Creator {
   id: string;
-  display_name: string;
-  avatar_url: string | null;
+  name: string;
+  badge: string;
+  role: string;
+  avatar: string;
   bio: string;
-  website: string;
-  social_x: string;
-  social_youtube: string;
-  social_instagram: string;
+  highlight: string;
   toolkit: string[];
-  created_at: string;
-  film_count: number;
+  works: { title: string; type: string; note: string }[];
+  links: { label: string; url: string }[];
+  stats: { label: string; value: string }[];
 }
 
-export default function CreatorsPage() {
-  const router = useRouter();
-  const [creators, setCreators] = useState<Creator[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+const FOUNDERS: Creator[] = [
+  {
+    id: "maya-shoshani",
+    name: "Maya Shoshani",
+    badge: "Pioneer Creator",
+    role: "Director \u00b7 Independent Filmmaker",
+    avatar: "/creators/maya-shoshani.jpg",
+    bio: "Storyteller passionate about telling emotional truths through technology, animation, humor, and psychological sensitivity. I tell stories about people \u2013 through the objects, machines, rituals, digital moments and things they hold onto when life gets overwhelming.",
+    highlight: "Invested over 300 hours in a single 14-minute film with an original composed score. Creator of \"Breakup Letters AI\" \u2013 a 5-part cinematic AI animated series submitted to 20+ international film festivals.",
+    toolkit: ["Kling", "Sora", "Veo3", "Wan 2.6", "Minimax", "Seedance", "After Effects"],
+    works: [
+      { title: "Breakup Letters AI", type: "Animated Series \u00b7 5 Episodes", note: "AI tools speak in their own voices \u00b7 Animation, Drama, Dark Comedy" },
+      { title: "Untitled Short Film", type: "Psychological Drama \u00b7 14 min", note: "Exploring emotional states \u00b7 Original composed score" },
+      { title: "Zen & Chaos", type: "Animated Comedy Series", note: "An angry sushi tries to find his center \u00b7 Absurdist comedy" },
+    ],
+    links: [
+      { label: "Portfolio", url: "https://www.behance.net/mayas-vision" },
+      { label: "LinkedIn", url: "https://www.linkedin.com/in/maya-shoshani-296147164/" },
+      { label: "Facebook", url: "https://www.facebook.com/maya.shoshani.9" },
+      { label: "Instagram", url: "https://www.instagram.com/mayas.vision" },
+    ],
+    stats: [
+      { label: "Hours per film", value: "300+" },
+      { label: "Festival submissions", value: "20+" },
+      { label: "AI tools mastered", value: "7" },
+    ],
+  },
+  {
+    id: "yuval-avadya",
+    name: "Yuval Avadya",
+    badge: "Pioneer Creator",
+    role: "AI Creative Director",
+    avatar: "/creators/yuval-avadya.jpg",
+    bio: "Turning imagination into reality with AI. Creating cinematic visuals for brands worldwide, pushing the boundaries of what's possible with generative video and AI-driven storytelling.",
+    highlight: "Specializes in high-end AI-generated brand content and cinematic visuals. Known for blending commercial creativity with cutting-edge AI video tools to deliver visuals that feel both futuristic and emotionally grounded.",
+    toolkit: ["Kling", "Seedance", "Nano Banana"],
+    works: [
+      { title: "Brand Campaigns", type: "AI Commercial Content", note: "Cinematic AI visuals for brands worldwide" },
+      { title: "AI Creative Reels", type: "Short-Form Content", note: "High-end AI-generated visual storytelling" },
+    ],
+    links: [
+      { label: "Instagram", url: "https://www.instagram.com/yuvimedia.ai" },
+      { label: "Personal", url: "https://www.instagram.com/yuvalavadya" },
+      { label: "Email", url: "mailto:yuvimgmt@gmail.com" },
+    ],
+    stats: [
+      { label: "Specialty", value: "Brands" },
+      { label: "AI tools mastered", value: "3" },
+      { label: "Focus", value: "Commercial" },
+    ],
+  },
+  {
+    id: "victor-leonativ",
+    name: "Victor Leonativ",
+    badge: "Pioneer Creator",
+    role: "AI Video Editor \u00b7 Creative Director",
+    avatar: "/creators/victor-leonativ.jpg",
+    bio: "Fusing years of traditional video editorial expertise with a high-fidelity AI stack. I don't just generate \u2013 I curate the intersection of human intuition and algorithmic precision to deliver the next evolution of social storytelling.",
+    highlight: "Veteran video editor who bridges the gap between traditional filmmaking craft and AI-powered creation. Brings editorial instinct and cinematic timing to every AI-generated frame.",
+    toolkit: ["Kling", "Runway", "After Effects", "Premiere Pro"],
+    works: [
+      { title: "AI Social Storytelling", type: "Short-Form Series", note: "Next-gen social content fusing editorial craft with AI generation" },
+      { title: "Creative Direction Reel", type: "Portfolio Showcase", note: "Traditional editing expertise meets AI-powered visuals" },
+    ],
+    links: [
+      { label: "Portfolio", url: "https://vectorcreations.wixsite.com/portfolio" },
+      { label: "YouTube", url: "https://www.youtube.com/@VXTEPS" },
+    ],
+    stats: [
+      { label: "Background", value: "Editorial" },
+      { label: "Approach", value: "Hybrid" },
+      { label: "Focus", value: "Storytelling" },
+    ],
+  },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   CREATOR CARD
+   ═══════════════════════════════════════════════════════════════ */
+
+function CreatorCard({ creator }: { creator: Creator }) {
+  const [expanded, setExpanded] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState(0);
 
   useEffect(() => {
-    async function load() {
-      if (!supabase) { setLoading(false); return; }
-
-      // Fetch all creators
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, display_name, avatar_url, bio, website, social_x, social_youtube, social_instagram, toolkit, created_at")
-        .eq("user_type", "creator")
-        .order("created_at", { ascending: true });
-
-      if (!profiles || profiles.length === 0) { setLoading(false); return; }
-
-      // Fetch film counts for each creator
-      const { data: movies } = await supabase
-        .from("movies")
-        .select("creator_name")
-        .eq("status", "approved");
-
-      const filmCounts: Record<string, number> = {};
-      (movies || []).forEach((m: any) => {
-        const name = m.creator_name || "";
-        filmCounts[name] = (filmCounts[name] || 0) + 1;
-      });
-
-      const creatorList: Creator[] = profiles.map((p: any) => ({
-        id: p.id,
-        display_name: p.display_name || "Creator",
-        avatar_url: p.avatar_url,
-        bio: p.bio || "",
-        website: p.website || "",
-        social_x: p.social_x || "",
-        social_youtube: p.social_youtube || "",
-        social_instagram: p.social_instagram || "",
-        toolkit: p.toolkit || [],
-        created_at: p.created_at,
-        film_count: filmCounts[p.display_name] || 0,
-      }));
-
-      setCreators(creatorList);
-      setLoading(false);
+    if (contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
     }
-    load();
-  }, []);
+    const handleResize = () => {
+      if (contentRef.current && expanded) {
+        setContentHeight(contentRef.current.scrollHeight);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [expanded]);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white relative overflow-hidden">
-      {/* Ambient */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[10%] left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full bg-purple-600/[0.04] blur-[180px]" />
-      </div>
+    <div className="flex flex-col items-center">
+      {/* ── Collapsed: Photo + Name + Badge ── */}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="group cursor-pointer flex flex-col items-center text-center focus:outline-none"
+      >
+        {/* Avatar — premium circular container */}
+        <div className="relative mb-5">
+          {/* Outer glow ring */}
+          <div className={`absolute -inset-1 rounded-full transition-all duration-700 ${
+            expanded
+              ? "opacity-100 shadow-[0_0_30px_rgba(212,168,75,0.25)]"
+              : "opacity-0 group-hover:opacity-100 group-hover:shadow-[0_0_20px_rgba(212,168,75,0.15)]"
+          }`}
+            style={{ background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d, #e8c65a)" }}
+          />
+          {/* Photo container */}
+          <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-[3px] border-[#0c0c12] shadow-2xl shadow-black/60">
+            <img
+              src={creator.avatar}
+              alt={creator.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = "none";
+                target.parentElement!.classList.add("avatar-fallback");
+              }}
+            />
+            {/* Fallback initials (shown if image fails) */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 avatar-initials pointer-events-none">
+              <span className="text-3xl md:text-4xl font-bold text-white/80">
+                {creator.name.split(" ").map(n => n[0]).join("")}
+              </span>
+            </div>
+            {/* Hover overlay */}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 flex items-center justify-center">
+              <ChevronDown
+                size={20}
+                className={`text-white/0 group-hover:text-white/60 transition-all duration-500 ${expanded ? "rotate-180" : ""}`}
+              />
+            </div>
+          </div>
 
-      {/* Nav */}
-      <nav className="relative z-20 px-6 md:px-12 py-6 flex items-center justify-between">
-        <button onClick={() => router.push("/")} className="flex items-center gap-2 text-white/30 hover:text-white transition-colors">
-          <ArrowLeft size={16} />
-          <span className="text-sm">Back</span>
-        </button>
-        <button onClick={() => router.push("/become-creator")} className="flex items-center gap-2 px-5 py-2 rounded-full border border-white/10 text-sm text-white/60 hover:text-white hover:border-white/20 transition-all">
-          <Sparkles size={14} /> Apply as Creator
-        </button>
-      </nav>
-
-      {/* Header */}
-      <div className="relative z-10 text-center px-6 pt-8 pb-16">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold tracking-widest uppercase mb-6">
-          <Sparkles size={12} /> Pioneer Creators
+          {/* Gold Badge — positioned below avatar */}
+          <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 gold-badge">
+            <div className="relative flex items-center justify-center px-4 py-1.5 rounded-[4px]"
+              style={{
+                background: "linear-gradient(145deg, #d4a84b 0%, #f5d77a 20%, #c9953c 40%, #f5d77a 55%, #b8862d 75%, #e8c65a 100%)",
+                boxShadow: "0 2px 8px rgba(180,130,40,0.4), 0 1px 2px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,235,170,0.5), inset 0 -1px 1px rgba(120,80,20,0.3)",
+                border: "1px solid rgba(218,175,80,0.6)",
+              }}>
+              <div className="absolute inset-0 rounded-[4px] opacity-[0.08]"
+                style={{ backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.15) 1px, rgba(255,255,255,0.15) 2px)" }} />
+              <div className="absolute inset-0 rounded-[4px] opacity-30"
+                style={{ background: "linear-gradient(120deg, transparent 30%, rgba(255,245,200,0.4) 45%, transparent 55%)" }} />
+              <div className="absolute top-[3px] right-[5px] w-[5px] h-[5px] rotate-45"
+                style={{ background: "linear-gradient(135deg, #2a2a2a 0%, #555 40%, #1a1a1a 100%)", boxShadow: "0 0 3px rgba(255,220,120,0.5)" }} />
+              <span className="relative text-[8px] md:text-[9px] font-extrabold tracking-[0.25em] uppercase pr-1"
+                style={{ color: "#8b6914", textShadow: "0 1px 0 rgba(255,235,170,0.5), 0 -0.5px 0 rgba(80,50,10,0.4)" }}>
+                {creator.badge}
+              </span>
+            </div>
+          </div>
         </div>
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4">Our Creators</h1>
-        <p className="text-white/25 text-base md:text-lg max-w-lg mx-auto">
-          The filmmakers shaping the future of AI cinema.
-          {creators.length > 0 && <span className="text-white/40"> {creators.length} creators and counting.</span>}
-        </p>
-      </div>
 
-      {/* Creators Grid */}
-      <div className="relative z-10 max-w-5xl mx-auto px-6 pb-20">
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 size={24} className="animate-spin text-white/20" />
-          </div>
-        ) : creators.length === 0 ? (
-          <div className="text-center py-20">
-            <Film size={32} className="text-white/10 mx-auto mb-4" />
-            <p className="text-white/20 mb-2">No creators yet</p>
-            <p className="text-white/10 text-sm">Be the first to join.</p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {creators.map((creator, index) => (
-              <div
-                key={creator.id}
-                className="bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-hidden hover:border-white/[0.12] transition-all duration-300"
-                style={{ animation: `reveal 0.5s cubic-bezier(0.16,1,0.3,1) ${index * 0.1}s backwards` }}
-              >
-                <div
-                  className="flex items-center gap-5 p-6 cursor-pointer"
-                  onClick={() => setExpandedId(expandedId === creator.id ? null : creator.id)}
-                >
-                  {/* Avatar */}
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden flex-shrink-0 border-2 border-white/[0.08] shadow-lg shadow-black/40">
-                    {creator.avatar_url ? (
-                      <img src={creator.avatar_url} alt={creator.display_name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-purple-900 to-indigo-900 flex items-center justify-center text-2xl font-bold text-white/40">
-                        {creator.display_name[0].toUpperCase()}
-                      </div>
-                    )}
-                  </div>
+        {/* Name */}
+        <h3 className="text-2xl md:text-[32px] font-bold tracking-tight text-white/90 group-hover:text-white transition-colors mt-2">
+          {creator.name}
+        </h3>
+        <p className="text-[12px] md:text-[13px] text-white/20 tracking-widest uppercase mt-1.5">{creator.role}</p>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">{creator.display_name}</h2>
-                      <span className="px-2.5 py-0.5 rounded-md text-[9px] font-black tracking-[0.12em] uppercase bg-gradient-to-r from-yellow-600/80 to-amber-500/80 text-white shadow-sm">
-                        Pioneer Creator
-                      </span>
-                    </div>
-                    {creator.bio && (
-                      <p className="text-white/35 text-sm leading-relaxed line-clamp-2">{creator.bio}</p>
-                    )}
-                    <div className="flex items-center gap-4 mt-2">
-                      <span className="text-xs text-white/20">
-                        <span className="text-white/50 font-semibold">{creator.film_count}</span> {creator.film_count === 1 ? "film" : "films"}
-                      </span>
-                      {creator.toolkit.length > 0 && (
-                        <span className="text-xs text-white/20">
-                          {creator.toolkit.slice(0, 3).join(" · ")}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+        {/* Tap hint */}
+        <div className={`flex items-center gap-1.5 mt-4 transition-all duration-500 ${
+          expanded ? "text-white/25" : "text-white/10 group-hover:text-white/25"
+        }`}>
+          <span className="text-[10px] font-medium tracking-[0.15em] uppercase">
+            {expanded ? "Tap to close" : "Tap to explore"}
+          </span>
+          <ChevronDown size={12} className={`transition-transform duration-500 ${expanded ? "rotate-180" : "group-hover:translate-y-0.5"}`} />
+        </div>
+      </button>
 
-                  {/* Arrow */}
-                  <div className={`flex-shrink-0 text-white/15 transition-transform duration-300 ${expandedId === creator.id ? "rotate-90" : ""}`}>
-                    <ArrowRight size={18} />
-                  </div>
-                </div>
+      {/* ── Expanded: Full Profile ── */}
+      <div
+        className="w-full max-w-[620px] overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        style={{ maxHeight: expanded ? `${contentHeight}px` : "0px", opacity: expanded ? 1 : 0 }}
+      >
+        <div ref={contentRef} className="pt-10 pb-6">
 
-                {/* Expanded Details */}
-                {expandedId === creator.id && (
-                  <div className="px-6 pb-6 border-t border-white/[0.04] pt-5" style={{ animation: "reveal 0.3s ease" }}>
-                    {creator.bio && (
-                      <p className="text-white/40 text-sm leading-relaxed mb-5">{creator.bio}</p>
-                    )}
+          {/* Divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mb-10" />
 
-                    {/* Toolkit */}
-                    {creator.toolkit.length > 0 && (
-                      <div className="mb-5">
-                        <p className="text-[10px] font-bold tracking-[0.2em] text-white/15 uppercase mb-2">AI Toolkit</p>
-                        <div className="flex flex-wrap gap-2">
-                          {creator.toolkit.map(tool => (
-                            <span key={tool} className="px-3 py-1 rounded-lg text-xs bg-white/[0.04] border border-white/[0.06] text-white/40">{tool}</span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Links */}
-                    <div className="flex flex-wrap gap-3 mb-5">
-                      {creator.website && (
-                        <a href={creator.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-purple-400/70 hover:text-purple-300 transition-colors">
-                          <ExternalLink size={11} /> Website
-                        </a>
-                      )}
-                      {creator.social_instagram && (
-                        <a href={`https://instagram.com/${creator.social_instagram.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-purple-400/70 hover:text-purple-300 transition-colors">
-                          <ExternalLink size={11} /> Instagram
-                        </a>
-                      )}
-                      {creator.social_youtube && (
-                        <a href={`https://youtube.com/${creator.social_youtube.replace("@", "@")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-purple-400/70 hover:text-purple-300 transition-colors">
-                          <ExternalLink size={11} /> YouTube
-                        </a>
-                      )}
-                      {creator.social_x && (
-                        <a href={`https://x.com/${creator.social_x.replace("@", "")}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-purple-400/70 hover:text-purple-300 transition-colors">
-                          <ExternalLink size={11} /> X
-                        </a>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={() => router.push(`/creator/${creator.id}`)}
-                      className="flex items-center gap-2 px-5 py-2.5 bg-white/[0.06] border border-white/[0.08] rounded-xl text-sm text-white/60 hover:text-white hover:bg-white/[0.1] transition-all"
-                    >
-                      <Film size={14} /> View Full Profile & Films
-                    </button>
-                  </div>
-                )}
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-3 mb-10">
+            {creator.stats.map((stat) => (
+              <div key={stat.label} className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 text-center">
+                <p className="text-2xl md:text-3xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent mb-1">{stat.value}</p>
+                <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-white/20">{stat.label}</p>
               </div>
             ))}
           </div>
-        )}
 
-        {/* Coming Soon */}
-        {!loading && (
-          <div className="text-center pt-16 pb-8">
-            <div className="flex justify-center gap-3 mb-6">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="w-12 h-12 rounded-full border border-dashed border-white/[0.08] flex items-center justify-center text-white/10 text-lg">?</div>
+          {/* Highlight */}
+          <div className="mb-10 px-6 py-6 rounded-2xl bg-gradient-to-br from-amber-500/[0.04] to-yellow-500/[0.02] border border-amber-500/[0.08]">
+            <Sparkles size={14} className="text-amber-400/40 mb-3" />
+            <p className="text-[15px] text-white/50 leading-[1.8] italic">
+              &quot;{creator.highlight}&quot;
+            </p>
+          </div>
+
+          {/* Bio */}
+          <div className="mb-10">
+            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/15 mb-4">About</p>
+            <p className="text-[14px] text-white/35 leading-[1.8]">{creator.bio}</p>
+          </div>
+
+          {/* Toolkit */}
+          <div className="mb-10">
+            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/15 mb-4">AI Toolkit</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {creator.toolkit.map((tool) => (
+                <span key={tool} className="px-3.5 py-1.5 rounded-full text-[12px] font-medium text-white/45 bg-white/[0.04] border border-white/[0.06] hover:border-amber-500/20 hover:text-amber-200/50 transition-all duration-300 cursor-default">
+                  {tool}
+                </span>
               ))}
             </div>
-            <p className="text-white/20 text-sm mb-1">More creators joining soon</p>
-            <p className="text-white/10 text-xs mb-6">Applications are open</p>
-            <button
-              onClick={() => router.push("/become-creator")}
-              className="inline-flex items-center gap-2 px-6 py-3 border border-white/10 rounded-full text-sm text-white/60 hover:text-white hover:border-white/20 transition-all"
-            >
-              Apply as Creator <ArrowRight size={14} />
-            </button>
           </div>
-        )}
+
+          {/* Selected Works */}
+          <div className="mb-10">
+            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/15 mb-4">Selected Works</p>
+            <div className="space-y-3">
+              {creator.works.map((work) => (
+                <div key={work.title} className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-all duration-300 group/work">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/10 to-yellow-500/5 border border-amber-500/10 flex items-center justify-center flex-shrink-0">
+                      <Film size={16} className="text-amber-400/40" />
+                    </div>
+                    <div>
+                      <p className="text-[14px] font-semibold text-white/70 group-hover/work:text-white/90 transition-colors">{work.title}</p>
+                      <p className="text-[11px] text-white/20 mt-0.5">{work.type}</p>
+                    </div>
+                  </div>
+                  <span className="text-[11px] text-white/15 hidden sm:block">{work.note}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Links */}
+          <div className="flex flex-wrap justify-center gap-3">
+            {creator.links.map((link) => (
+              <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium text-white/30 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] hover:text-white/50 transition-all duration-300">
+                <ExternalLink size={12} />
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CREATORS PAGE
+   ═══════════════════════════════════════════════════════════════ */
+
+export default function CreatorsPage() {
+  const router = useRouter();
+
+  return (
+    <div className="min-h-screen bg-[#060608] text-white relative overflow-hidden">
+
+      {/* Ambient — Premium layered background */}
+      <div className="fixed inset-0 pointer-events-none">
+        {/* Top warm spotlight */}
+        <div className="absolute top-[5%] left-1/2 -translate-x-1/2 w-[1000px] h-[700px] rounded-full opacity-[0.06]"
+          style={{ background: "radial-gradient(ellipse, rgba(180,140,60,0.5) 0%, rgba(139,92,246,0.3) 35%, transparent 70%)", animation: "glow 18s ease-in-out infinite" }} />
+        {/* Center indigo wash */}
+        <div className="absolute top-[30%] left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full opacity-[0.04]"
+          style={{ background: "radial-gradient(ellipse, rgba(99,102,241,0.7) 0%, transparent 65%)", animation: "glow 12s ease-in-out infinite reverse" }} />
+        {/* Bottom warm glow */}
+        <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full opacity-[0.03]"
+          style={{ background: "radial-gradient(ellipse, rgba(212,168,75,0.4) 0%, transparent 70%)", animation: "glow 20s ease-in-out infinite" }} />
+        {/* Subtle vignette */}
+        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.4) 100%)" }} />
+        {/* Noise texture */}
+        <div className="absolute inset-0 opacity-[0.025]"
+          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")` }} />
+        {/* Fine grid lines */}
+        <div className="absolute inset-0 opacity-[0.015]"
+          style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px)", backgroundSize: "80px 80px" }} />
+      </div>
+
+      {/* Nav */}
+      <div className="sticky top-0 z-50 bg-[#060608]/60 backdrop-blur-2xl border-b border-white/[0.04]">
+        <div className="max-w-[900px] mx-auto px-6 h-14 flex items-center gap-4">
+          <button onClick={() => router.push("/")} className="w-9 h-9 rounded-full border border-white/[0.08] flex items-center justify-center text-white/25 hover:text-white transition-all cursor-pointer">
+            <ArrowLeft size={15} />
+          </button>
+          <span className="text-[15px] font-semibold tracking-wide text-white/50">Creators</span>
+        </div>
+      </div>
+
+      {/* ═══ ALL CONTENT CENTERED ═══ */}
+      <div className="relative z-10 flex flex-col items-center px-6">
+
+        {/* Hero */}
+        <div className="text-center pt-16 md:pt-24 pb-10 md:pb-14 max-w-[800px]" style={{ animation: "reveal 0.8s cubic-bezier(0.16,1,0.3,1)" }}>
+          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-500/[0.08] border border-indigo-400/[0.12] text-[11px] font-bold tracking-[0.25em] text-indigo-300/60 uppercase mb-8 backdrop-blur-sm">
+            <Sparkles size={13} className="text-indigo-400/60" />
+            Pioneer Creators
+          </div>
+
+          <h1 className="text-[42px] md:text-[60px] lg:text-[72px] font-bold tracking-tight leading-[1.05] mb-6">
+            The artists behind{" "}
+            <span className="bg-gradient-to-r from-white/40 via-indigo-300/50 to-violet-400/40 bg-clip-text text-transparent">
+              Spike AI cinema.
+            </span>
+          </h1>
+
+          <p className="text-[16px] md:text-[18px] text-white/20 leading-[1.7] max-w-lg mx-auto">
+            A handpicked group of visionary filmmakers defining the future of AI-generated cinema on Spike AI.
+          </p>
+        </div>
+
+        {/* Divider */}
+        <div className="w-full max-w-[620px]">
+          <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        </div>
+
+        {/* Founders */}
+        <div className="py-14 md:py-20 w-full max-w-[620px]" style={{ animation: "reveal 1s cubic-bezier(0.16,1,0.3,1) 0.2s both" }}>
+          {FOUNDERS.map((creator) => (
+            <CreatorCard key={creator.id} creator={creator} />
+          ))}
+        </div>
+
+        {/* More Coming */}
+        <div className="w-full max-w-[620px] text-center pb-20">
+          <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mb-16" />
+
+          <div className="flex items-center justify-center gap-4 mb-8">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-dashed border-white/[0.06] flex items-center justify-center">
+                <span className="text-white/[0.08] text-lg font-bold">?</span>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-[13px] text-white/15 tracking-wide mb-2">More creators joining soon</p>
+          <p className="text-[11px] text-white/[0.08] tracking-wider">Applications are open</p>
+
+          <button
+            onClick={() => router.push("/submit")}
+            className="mt-10 inline-flex items-center gap-3 px-10 py-4 text-black text-[15px] font-semibold tracking-wide rounded-full cursor-pointer transition-all active:scale-[0.97] cta-btn"
+          >
+            Apply as Creator
+            <ArrowRight size={16} strokeWidth={2.5} />
+          </button>
+        </div>
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 py-8 px-6 border-t border-white/[0.04]">
-        <div className="max-w-5xl mx-auto text-center">
-          <span className="text-lg font-semibold tracking-[0.18em] text-white">spike AI</span>
-          <p className="text-white/15 text-xs mt-3">&copy; {new Date().getFullYear()} Spike AI. The home for AI-generated cinema.</p>
-          <div className="flex justify-center gap-4 mt-2 text-[11px] text-white/10">
-            <a href="/terms" className="hover:text-white/25 transition-colors">Terms</a>
-            <a href="/privacy" className="hover:text-white/25 transition-colors">Privacy</a>
-            <a href="/community-guidelines" className="hover:text-white/25 transition-colors">Guidelines</a>
-          </div>
+      <footer className="relative z-10 py-10 border-t border-white/[0.03]">
+        <div className="text-center">
+          <span className="text-[14px] font-semibold tracking-[0.2em] text-white/[0.06]">spike AI</span>
+          <div className="flex justify-center gap-4 mt-3 text-[11px] text-white/15"><a href="/terms" className="hover:text-white/30 transition-colors">Terms</a><a href="/privacy" className="hover:text-white/30 transition-colors">Privacy</a><a href="/community-guidelines" className="hover:text-white/30 transition-colors">Guidelines</a></div>
         </div>
       </footer>
+
+      <style jsx>{`
+        .cta-btn {
+          background: linear-gradient(180deg, #fff 0%, #e4e4e7 100%);
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 4px 20px rgba(255,255,255,0.06), 0 0 60px rgba(99,102,241,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+        }
+        .cta-btn:hover {
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.15), 0 8px 40px rgba(255,255,255,0.1), 0 0 80px rgba(99,102,241,0.12), inset 0 1px 0 rgba(255,255,255,1);
+          transform: translateY(-2px);
+        }
+        .gold-badge { transition: all 0.3s ease; }
+        .gold-badge:hover { filter: brightness(1.1); }
+        .avatar-fallback { background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 50%, #8b5cf6 100%); }
+        .avatar-fallback + .avatar-initials, .avatar-fallback ~ .avatar-initials { opacity: 1 !important; }
+        @keyframes reveal {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glow {
+          0%, 100% { opacity: 0.05; transform: translate(-50%, 0) scale(1); }
+          50% { opacity: 0.08; transform: translate(-50%, 0) scale(1.15); }
+        }
+      `}</style>
     </div>
   );
 }
