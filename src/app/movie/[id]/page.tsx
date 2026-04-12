@@ -6,7 +6,7 @@ import {
   Play, ArrowLeft, Plus, Share2, X,
   Star, Clock, Cpu, ChevronLeft, ChevronRight,
   Sparkles, ExternalLink, Flame, SkipForward,
-  Bookmark, Check,
+  Bookmark, Check, Pencil, Save, Loader2,
 } from "lucide-react";
 import { supabase, getSmartPoster, getSmartHeroImage } from "@/lib/supabase";
 
@@ -91,6 +91,10 @@ export default function MoviePage() {
   const [popAnim, setPopAnim] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [dbMovies, setDbMovies] = useState<Movie[]>([]);
+  const [isOwner, setIsOwner] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState<any>(null);
+  const [editSaving, setEditSaving] = useState(false);
 
   useEffect(() => { if (window.innerWidth >= 3840) setQuality("4k"); }, []);
 
@@ -106,6 +110,14 @@ export default function MoviePage() {
           setMovie({ id: data.id, title: data.title, year: data.year || 2026, rating: Number(data.rating) || 0, duration: data.duration || "", poster: getSmartPoster(data.poster_url, data.video_url, data.id), image: getSmartHeroImage(data.hero_image, data.video_url, data.poster_url, data.id), aiModels: data.ai_models || [], genre: data.genre || "Sci-Fi", description: data.description || "", tagline: data.tagline || "", maturity: data.maturity || "16+", director: data.creator_name || "AI Creator", creator_name: data.creator_name || "", video_url: data.video_url, upvotes_count: data.upvotes_count || 0 });
           setVotes(data.upvotes_count || 0);
           setIsDbMovie(true);
+          // Check if user owns this movie
+          if (supabase) {
+            const { data: { session: s } } = await supabase.auth.getSession();
+            if (s?.user) {
+              const { data: p } = await supabase.from("profiles").select("role, display_name").eq("id", s.user.id).single();
+              if (p?.role === "admin" || (p?.display_name && p.display_name === data.creator_name)) setIsOwner(true);
+            }
+          }
           setLoading(false);
           return;
         }
@@ -129,6 +141,9 @@ export default function MoviePage() {
       const { data: { session } } = await supabase!.auth.getSession();
       if (!session?.user) return;
       setUser(session.user);
+      // Check ownership
+      const { data: profile } = await supabase!.from("profiles").select("role, user_type, display_name").eq("id", session.user.id).single();
+      if (profile?.role === "admin") setIsOwner(true);
       try {
         const { data: voteRows } = await supabase!.from("user_votes").select("movie_id").eq("user_id", session.user.id);
         if (voteRows?.some((r: any) => r.movie_id === movieId)) setVoted(true);
@@ -213,6 +228,31 @@ export default function MoviePage() {
       </div><div className="flex flex-col items-center gap-4"><div className="w-10 h-10 border-2 border-white border-t-transparent rounded-full animate-spin" /><p className="text-white/30 text-sm tracking-wider">Loading film...</p></div></div>);
   if (!movie) return (<div className="min-h-screen bg-[#060608] relative overflow-hidden flex items-center justify-center"><div className="text-center"><h1 className="text-4xl font-bold text-white mb-4">Film Not Found</h1><p className="text-white/30 mb-8">This film doesn&apos;t exist in our universe.</p><button onClick={() => router.push("/")} className="px-6 py-3 bg-white text-black rounded-lg">Back to Home</button></div></div>);
 
+  const startEdit = () => {
+    setEditForm({
+      title: movie!.title, description: movie!.description || "", tagline: movie!.tagline || "",
+      video_url: movie!.video_url || "", genre: movie!.genre || "", duration: movie!.duration || "",
+      year: movie!.year || 2026, poster_url: movie!.poster || "",
+    });
+    setEditing(true);
+  };
+
+  const saveEdit = async () => {
+    if (!supabase || !editForm) return;
+    setEditSaving(true);
+    const { error } = await supabase.from("movies").update({
+      title: editForm.title, description: editForm.description, tagline: editForm.tagline,
+      video_url: editForm.video_url, genre: editForm.genre, duration: editForm.duration,
+      year: editForm.year, poster_url: editForm.poster_url,
+    }).eq("id", movieId);
+    if (!error) {
+      setMovie({ ...movie!, title: editForm.title, description: editForm.description, tagline: editForm.tagline,
+        video_url: editForm.video_url, genre: editForm.genre, duration: editForm.duration, year: editForm.year });
+      setEditing(false);
+    }
+    setEditSaving(false);
+  };
+
   const heroImg = movie.image || movie.poster;
   const qLabel = quality === "4k" ? "4K" : quality === "hd" ? "HD" : "Auto";
   const qColor = quality === "4k" ? "text-amber-400 border-amber-400/30 bg-amber-400/10" : quality === "hd" ? "text-green-400 border-green-400/30 bg-green-400/10" : "text-white/40 border-white/10 bg-white/5";
@@ -266,6 +306,7 @@ export default function MoviePage() {
                 <button onClick={handleUpvote} className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm border transition-all ${popAnim ? "scale-110" : ""} ${voted ? "bg-white/15 border-white/30 text-white" : "bg-white/5 border-white/10 text-white/60 hover:text-white hover:border-white/20"}`}><Flame size={16} fill={voted ? "currentColor" : "none"} />{votes > 0 ? votes.toLocaleString() : "Upvote"}</button>
                 <button onClick={handleWatchlist} className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm border transition-all ${saved ? "bg-white/15 border-white/25 text-white" : "bg-white/5 border-white/10 text-white/60 hover:text-white hover:border-white/20"}`}>{saved ? <Check size={16} /> : <Plus size={16} />}{saved ? "In My List" : "My List"}</button>
                 <button onClick={handleShare} className="flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm border bg-white/5 border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all">{shareMsg ? <Check size={16} className="text-green-400" /> : <Share2 size={16} />}{shareMsg || "Share"}</button>
+                {isOwner && <button onClick={startEdit} className="flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm border bg-white/5 border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all"><Pencil size={16} />Edit</button>}
               </div>
 
               <p className="text-white/50 text-sm md:text-base leading-relaxed max-w-2xl mb-6">{movie.description || "An AI-generated cinematic experience pushing the boundaries of artificial creativity."}</p>
@@ -287,8 +328,64 @@ export default function MoviePage() {
       {/* MORE LIKE THIS */}
       {similarMovies.length > 0 && (<section className="py-8 md:py-12 px-4 md:px-6"><div className="max-w-[1400px] mx-auto"><h2 className="text-xl font-semibold mb-6 flex items-center gap-2"><Sparkles size={18} className="text-white" />More Like This</h2><div className="relative group"><button onClick={() => scrollSimilar("left")} className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/80 border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"><ChevronLeft size={20} /></button><button onClick={() => scrollSimilar("right")} className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/80 border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"><ChevronRight size={20} /></button><div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>{similarMovies.map(m => (<div key={m.id} onClick={() => router.push(`/movie/${m.id}`)} className="flex-shrink-0 w-[130px] md:w-[180px] cursor-pointer group/card"><div className="relative aspect-[2/3] rounded-lg overflow-hidden mb-2 border border-white/[0.04] group-hover/card:border-white/20 transition-all duration-300"><img src={m.poster} alt={m.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110" /><div className="absolute inset-0 bg-black/0 group-hover/card:bg-black/50 transition-all flex items-center justify-center"><div className="w-12 h-12 rounded-full bg-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 scale-75 group-hover/card:scale-100 transition-all shadow-lg shadow-black/30"><Play size={20} fill="white" className="text-white ml-0.5" /></div></div></div><p className="text-sm font-medium text-white/80 group-hover/card:text-white transition-colors truncate">{m.title}</p><div className="flex items-center gap-2 mt-1"><span className="text-yellow-400 text-xs flex items-center gap-0.5"><Star size={10} fill="currentColor" />{m.rating}</span><span className="text-white/20 text-xs">{m.year}</span></div></div>))}</div></div></div></section>)}
 
+      {/* EDIT MODAL */}
+      {editing && editForm && (
+        <div className="fixed inset-0 z-[500] flex items-center justify-center px-4" onClick={() => setEditing(false)}>
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" />
+          <div className="relative z-10 w-full max-w-xl bg-[#0c0c0e] border border-white/[0.06] rounded-2xl shadow-2xl max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+              <h3 className="text-lg font-bold">Edit Film</h3>
+              <button onClick={() => setEditing(false)} className="text-white/30 hover:text-white transition-colors"><X size={18} /></button>
+            </div>
+            <div className="px-6 py-5 space-y-5">
+              <div>
+                <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Title</label>
+                <input value={editForm.title} onChange={e => setEditForm({...editForm, title: e.target.value})} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Tagline</label>
+                <input value={editForm.tagline} onChange={e => setEditForm({...editForm, tagline: e.target.value})} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Description</label>
+                <textarea value={editForm.description} onChange={e => setEditForm({...editForm, description: e.target.value})} rows={4} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all resize-none" />
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Genre</label>
+                  <input value={editForm.genre} onChange={e => setEditForm({...editForm, genre: e.target.value})} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Duration</label>
+                  <input value={editForm.duration} onChange={e => setEditForm({...editForm, duration: e.target.value})} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all" placeholder="e.g. 5m 19sec" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Year</label>
+                  <input type="number" value={editForm.year} onChange={e => setEditForm({...editForm, year: parseInt(e.target.value) || 2026})} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Video URL</label>
+                <input value={editForm.video_url} onChange={e => setEditForm({...editForm, video_url: e.target.value})} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all" placeholder="YouTube or Vimeo link" />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Poster URL</label>
+                <input value={editForm.poster_url} onChange={e => setEditForm({...editForm, poster_url: e.target.value})} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all" placeholder="Direct image URL" />
+              </div>
+            </div>
+            <div className="px-6 py-4 border-t border-white/[0.06] flex justify-end gap-3">
+              <button onClick={() => setEditing(false)} className="px-5 py-2.5 text-sm text-white/40 hover:text-white transition-colors">Cancel</button>
+              <button onClick={saveEdit} disabled={editSaving} className="flex items-center gap-2 px-6 py-2.5 bg-white text-black text-sm font-bold rounded-xl hover:bg-white/90 disabled:opacity-30 transition-all">
+                {editSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                {editSaving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* FOOTER */}
-      <footer className="py-8 md:py-12 px-4 md:px-6 border-t border-white/[0.03][0.04]"><div className="max-w-[1400px] mx-auto text-center"><span className="text-lg font-semibold tracking-[0.18em] text-white">spike AI</span><p className="text-white/20 text-xs mt-4">&copy; {new Date().getFullYear()} Spike AI. The home for AI-generated cinema.</p><div className="flex justify-center gap-4 mt-3 text-[11px] text-white/15"><a href="/terms" className="hover:text-white/30 transition-colors">Terms</a><a href="/privacy" className="hover:text-white/30 transition-colors">Privacy</a><a href="/community-guidelines" className="hover:text-white/30 transition-colors">Guidelines</a></div></div></footer>
+      <footer className="py-8 md:py-12 px-4 md:px-6 border-t border-white/[0.04]"><div className="max-w-[1400px] mx-auto text-center"><span className="text-lg font-semibold tracking-[0.18em] text-white">spike AI</span><p className="text-white/20 text-xs mt-4">&copy; {new Date().getFullYear()} Spike AI. The home for AI-generated cinema.</p><div className="flex justify-center gap-4 mt-3 text-[11px] text-white/15"><a href="/terms" className="hover:text-white/30 transition-colors">Terms</a><a href="/privacy" className="hover:text-white/30 transition-colors">Privacy</a><a href="/community-guidelines" className="hover:text-white/30 transition-colors">Guidelines</a></div></div></footer>
 
       {shareMsg && (<div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[600] px-5 py-3 rounded-xl bg-[#1a1a1e]/95 backdrop-blur-2xl border border-white/[0.08] shadow-2xl" style={{ animation: "fadeInUp 0.3s cubic-bezier(0.22,1,0.36,1)" }}><span className="text-[13px] font-medium tracking-wide text-white/80 flex items-center gap-2"><Check size={14} className="text-green-400" />{shareMsg}</span></div>)}
     </div>
