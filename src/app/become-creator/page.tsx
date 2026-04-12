@@ -136,7 +136,7 @@ export default function BecomeCreatorPage() {
         </button>
       </nav>
 
-      <div className="relative z-10 max-w-lg mx-auto px-6 pb-20">
+      <div className="relative z-10 w-full max-w-lg mx-auto px-6 pb-20" style={{ marginLeft: "auto", marginRight: "auto" }}>
         <div className="text-center mb-12">
           <div className="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/15 flex items-center justify-center mx-auto mb-6">
             <Sparkles size={28} className="text-purple-400" />
