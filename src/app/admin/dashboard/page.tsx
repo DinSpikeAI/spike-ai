@@ -78,9 +78,11 @@ export default function AdminDashboard() {
   const [newNotif, setNewNotif] = useState("");
   const [showNotifPanel, setShowNotifPanel] = useState(false);
   const [showUsers, setShowUsers] = useState(false);
-  const [activeTab, setActiveTab] = useState("films")  // films | creators | analytics;
+  const [activeTab, setActiveTab] = useState("films")  // films | creators | analytics | requests;
   const [creators, setCreators] = useState([]);
   const [creatorsLoading, setCreatorsLoading] = useState(false);
+  const [creatorRequests, setCreatorRequests] = useState<any[]>([]);
+  const [requestsLoading, setRequestsLoading] = useState(false);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const [smartNotifs, setSmartNotifs] = useState([]);
   const [lastSeenNotif, setLastSeenNotif] = useState("");
@@ -175,8 +177,35 @@ export default function AdminDashboard() {
   const markAllRead = () => { const now = new Date().toISOString(); setLastSeenNotif(now); localStorage.setItem("spike_last_seen_notif", now); };
 
   useEffect(() => {
-    if (!authChecking && isAdmin) { fetchMovies(); fetchStats(); fetchCreators(); }
+    if (!authChecking && isAdmin) { fetchMovies(); fetchStats(); fetchCreators(); fetchRequests(); }
   }, [isAdmin, authChecking, fetchMovies, fetchStats]);
+
+  const fetchRequests = async () => {
+    if (!supabase) return;
+    setRequestsLoading(true);
+    const { data } = await supabase
+      .from("profiles")
+      .select("id, display_name, email, bio, website, social_x, social_youtube, social_instagram, sample_work_url, avatar_url, creator_request, created_at")
+      .eq("creator_request", "pending")
+      .order("created_at", { ascending: false });
+    if (data) setCreatorRequests(data);
+    setRequestsLoading(false);
+  };
+
+  const approveCreator = async (id: string, name: string) => {
+    if (!supabase) return;
+    await supabase.from("profiles").update({ user_type: "creator", creator_request: "approved" }).eq("id", id);
+    showToast(name + " approved as creator!");
+    setCreatorRequests(prev => prev.filter(r => r.id !== id));
+    fetchCreators();
+  };
+
+  const rejectCreator = async (id: string, name: string) => {
+    if (!supabase) return;
+    await supabase.from("profiles").update({ creator_request: "rejected" }).eq("id", id);
+    showToast(name + " rejected");
+    setCreatorRequests(prev => prev.filter(r => r.id !== id));
+  };
 
   /* ── Notifications CRUD ── */
   const fetchNotifs = useCallback(async () => {
@@ -434,6 +463,7 @@ export default function AdminDashboard() {
           <button onClick={() => setActiveTab("films")} className={"px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all cursor-pointer " + (activeTab === "films" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50")}><Film size={14} className="inline mr-2" />Films ({movies.length})</button>
           <button onClick={() => setActiveTab("creators")} className={"px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all cursor-pointer " + (activeTab === "creators" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50")}><Users size={14} className="inline mr-2" />Creators ({creators.length})</button>
           <button onClick={() => setActiveTab("analytics")} className={"px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all cursor-pointer " + (activeTab === "analytics" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50")}><Sparkles size={14} className="inline mr-2" />Analytics</button>
+          <button onClick={() => setActiveTab("requests")} className={"px-5 py-2.5 rounded-xl text-[13px] font-bold tracking-wide transition-all cursor-pointer " + (activeTab === "requests" ? "bg-white/[0.08] text-white border border-white/[0.1]" : "text-white/30 hover:text-white/50") + (creatorRequests.length > 0 ? " ring-1 ring-purple-500/30" : "")}><Inbox size={14} className="inline mr-2" />Requests{creatorRequests.length > 0 && <span className="ml-1.5 w-5 h-5 rounded-full bg-purple-500/20 inline-flex items-center justify-center text-[10px] font-black text-purple-300">{creatorRequests.length}</span>}</button>
         </div>
 
         {/* CREATORS TAB */}
@@ -471,6 +501,69 @@ export default function AdminDashboard() {
               <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-5"><h3 className="text-[13px] font-bold text-white/70 mb-4 flex items-center gap-2"><Sparkles size={14} className="text-cyan-400" /> AI Tools</h3><div className="space-y-2">{(()=>{const t={};movies.filter(m=>m.status==="approved").forEach(m=>{(m.ai_models||[]).forEach(x=>{t[x]=(t[x]||0)+1;});});const total=Object.values(t).reduce((s,v)=>s+v,0);const c=["bg-cyan-400","bg-violet-400","bg-emerald-400","bg-amber-400","bg-rose-400"];return Object.entries(t).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([tool,count],i)=>(<div key={tool} className="flex items-center gap-3"><p className="text-[12px] text-white/50 w-28 truncate">{tool}</p><div className="flex-1 h-2 bg-white/[0.04] rounded-full overflow-hidden"><div className={"h-full rounded-full "+c[i%c.length]} style={{width:(total>0?(count/total*100):0)+"%"}}></div></div><span className="text-[11px] text-white/30 w-8 text-right">{count}</span></div>));})()}</div></div>
               <div className="bg-[#111114] border border-white/[0.06] rounded-2xl p-5 lg:col-span-2"><h3 className="text-[13px] font-bold text-white/70 mb-4 flex items-center gap-2"><Clock size={14} className="text-white/40" /> Recent Activity</h3><div className="space-y-1">{(()=>{const ev=[];movies.slice(0,10).forEach(m=>{ev.push({time:m.created_at,text:(m.status==="pending"?"Submitted":m.status==="approved"?"Approved":"Rejected")+": "+m.title,type:m.status});});recentUsers.slice(0,5).forEach(u=>{ev.push({time:u.created_at,text:"New user: "+u.email,type:"user"});});ev.sort((a,b)=>new Date(b.time)-new Date(a.time));return ev.slice(0,12).map((e,i)=>(<div key={i} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/[0.02]"><div className={"w-2 h-2 rounded-full flex-shrink-0 "+(e.type==="approved"?"bg-green-400":e.type==="pending"?"bg-yellow-400":e.type==="rejected"?"bg-red-400":"bg-purple-400")}></div><p className={"text-[12px] flex-1 truncate "+(e.type==="approved"?"text-green-400/70":e.type==="pending"?"text-yellow-400/70":e.type==="user"?"text-purple-400/70":"text-red-400/70")}>{e.text}</p><p className="text-[10px] text-white/15 flex-shrink-0">{new Date(e.time).toLocaleDateString("en-GB",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}</p></div>));})()}</div></div>
             </div>
+          </div>
+        )}
+
+        {/* REQUESTS TAB */}
+        {activeTab === "requests" && (
+          <div className="space-y-4">
+            {requestsLoading ? (
+              <div className="flex items-center justify-center py-20"><Loader2 size={24} className="animate-spin text-white/20" /></div>
+            ) : creatorRequests.length === 0 ? (
+              <div className="text-center py-20">
+                <Inbox size={32} className="text-white/10 mx-auto mb-4" />
+                <p className="text-white/20">No pending requests</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {creatorRequests.map(r => (
+                  <div key={r.id} className="bg-[#111114] border border-purple-500/10 rounded-2xl p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border border-white/10">
+                        {r.avatar_url ? (
+                          <img src={r.avatar_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-purple-900 to-purple-700 flex items-center justify-center text-sm font-bold text-white">
+                            {(r.display_name || "?")[0].toUpperCase()}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-bold text-white">{r.display_name || "No name"}</h3>
+                        <p className="text-xs text-white/30">{r.email}</p>
+                        {r.bio && <p className="text-sm text-white/50 mt-2 leading-relaxed">{r.bio}</p>}
+                        {r.sample_work_url && (
+                          <a href={r.sample_work_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-3 text-xs text-purple-400 hover:text-purple-300 transition-colors">
+                            <Film size={12} /> View their work →
+                          </a>
+                        )}
+                        <div className="flex flex-wrap gap-3 mt-3 text-[11px] text-white/20">
+                          {r.website && <span>🌐 {r.website}</span>}
+                          {r.social_x && <span>𝕏 {r.social_x}</span>}
+                          {r.social_youtube && <span>▶ {r.social_youtube}</span>}
+                          {r.social_instagram && <span>📷 {r.social_instagram}</span>}
+                        </div>
+                        <p className="text-[10px] text-white/10 mt-2">Applied {new Date(r.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</p>
+                      </div>
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <button
+                          onClick={() => approveCreator(r.id, r.display_name)}
+                          className="px-5 py-2 bg-green-500/15 border border-green-500/30 text-green-400 text-xs font-bold rounded-lg hover:bg-green-500/25 transition-all"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => rejectCreator(r.id, r.display_name)}
+                          className="px-5 py-2 bg-white/[0.04] border border-white/[0.08] text-white/40 text-xs font-medium rounded-lg hover:text-red-400 hover:border-red-500/30 transition-all"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

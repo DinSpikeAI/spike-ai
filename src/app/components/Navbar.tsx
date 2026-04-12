@@ -121,7 +121,7 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
             { label: "My List", href: "/my-list" },
             { label: "Creators", href: "/creators" },
             ...(isCreator ? [{ label: "Submit Film", href: "/submit", special: true }] : []),
-            ...(!isCreator ? [{ label: "Join as Creator", href: "/spike_apply_en.html", special: true }] : []),
+            ...(!isCreator ? [{ label: "Join as Creator", href: "/become-creator", special: true }] : []),
           ].map((link) => (
             link.special ? (
               <a key={link.label} href={link.href} className="text-[12.5px] font-medium tracking-[0.04em] px-5 py-1.5 rounded-full border border-white/30 text-white/70 hover:bg-white/10 hover:text-white transition-all duration-300 ml-1">{link.label}</a>
@@ -346,7 +346,7 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
                 { label: "My List", href: "/my-list", icon: "📋" },
                 { label: "Creators", href: "/creators", icon: "🎭" },
                 ...(isCreator ? [{ label: "Submit Film", href: "/submit", icon: "🎥" }] : []),
-                ...(!isCreator ? [{ label: "Join as Creator", href: "/spike_apply_en.html", icon: "⭐" }] : []),
+                ...(!isCreator ? [{ label: "Join as Creator", href: "/become-creator", icon: "⭐" }] : []),
               ].map((item) => (
                 <a key={item.label} href={item.href} className="flex items-center gap-3 px-5 py-3.5 text-white/60 hover:text-white hover:bg-white/[0.04] transition-colors" onClick={() => setShowMobileMenu(false)}>
                   <span className="text-base">{item.icon}</span>
