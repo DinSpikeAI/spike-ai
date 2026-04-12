@@ -58,6 +58,7 @@ export default function SubmitPage() {
     trailer_url: '', poster_url: '', tagline: '', series_name: '', episode_number: '',
   })
   const [selectedModels, setSelectedModels] = useState<string[]>([])
+  const [selectedGenres, setSelectedGenres] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [cooldown, setCooldown] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -84,7 +85,11 @@ export default function SubmitPage() {
     checkAccess()
   }, [])
 
-  const isValid = !!(form.title && form.description && form.genre && form.category && form.creator_name)
+  const isValid = !!(form.title && form.description && selectedGenres.length > 0 && form.category && form.creator_name)
+
+  const toggleGenre = (genre: string) => {
+    setSelectedGenres(prev => prev.includes(genre) ? prev.filter(g => g !== genre) : prev.length < 2 ? [...prev, genre] : prev)
+  }
 
   const toggleModel = (model: string) => {
     setSelectedModels(prev => prev.includes(model) ? prev.filter(m => m !== model) : [...prev, model])
@@ -105,7 +110,7 @@ export default function SubmitPage() {
       const missing: string[] = []
       if (!form.title) missing.push('Title')
       if (!form.description) missing.push('Description')
-      if (!form.genre) missing.push('Genre')
+      if (selectedGenres.length === 0) missing.push('Genre')
       if (!form.category) missing.push('Category')
       if (!form.creator_name) missing.push('Creator')
       setToast({ message: `Missing: ${missing.join(', ')}`, type: 'warning' })
@@ -115,7 +120,7 @@ export default function SubmitPage() {
     try {
       if (!supabase) throw new Error('Service unavailable')
       const { error } = await supabase.from('movies').insert({
-        title: form.title, description: form.description, genre: form.genre,
+        title: form.title, description: form.description, genre: selectedGenres.join(', '),
         category: form.category, duration: form.duration || null,
         creator_name: form.creator_name, video_url: form.video_url || null,
         trailer_url: form.trailer_url || null, poster_url: form.poster_url || null,
@@ -295,7 +300,19 @@ export default function SubmitPage() {
               <TextareaField label="Description" required placeholder="Story, vision, what makes it unique..." value={form.description} onChange={v => update('description', v)} rows={4} />
               <InputField label="Tagline" placeholder="A short catchy line for the hero card" value={form.tagline} onChange={v => update('tagline', v)} />
               <div className="grid grid-cols-2 gap-4">
-                <SelectField label="Genre" required value={form.genre} onChange={v => update('genre', v)} options={GENRES} placeholder="Select genre" />
+                <div>
+                  <label className="block text-[9px] font-bold tracking-[0.2em] text-white/15 uppercase mb-3">Genre * <span className="text-white/10 normal-case tracking-normal">(up to 2)</span></label>
+                  <div className="flex flex-wrap gap-2">
+                    {GENRES.map(genre => (
+                      <button key={genre} type="button" onClick={() => toggleGenre(genre)}
+                        className={"px-3.5 py-2 rounded-xl text-[12px] font-medium border transition-all cursor-pointer " + (selectedGenres.includes(genre) ? "bg-violet-500/20 border-violet-500/40 text-violet-300" : "bg-white/[0.02] border-white/[0.06] text-white/30 hover:text-white/60 hover:border-white/15")}
+                      >
+                        {selectedGenres.includes(genre) && <span className="mr-1 text-violet-400">✓</span>}
+                        {genre}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <SelectField label="Category" required value={form.category} onChange={v => update('category', v)} options={CATEGORIES} placeholder="Select category" />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -376,10 +393,10 @@ export default function SubmitPage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0c0c14] via-transparent to-transparent" />
 
                   {/* Genre badge */}
-                  {form.genre && (
+                  {selectedGenres.length > 0 && (
                     <div className="absolute top-3 left-3">
                       <span className="px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider text-violet-300 border border-violet-500/20">
-                        {form.genre}
+                        {selectedGenres.join(' / ')}
                       </span>
                     </div>
                   )}
@@ -442,7 +459,7 @@ export default function SubmitPage() {
                       </span>
                     </div>
                     <span className="text-[10px] text-white/10">
-                      {[form.title, form.description, form.genre, form.category, form.creator_name].filter(Boolean).length}/5
+                      {[form.title, form.description, selectedGenres.length > 0 ? 'yes' : '', form.category, form.creator_name].filter(Boolean).length}/5
                     </span>
                   </div>
                 </div>
