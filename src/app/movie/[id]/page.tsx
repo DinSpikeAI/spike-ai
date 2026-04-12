@@ -91,7 +91,6 @@ export default function MoviePage() {
   const [popAnim, setPopAnim] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [dbMovies, setDbMovies] = useState<Movie[]>([]);
-  const [creatorProfile, setCreatorProfile] = useState<any>(null);
   const [seriesEpisodes, setSeriesEpisodes] = useState<any[]>([]);
   const [isOwner, setIsOwner] = useState(false);
   const [editing, setEditing] = useState(false);
