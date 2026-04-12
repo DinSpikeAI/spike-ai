@@ -330,9 +330,9 @@ export default function AuthPage() {
                         />
                         <span className="text-[11px] text-white/25 leading-[1.6] group-hover:text-white/35 transition-colors">
                           I agree to the{" "}
-                          <a href="/terms" target="_blank" className="text-purple-400/60 hover:text-purple-400/80 underline">Terms of Service</a>
+                          <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-purple-400/60 hover:text-purple-400/80 underline">Terms of Service</a>
                           {" "}and{" "}
-                          <a href="/privacy" target="_blank" className="text-purple-400/60 hover:text-purple-400/80 underline">Privacy Policy</a>.
+                          <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-purple-400/60 hover:text-purple-400/80 underline">Privacy Policy</a>.
                           I confirm I am at least 18 years old.
                         </span>
                       </label>
@@ -359,9 +359,9 @@ export default function AuthPage() {
                     {view !== "signup" && (
                       <p className="text-[10px] text-white/10 text-center mt-3">
                         By continuing, you agree to our{" "}
-                        <a href="/terms" target="_blank" className="text-white/20 hover:text-white/30 underline">Terms</a>
+                        <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-white/30 underline">Terms</a>
                         {" "}and{" "}
-                        <a href="/privacy" target="_blank" className="text-white/20 hover:text-white/30 underline">Privacy Policy</a>.
+                        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-white/30 underline">Privacy Policy</a>.
                       </p>
                     )}
                   </div>
