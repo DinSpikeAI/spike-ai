@@ -94,7 +94,7 @@ export default function BecomeCreatorPage() {
     setSubmitting(false);
   };
 
-  const inputClass = "w-full px-5 py-[15px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[15px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 focus:bg-white/[0.07] focus:shadow-[0_0_25px_rgba(139,92,246,0.1)] transition-all duration-300";
+  const inputClass = "w-full px-5 py-[17px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[15px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 focus:bg-white/[0.07] focus:shadow-[0_0_25px_rgba(139,92,246,0.1)] transition-all duration-300";
 
   const Shell = ({ children }: { children: React.ReactNode }) => (
     <div className="min-h-screen bg-[#07070a] flex flex-col relative overflow-hidden">
@@ -185,29 +185,29 @@ export default function BecomeCreatorPage() {
 
   return (
     <Shell>
-      <div className="w-full max-w-[560px] text-center">
+      <div className="w-full max-w-[680px] text-center">
 
         {/* Title */}
         <h1 className="text-[46px] md:text-[58px] font-bold tracking-[-0.03em] leading-[1.06] text-white mb-3"
           style={{ textShadow: "0 0 80px rgba(139, 92, 246, 0.15)" }}>
-          Become a creator.
+          Creator Registration
         </h1>
-        <p className="text-[16px] text-white/25 mb-10">Join as a Pioneer Creator and share your AI films.</p>
+        <p className="text-[16px] text-white/25 mb-10">Apply to join Spike AI as a Pioneer Creator. Share your AI films with a global audience.</p>
 
         {/* ═══ Form Card ═══ */}
-        <div className="max-w-[520px] mx-auto">
+        <div className="max-w-[640px] mx-auto">
           <div className="relative rounded-2xl overflow-hidden">
             <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-violet-500/25 via-blue-500/15 to-pink-500/15" />
-            <div className="relative rounded-2xl bg-[#0c0c14]/95 backdrop-blur-2xl p-8">
+            <div className="relative rounded-2xl bg-[#0c0c14]/95 backdrop-blur-2xl p-10">
 
               {/* Avatar Upload */}
               <div className="flex justify-center mb-8">
                 <div className="relative group">
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/[0.1] shadow-xl shadow-black/40 group-hover:border-violet-400/30 transition-all duration-300">
+                  <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-white/[0.1] shadow-xl shadow-black/40 group-hover:border-violet-400/30 transition-all duration-300">
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-violet-800 to-indigo-900 flex items-center justify-center text-2xl font-bold text-white/30">{initial}</div>
+                      <div className="w-full h-full bg-gradient-to-br from-violet-800 to-indigo-900 flex items-center justify-center text-3xl font-bold text-white/30">{initial}</div>
                     )}
                   </div>
                   <button
@@ -234,7 +234,7 @@ export default function BecomeCreatorPage() {
                 {/* Bio */}
                 <div>
                   <label className="block text-[11px] font-semibold tracking-[0.2em] text-violet-300/35 uppercase mb-2.5 ml-1">About You *</label>
-                  <textarea value={bio} onChange={(e) => { setBio(e.target.value); setError(null); }} rows={3}
+                  <textarea value={bio} onChange={(e) => { setBio(e.target.value); setError(null); }} rows={4}
                     placeholder="Tell us about your work with AI cinema..."
                     className={inputClass + " resize-none"} />
                 </div>
@@ -265,17 +265,17 @@ export default function BecomeCreatorPage() {
                   <div>
                     <label className="block text-[10px] font-semibold tracking-[0.15em] text-violet-300/25 uppercase mb-2 ml-1">X</label>
                     <input value={socialX} onChange={(e) => setSocialX(e.target.value)} placeholder="@handle"
-                      className="w-full px-3.5 py-[13px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 transition-all duration-300" />
+                      className="w-full px-3.5 py-[15px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 transition-all duration-300" />
                   </div>
                   <div>
                     <label className="block text-[10px] font-semibold tracking-[0.15em] text-violet-300/25 uppercase mb-2 ml-1">YouTube</label>
                     <input value={socialYoutube} onChange={(e) => setSocialYoutube(e.target.value)} placeholder="@channel"
-                      className="w-full px-3.5 py-[13px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 transition-all duration-300" />
+                      className="w-full px-3.5 py-[15px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 transition-all duration-300" />
                   </div>
                   <div>
                     <label className="block text-[10px] font-semibold tracking-[0.15em] text-violet-300/25 uppercase mb-2 ml-1">Instagram</label>
                     <input value={socialInstagram} onChange={(e) => setSocialInstagram(e.target.value)} placeholder="@user"
-                      className="w-full px-3.5 py-[13px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 transition-all duration-300" />
+                      className="w-full px-3.5 py-[15px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 transition-all duration-300" />
                   </div>
                 </div>
 
