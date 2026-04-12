@@ -19,6 +19,7 @@ import {
   Share2,
   Cpu,
   Flame,
+  Film,
   Trash2,
   Pencil,
   Shield,
