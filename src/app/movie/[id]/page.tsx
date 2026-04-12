@@ -51,7 +51,7 @@ function getEmbedUrl(url: string, quality: "auto" | "hd" | "4k"): string | null 
    MOVIE DATA (standalone fallback)
    ═══════════════════════════════════════════════════════════════ */
 
-interface Movie { id: string; title: string; year: number; rating: number; duration: string; poster: string; image?: string; aiModels: string[]; genre?: string; description?: string; tagline?: string; maturity?: string; director?: string; creator?: string; creator_name?: string; video_url?: string; upvotes_count?: number; }
+interface Movie { id: string; title: string; year: number; rating: number; duration: string; poster: string; image?: string; aiModels: string[]; genre?: string; description?: string; tagline?: string; maturity?: string; director?: string; creator?: string; creator_name?: string; video_url?: string; upvotes_count?: number; series_name?: string; episode_number?: number; }
 interface Creator { id: string; name: string; bio: string; avatar: string; followers: number; films: number; joined: string; specialties: string[]; }
 
 const CREATORS: Creator[] = [
@@ -108,7 +108,7 @@ export default function MoviePage() {
       if (supabase && looksLikeUuid) {
         const { data, error } = await supabase.from("movies").select("*").eq("id", movieId).single();
         if (!error && data) {
-          setMovie({ id: data.id, title: data.title, year: data.year || 2026, rating: Number(data.rating) || 0, duration: data.duration || "", poster: getSmartPoster(data.poster_url, data.video_url, data.id), image: getSmartHeroImage(data.hero_image, data.video_url, data.poster_url, data.id), aiModels: data.ai_models || [], genre: data.genre || "Sci-Fi", description: data.description || "", tagline: data.tagline || "", maturity: data.maturity || "16+", director: data.creator_name || "AI Creator", creator_name: data.creator_name || "", video_url: data.video_url, upvotes_count: data.upvotes_count || 0 });
+          setMovie({ id: data.id, title: data.title, year: data.year || 2026, rating: Number(data.rating) || 0, duration: data.duration || "", poster: getSmartPoster(data.poster_url, data.video_url, data.id), image: getSmartHeroImage(data.hero_image, data.video_url, data.poster_url, data.id), aiModels: data.ai_models || [], genre: data.genre || "Sci-Fi", description: data.description || "", tagline: data.tagline || "", maturity: data.maturity || "16+", director: data.creator_name || "AI Creator", creator_name: data.creator_name || "", video_url: data.video_url, upvotes_count: data.upvotes_count || 0, series_name: data.series_name || undefined, episode_number: data.episode_number || undefined });
           setVotes(data.upvotes_count || 0);
           setIsDbMovie(true);
           // Load series episodes
@@ -173,6 +173,7 @@ export default function MoviePage() {
           duration: row.duration || "", poster: getSmartPoster(row.poster_url, row.video_url, row.id),
           aiModels: row.ai_models || [], genre: row.genre || "", description: row.description || "",
           video_url: row.video_url || undefined, upvotes_count: row.upvotes_count || 0,
+          series_name: row.series_name || undefined, episode_number: row.episode_number || undefined,
         })));
       }
     }
@@ -218,9 +219,17 @@ export default function MoviePage() {
 
   const creator = movie ? getCreatorForMovie(movie) : null;
   const moviesPool = dbMovies.length > 0 ? dbMovies : ALL_MOVIES;
-  const similarMovies = movie ? moviesPool.filter(m => m.id !== movie.id && m.genre === movie.genre).slice(0, 10) : [];
-  const otherMovies = movie ? moviesPool.filter(m => m.id !== movie.id) : [];
-  const upNextMovie = otherMovies.length > 0 ? otherMovies[0] : null;
+
+  // Up Next: next episode if series, otherwise random
+  const nextEpisode = movie?.series_name && seriesEpisodes.length > 0
+    ? seriesEpisodes.find((ep: any) => (ep.episode_number || 0) > (movie.episode_number || 0))
+    : null;
+  const upNextMovie = nextEpisode
+    ? { id: nextEpisode.id, title: nextEpisode.title, year: nextEpisode.year || 2026, rating: Number(nextEpisode.rating) || 0, duration: nextEpisode.duration || "", poster: getSmartPoster(nextEpisode.poster_url, nextEpisode.video_url, nextEpisode.id), genre: nextEpisode.genre || "", aiModels: [], upvotes_count: 0 }
+    : (() => { const other = moviesPool.filter(m => m.id !== movie?.id && !(movie?.series_name && (m as any).series_name === movie.series_name)); return other.length > 0 ? other[0] : null; })();
+
+  // Similar: exclude same series episodes
+  const similarMovies = movie ? moviesPool.filter(m => m.id !== movie.id && m.genre === movie.genre && !(movie.series_name && (m as any).series_name === movie.series_name)).slice(0, 10) : [];
   const embedUrl = movie?.video_url ? getEmbedUrl(movie.video_url, quality) : null;
   const scrollSimilar = (dir: "left" | "right") => { scrollRef.current?.scrollBy({ left: dir === "left" ? -400 : 400, behavior: "smooth" }); };
 
@@ -367,7 +376,7 @@ export default function MoviePage() {
       )}
 
       {/* UP NEXT */}
-      {upNextMovie && (<section className="py-6 md:py-8 px-4 md:px-6"><div className="max-w-[1400px] mx-auto"><h2 className="text-lg font-bold mb-4 flex items-center gap-2"><SkipForward size={18} className="text-white" />Up Next</h2><div onClick={() => router.push(`/movie/${upNextMovie.id}`)} className="flex items-center gap-4 md:gap-6 bg-white/[0.03] border border-white/[0.04] hover:border-white/15 rounded-xl p-3 md:p-4 cursor-pointer transition-all group"><div className="relative w-[70px] md:w-[90px] flex-shrink-0 aspect-[2/3] rounded-lg overflow-hidden"><img src={upNextMovie.poster} alt={upNextMovie.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" /><div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Play size={14} fill="white" className="text-white ml-0.5" /></div></div></div><div className="flex-1 min-w-0"><p className="text-xs text-white/20 uppercase tracking-wider font-medium mb-1">Playing Next</p><h3 className="text-base md:text-lg font-bold text-white truncate group-hover:text-white transition-colors">{upNextMovie.title}</h3><div className="flex items-center gap-2 mt-1"><span className="text-yellow-400 text-xs flex items-center gap-0.5"><Star size={10} fill="currentColor" />{upNextMovie.rating}</span><span className="text-white/20 text-xs">{upNextMovie.year} · {upNextMovie.genre} · {upNextMovie.duration}</span></div></div><div className="flex-shrink-0 hidden sm:flex"><button className="flex items-center gap-2 px-5 py-2.5 bg-white text-black rounded-lg font-semibold text-sm hover:bg-white/80 transition-all"><Play size={14} fill="white" />Play Next</button></div></div></div></section>)}
+      {upNextMovie && (<section className="py-6 md:py-8 px-4 md:px-6"><div className="max-w-[1400px] mx-auto"><h2 className="text-lg font-bold mb-4 flex items-center gap-2"><SkipForward size={18} className="text-white" />Up Next</h2><div onClick={() => router.push(`/movie/${upNextMovie.id}`)} className="flex items-center gap-4 md:gap-6 bg-white/[0.03] border border-white/[0.04] hover:border-white/15 rounded-xl p-3 md:p-4 cursor-pointer transition-all group"><div className="relative w-[70px] md:w-[90px] flex-shrink-0 aspect-[2/3] rounded-lg overflow-hidden"><img src={upNextMovie.poster} alt={upNextMovie.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" /><div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Play size={14} fill="white" className="text-white ml-0.5" /></div></div></div><div className="flex-1 min-w-0"><p className="text-xs text-white/20 uppercase tracking-wider font-medium mb-1">{nextEpisode ? `Episode ${nextEpisode.episode_number}` : "Playing Next"}</p><h3 className="text-base md:text-lg font-bold text-white truncate group-hover:text-white transition-colors">{upNextMovie.title}</h3><div className="flex items-center gap-2 mt-1"><span className="text-yellow-400 text-xs flex items-center gap-0.5"><Star size={10} fill="currentColor" />{upNextMovie.rating}</span><span className="text-white/20 text-xs">{upNextMovie.year} · {upNextMovie.genre} · {upNextMovie.duration}</span></div></div><div className="flex-shrink-0 hidden sm:flex"><button className="flex items-center gap-2 px-5 py-2.5 bg-white text-black rounded-lg font-semibold text-sm hover:bg-white/80 transition-all"><Play size={14} fill="white" />Play Next</button></div></div></div></section>)}
 
       {/* MORE LIKE THIS */}
       {similarMovies.length > 0 && (<section className="py-8 md:py-12 px-4 md:px-6"><div className="max-w-[1400px] mx-auto"><h2 className="text-xl font-semibold mb-6 flex items-center gap-2"><Sparkles size={18} className="text-white" />More Like This</h2><div className="relative group"><button onClick={() => scrollSimilar("left")} className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/80 border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"><ChevronLeft size={20} /></button><button onClick={() => scrollSimilar("right")} className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/80 border border-white/10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"><ChevronRight size={20} /></button><div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: "none" }}>{similarMovies.map(m => (<div key={m.id} onClick={() => router.push(`/movie/${m.id}`)} className="flex-shrink-0 w-[130px] md:w-[180px] cursor-pointer group/card"><div className="relative aspect-[2/3] rounded-lg overflow-hidden mb-2 border border-white/[0.04] group-hover/card:border-white/20 transition-all duration-300"><img src={m.poster} alt={m.title} className="w-full h-full object-cover transition-transform duration-500 group-hover/card:scale-110" /><div className="absolute inset-0 bg-black/0 group-hover/card:bg-black/50 transition-all flex items-center justify-center"><div className="w-12 h-12 rounded-full bg-white flex items-center justify-center opacity-0 group-hover/card:opacity-100 scale-75 group-hover/card:scale-100 transition-all shadow-lg shadow-black/30"><Play size={20} fill="white" className="text-white ml-0.5" /></div></div></div><p className="text-sm font-medium text-white/80 group-hover/card:text-white transition-colors truncate">{m.title}</p><div className="flex items-center gap-2 mt-1"><span className="text-yellow-400 text-xs flex items-center gap-0.5"><Star size={10} fill="currentColor" />{m.rating}</span><span className="text-white/20 text-xs">{m.year}</span></div></div>))}</div></div></div></section>)}
