@@ -10,6 +10,7 @@ export interface Movie {
   description?: string;
   creator?: string;
   upvotes_count: number;
+  view_count?: number;
   video_url?: string;
   sort_order?: number;
   series_name?: string;

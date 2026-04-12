@@ -212,6 +212,7 @@ export default function HomePage() {
             genre: row.genre || "",
             description: row.description || "",
             upvotes_count: row.upvotes_count || 0,
+            view_count: row.view_count || 0,
             video_url: row.video_url || undefined,
             sort_order: row.sort_order || 0,
             series_name: row.series_name || undefined,

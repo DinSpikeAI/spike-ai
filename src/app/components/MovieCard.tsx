@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Play, Star, Clock, Flame, Trash2, Pencil, Bookmark, Share2,
+  Play, Star, Clock, Flame, Trash2, Pencil, Bookmark, Share2, Eye,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Movie } from "./types";
@@ -216,6 +216,7 @@ export default function MovieCard({
         <h4 className="text-[13px] font-semibold tracking-wide text-white leading-tight mb-1">{movie.title}</h4>
         <div className="flex items-center gap-1.5 text-[10px] font-light tracking-wider text-white/35 mb-2">
           <Clock size={9} />{movie.duration}{movie.genre && <span>· {movie.genre}</span>}
+          {movie.view_count ? <span>· <Eye size={9} /> {movie.view_count.toLocaleString()}</span> : null}
         </div>
         <div className="flex flex-wrap gap-1">
           {movie.aiModels.slice(0, 2).map((model) => (

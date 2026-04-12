@@ -6,7 +6,7 @@ import {
   Play, ArrowLeft, Plus, Share2, X,
   Star, Clock, Cpu, ChevronLeft, ChevronRight,
   Sparkles, ExternalLink, Flame, SkipForward,
-  Check, Film, Pencil, Save, Loader2,
+  Check, Film, Pencil, Save, Loader2, Eye,
 } from "lucide-react";
 import { supabase, getSmartPoster, getSmartHeroImage } from "@/lib/supabase";
 
@@ -96,6 +96,7 @@ export default function MoviePage() {
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<any>(null);
   const [editSaving, setEditSaving] = useState(false);
+  const [viewCount, setViewCount] = useState(0);
 
   useEffect(() => { if (window.innerWidth >= 3840) setQuality("4k"); }, []);
 
@@ -110,6 +111,7 @@ export default function MoviePage() {
         if (!error && data) {
           setMovie({ id: data.id, title: data.title, year: data.year || 2026, rating: Number(data.rating) || 0, duration: data.duration || "", poster: getSmartPoster(data.poster_url, data.video_url, data.id), image: getSmartHeroImage(data.hero_image, data.video_url, data.poster_url, data.id), aiModels: data.ai_models || [], genre: data.genre || "Sci-Fi", description: data.description || "", tagline: data.tagline || "", maturity: data.maturity || "16+", director: data.creator_name || "AI Creator", creator_name: data.creator_name || "", video_url: data.video_url, upvotes_count: data.upvotes_count || 0, series_name: data.series_name || undefined, episode_number: data.episode_number || undefined });
           setVotes(data.upvotes_count || 0);
+          setViewCount(data.view_count || 0);
           setIsDbMovie(true);
           // Load series episodes
           if (data.series_name) {
@@ -139,6 +141,24 @@ export default function MoviePage() {
     }
     load();
   }, [movieId]);
+
+  // ── Record View (dedup: 1 per user/session per 24h) ──
+  useEffect(() => {
+    if (!supabase || !isDbMovie || !movie) return;
+    async function recordView() {
+      const { data: { session } } = await supabase!.auth.getSession();
+      const sessionId = session?.user?.id ? null : (sessionStorage.getItem("spike_session") || (() => { const id = crypto.randomUUID(); sessionStorage.setItem("spike_session", id); return id; })());
+      try {
+        const { data } = await supabase!.rpc("record_view", {
+          p_movie_id: movieId,
+          p_user_id: session?.user?.id || null,
+          p_session_id: sessionId,
+        });
+        if (typeof data === "number") setViewCount(data);
+      } catch {}
+    }
+    recordView();
+  }, [movieId, isDbMovie, movie]);
 
   // ── Load User Data ──
   useEffect(() => {
@@ -325,6 +345,7 @@ export default function MoviePage() {
                 <span className="text-white/40 text-sm">{movie.year}</span>
                 <span className="inline-flex items-center justify-center w-8 h-5 border border-white/20 rounded text-[10px] font-semibold text-white/50">{movie.maturity || "16+"}</span>
                 <span className="text-white/40 text-sm flex items-center gap-1"><Clock size={12} />{movie.duration}</span>
+                {viewCount > 0 && <span className="text-white/40 text-sm flex items-center gap-1"><Eye size={12} />{viewCount.toLocaleString()} views</span>}
                 
                 {movie.rating > 0 && <div className="flex items-center gap-1"><Star size={13} className="text-yellow-400" fill="#eab308" /><span className="text-white/60 text-sm font-medium">{movie.rating}</span></div>}
               </div>
