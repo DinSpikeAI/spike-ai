@@ -12,8 +12,9 @@ const AI_MODELS = [
 ]
 
 const GENRES = [
-  'Sci-Fi', 'Drama', 'Horror', 'Comedy', 'Action', 'Thriller',
-  'Romance', 'Documentary', 'Fantasy', 'Animation', 'Experimental', 'Music Video'
+  'Sci-Fi', 'Drama', 'Horror', 'Comedy', 'Dark Comedy', 'Action', 'Thriller',
+  'Romance', 'Documentary', 'Fantasy', 'Animation', 'Experimental', 'Music Video',
+  'Cyberpunk', 'Mystery', 'Art House', 'Anime', 'Musical', 'Satire', 'Psychological'
 ]
 
 const CATEGORIES = [
