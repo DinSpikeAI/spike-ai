@@ -118,7 +118,7 @@ export default function BecomeCreatorPage() {
         </div>
         <h1 className="text-[44px] md:text-[52px] font-bold tracking-[-0.02em] leading-[1.08] text-white mb-5" style={{ textShadow: "0 0 80px rgba(139,92,246,0.15)" }}>Sign in{"\n"}to apply.</h1>
         <p className="text-[17px] text-white/30 mb-14">You need an account to become a creator.</p>
-        <button onClick={() => router.push("/auth")} className="cta-btn px-12 py-[17px] text-black text-[15px] font-bold rounded-full inline-flex items-center gap-3 cursor-pointer">Sign In <ArrowRight size={17} strokeWidth={2.5} /></button>
+        <button onClick={() => router.push("/auth")} className="bg-white hover:bg-white/90 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]">Sign In <ArrowRight size={17} strokeWidth={2.5} /></button>
       </div>
     </Shell>
   );
@@ -135,7 +135,7 @@ export default function BecomeCreatorPage() {
         <h1 className="text-[44px] md:text-[52px] font-bold tracking-[-0.02em] leading-[1.08] text-white mb-5">You&apos;re{"\n"}a creator.</h1>
         <p className="text-[17px] text-white/30 mb-14">Submit films and manage your profile.</p>
         <div className="flex flex-col items-center gap-4">
-          <button onClick={() => router.push("/submit")} className="cta-btn px-12 py-[17px] text-black text-[15px] font-bold rounded-full inline-flex items-center gap-3 cursor-pointer">Submit Film <ArrowRight size={17} strokeWidth={2.5} /></button>
+          <button onClick={() => router.push("/submit")} className="bg-white hover:bg-white/90 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]">Submit Film <ArrowRight size={17} strokeWidth={2.5} /></button>
           <button onClick={() => router.push("/profile")} className="text-white/15 text-[13px] hover:text-white/30 transition-colors cursor-pointer">Go to profile</button>
         </div>
       </div>
@@ -254,7 +254,7 @@ export default function BecomeCreatorPage() {
 
                 {/* CTA */}
                 <button onClick={handleSubmit} disabled={submitting}
-                  className="cta-btn w-full mt-3 py-[17px] text-black text-[15px] font-bold tracking-wide rounded-full flex items-center justify-center gap-2.5 disabled:opacity-30 cursor-pointer active:scale-[0.97] transition-transform">
+                  className="bg-white hover:bg-white/90 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)]">
                   {submitting ? <Loader2 size={19} className="animate-spin text-black/40" /> : <><Sparkles size={16} /> Apply as Pioneer Creator</>}
                 </button>
               </div>
