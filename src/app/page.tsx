@@ -19,14 +19,13 @@ import {
   Share2,
   Cpu,
   Flame,
-  Film,
   Trash2,
   Pencil,
   Shield,
   Bookmark,
   Menu,
 } from "lucide-react";
-import { supabase, getSmartPoster, getYouTubeThumbnail } from "@/lib/supabase";
+import { supabase, getSmartPoster } from "@/lib/supabase";
 
 /* ═══════════════════════════════════════════════════════════════
    HARDCODED DATA (fallback when Supabase is empty)
@@ -1765,19 +1764,33 @@ export default function HomePage() {
   // Deduplicate by id
   const uniqueMoviesMap = new Map<string, Movie>();
   allMovies.forEach((m) => { if (!uniqueMoviesMap.has(m.id)) uniqueMoviesMap.set(m.id, m); });
-  const uniqueMovies = Array.from(uniqueMoviesMap.values()).sort((a, b) => {
-    const aPos = a.sort_order || 0;
-    const bPos = b.sort_order || 0;
-    // Movies with position > 0 come first, sorted ascending
-    // Movies with position 0 go last
-    if (aPos > 0 && bPos > 0) return aPos - bPos;
-    if (aPos > 0) return -1;
-    if (bPos > 0) return 1;
-    return 0;
-  });
+  const uniqueMovies = Array.from(uniqueMoviesMap.values());
+  
+  // Split: positioned (sort_order > 0) vs unpositioned
+  const positioned = uniqueMovies.filter(m => (m.sort_order || 0) > 0).sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+  const unpositioned = uniqueMovies.filter(m => !(m.sort_order || 0)).sort((a, b) => (b.upvotes_count || 0) - (a.upvotes_count || 0));
+  
+  // Merge: place positioned movies at their exact index, fill rest with unpositioned
+  const merged: Movie[] = [];
+  let uIdx = 0;
+  const maxPos = positioned.length > 0 ? Math.max(...positioned.map(m => m.sort_order || 0)) : 0;
+  const totalSlots = Math.max(maxPos, positioned.length + unpositioned.length);
+  
+  for (let i = 1; i <= totalSlots; i++) {
+    const atPos = positioned.find(m => m.sort_order === i);
+    if (atPos) {
+      merged.push(atPos);
+    } else if (uIdx < unpositioned.length) {
+      merged.push(unpositioned[uIdx++]);
+    }
+  }
+  // Add remaining unpositioned
+  while (uIdx < unpositioned.length) {
+    merged.push(unpositioned[uIdx++]);
+  }
 
   // Hide non-first episodes from grid (series show only ep1)
-  const gridMovies = uniqueMovies.filter((m) => {
+  const gridMovies = merged.filter((m) => {
     if (m.series_name && m.episode_number && m.episode_number > 1) return false;
     return true;
   });
@@ -1854,7 +1867,7 @@ export default function HomePage() {
 
         <div className="mt-8 md:mt-14 px-4 md:px-12">
           {/* Shimmer loading while fetching from DB */}
-          {!dbReady && uniqueMovies.length === 0 && (
+          {!dbReady && merged.length === 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
               {[1, 2, 3, 4, 5, 6, 7, 8].map((card) => (
                 <div key={card}>

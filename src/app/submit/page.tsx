@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Upload, Film, Sparkles, ArrowLeft, Check, Image as ImageIcon, Loader2, AlertCircle, X, Play, Clock, Star, Cpu } from 'lucide-react'
+import { Upload, Film, Sparkles, ArrowLeft, Check, Image as ImageIcon, Loader2, AlertCircle, X, Play, Clock, Cpu } from 'lucide-react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 
@@ -17,8 +17,8 @@ const GENRES = [
 ]
 
 const CATEGORIES = [
-  'Trending', 'New Releases', "Editor's Choice", 'Most Upvoted',
-  'Shorts', 'Feature Films', 'Series', 'Music Videos'
+  'Trending', 'AI Horror', 'Sci-Fi Visions', 'Award Winning',
+  'AI Anime', 'Action', 'Fantasy', 'Runway Masterpieces'
 ]
 
 /* ═══════════════════════════════════════════
@@ -58,6 +58,7 @@ export default function SubmitPage() {
   })
   const [selectedModels, setSelectedModels] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
+  const [cooldown, setCooldown] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'warning' } | null>(null)
   const [accessChecking, setAccessChecking] = useState(true)
@@ -93,6 +94,12 @@ export default function SubmitPage() {
   }
 
   const handleSubmit = async () => {
+    // Validate video URL if provided
+    if (form.video_url && !form.video_url.match(/^https?://(www.)?(youtube.com|youtu.be|vimeo.com)//)) {
+      setToast({ message: 'Video URL must be a YouTube or Vimeo link', type: 'warning' });
+      return;
+    }
+
     if (!isValid) {
       const missing: string[] = []
       if (!form.title) missing.push('Title')
@@ -115,6 +122,8 @@ export default function SubmitPage() {
       })
       if (error) throw error
       setSubmitted(true)
+      setCooldown(true)
+      setTimeout(() => setCooldown(false), 30000)
     } catch (err) {
 
       setToast({ message: 'Submission failed. Please try again.', type: 'error' })
@@ -441,7 +450,7 @@ export default function SubmitPage() {
               {/* Submit Button */}
               <button
                 onClick={handleSubmit}
-                disabled={submitting}
+                disabled={submitting || cooldown}
                 className={`w-full py-4 px-8 rounded-2xl text-[14px] font-bold tracking-wide uppercase flex items-center justify-center gap-3 transition-all duration-300 cursor-pointer ${
                   submitting
                     ? 'bg-white/[0.03] text-white/20 border border-white/[0.05] cursor-wait'
@@ -463,7 +472,7 @@ export default function SubmitPage() {
               )}
               <p className="text-center text-[10px] text-white/8">
                 By submitting, you confirm this is your original AI-generated work and agree to our{" "}
-                <a href="/terms" target="_blank" className="text-white/20 hover:text-white/30 underline">Terms of Service</a>.
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-white/20 hover:text-white/30 underline">Terms of Service</a>.
               </p>
             </div>
           </div>

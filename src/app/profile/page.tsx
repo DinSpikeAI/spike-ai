@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft, Loader2, LogIn, Check, Heart, Bookmark,
-  Calendar, Film, Sparkles, Camera, ExternalLink, Globe, Flame,
+  ArrowLeft, Loader2, LogIn, Check, Bookmark,
+  Calendar, Film, Camera, ExternalLink, Globe, Flame,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -103,6 +103,7 @@ export default function ProfilePage() {
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !supabase || !user) return;
+    if (file.size > 5 * 1024 * 1024) { showToast("Max file size is 5MB"); return; }
     setUploadingBanner(true);
     try {
       const ext = file.name.split(".").pop();

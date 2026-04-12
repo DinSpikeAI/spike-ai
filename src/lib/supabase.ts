@@ -12,8 +12,6 @@ export const supabase: SupabaseClient | null =
     ? createClient(SUPABASE_URL, SUPABASE_KEY)
     : null;
 
-// Legacy fallback key — only used if user isn't logged in yet
-export const ADMIN_KEY = process.env.NEXT_PUBLIC_ADMIN_KEY || "";
 
 /* ═══════════════════════════════════════════════════════════════
    ADMIN AUTH — Role-based via profiles table
@@ -47,10 +45,7 @@ export async function checkIsAdmin(urlKey?: string | null): Promise<{
     }
   }
 
-  // 3. Fallback: URL key (for initial setup before first admin is set)
-  if (ADMIN_KEY && urlKey === ADMIN_KEY) {
-    return { isAdmin: true, user: session?.user || null, method: "key" };
-  }
+  // URL key fallback removed for security
 
   return { isAdmin: false, user: session?.user || null, method: "none" };
 }

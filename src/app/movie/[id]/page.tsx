@@ -6,7 +6,7 @@ import {
   Play, ArrowLeft, Plus, Share2, X,
   Star, Clock, Cpu, ChevronLeft, ChevronRight,
   Sparkles, ExternalLink, Flame, SkipForward,
-  Bookmark, Check, Film, Pencil, Save, Loader2,
+  Check, Film, Pencil, Save, Loader2,
 } from "lucide-react";
 import { supabase, getSmartPoster, getSmartHeroImage } from "@/lib/supabase";
 
