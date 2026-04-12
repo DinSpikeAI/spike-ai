@@ -52,6 +52,30 @@ const FOUNDERS: Creator[] = [
       { label: "AI tools mastered", value: "7" },
     ],
   },
+  {
+    id: "yuval-avadya",
+    name: "Yuval Avadya",
+    badge: "Pioneer Creator",
+    role: "AI Creative Director",
+    avatar: "/creators/yuval-avadya.jpg",
+    bio: "Turning imagination into reality with AI. Creating cinematic visuals for brands worldwide, pushing the boundaries of what's possible with generative video and AI-driven storytelling.",
+    highlight: "Specializes in high-end AI-generated brand content and cinematic visuals. Known for blending commercial creativity with cutting-edge AI video tools to deliver visuals that feel both futuristic and emotionally grounded.",
+    toolkit: ["Kling", "Seedance", "Nano Banana"],
+    works: [
+      { title: "Brand Campaigns", type: "AI Commercial Content", note: "Cinematic AI visuals for brands worldwide" },
+      { title: "AI Creative Reels", type: "Short-Form Content", note: "High-end AI-generated visual storytelling" },
+    ],
+    links: [
+      { label: "Instagram", url: "https://www.instagram.com/yuvimedia.ai" },
+      { label: "Personal", url: "https://www.instagram.com/yuvalavadya" },
+      { label: "Email", url: "mailto:yuvimgmt@gmail.com" },
+    ],
+    stats: [
+      { label: "Specialty", value: "Brands" },
+      { label: "AI tools mastered", value: "3" },
+      { label: "Focus", value: "Commercial" },
+    ],
+  },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
