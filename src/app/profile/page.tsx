@@ -90,11 +90,11 @@ export default function ProfilePage() {
   const handleSave = async () => {
     if (!supabase || !user) return;
     setSaving(true);
-    const { error } = await supabase.from("profiles").upsert({
-      id: user.id, display_name: displayName.trim(), bio: bio.trim(), email: user.email,
+    const { error } = await supabase.from("profiles").update({
+      display_name: displayName.trim(), bio: bio.trim(),
       website: website.trim(), social_x: socialX.trim(), social_youtube: socialYoutube.trim(),
       social_instagram: socialInstagram.trim(), banner_url: bannerUrl.trim(),
-    }, { onConflict: "id" });
+    }).eq("id", user.id);
     if (!error) { showToast("Profile saved"); await supabase.auth.updateUser({ data: { display_name: displayName.trim() } }); }
     else showToast("Error saving");
     setSaving(false);
