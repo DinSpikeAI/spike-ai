@@ -76,6 +76,29 @@ const FOUNDERS: Creator[] = [
       { label: "Focus", value: "Commercial" },
     ],
   },
+  {
+    id: "victor-leonativ",
+    name: "Victor Leonativ",
+    badge: "Pioneer Creator",
+    role: "AI Video Editor \u00b7 Creative Director",
+    avatar: "/creators/victor-leonativ.jpg",
+    bio: "Fusing years of traditional video editorial expertise with a high-fidelity AI stack. I don't just generate \u2013 I curate the intersection of human intuition and algorithmic precision to deliver the next evolution of social storytelling.",
+    highlight: "Veteran video editor who bridges the gap between traditional filmmaking craft and AI-powered creation. Brings editorial instinct and cinematic timing to every AI-generated frame.",
+    toolkit: ["Kling", "Runway", "After Effects", "Premiere Pro"],
+    works: [
+      { title: "AI Social Storytelling", type: "Short-Form Series", note: "Next-gen social content fusing editorial craft with AI generation" },
+      { title: "Creative Direction Reel", type: "Portfolio Showcase", note: "Traditional editing expertise meets AI-powered visuals" },
+    ],
+    links: [
+      { label: "Portfolio", url: "https://vectorcreations.wixsite.com/portfolio" },
+      { label: "YouTube", url: "https://www.youtube.com/@VXTEPS" },
+    ],
+    stats: [
+      { label: "Background", value: "Editorial" },
+      { label: "Approach", value: "Hybrid" },
+      { label: "Focus", value: "Storytelling" },
+    ],
+  },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
