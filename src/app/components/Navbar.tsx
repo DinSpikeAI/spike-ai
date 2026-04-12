@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
-  Search, Bell, Star, X, Shield, Menu, Plus, Plus,
+  Search, Bell, Star, X, Shield, Menu, Plus,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Category } from "./types";
