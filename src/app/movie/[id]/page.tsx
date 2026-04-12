@@ -91,6 +91,7 @@ export default function MoviePage() {
   const [popAnim, setPopAnim] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [dbMovies, setDbMovies] = useState<Movie[]>([]);
+  const [seriesEpisodes, setSeriesEpisodes] = useState<any[]>([]);
   const [isOwner, setIsOwner] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<any>(null);
@@ -110,6 +111,11 @@ export default function MoviePage() {
           setMovie({ id: data.id, title: data.title, year: data.year || 2026, rating: Number(data.rating) || 0, duration: data.duration || "", poster: getSmartPoster(data.poster_url, data.video_url, data.id), image: getSmartHeroImage(data.hero_image, data.video_url, data.poster_url, data.id), aiModels: data.ai_models || [], genre: data.genre || "Sci-Fi", description: data.description || "", tagline: data.tagline || "", maturity: data.maturity || "16+", director: data.creator_name || "AI Creator", creator_name: data.creator_name || "", video_url: data.video_url, upvotes_count: data.upvotes_count || 0 });
           setVotes(data.upvotes_count || 0);
           setIsDbMovie(true);
+          // Load series episodes
+          if (data.series_name) {
+            const { data: eps } = await supabase.from("movies").select("*").eq("series_name", data.series_name).eq("status", "approved").order("episode_number", { ascending: true });
+            if (eps) setSeriesEpisodes(eps);
+          }
           // Check if user owns this movie
           if (supabase) {
             const { data: { session: s } } = await supabase.auth.getSession();
@@ -243,7 +249,7 @@ export default function MoviePage() {
     const { error } = await supabase.from("movies").update({
       title: editForm.title, description: editForm.description, tagline: editForm.tagline,
       video_url: editForm.video_url, genre: editForm.genre, duration: editForm.duration,
-      year: editForm.year, poster_url: editForm.poster_url,
+      year: editForm.year, poster_url: editForm.poster_url, series_name: editForm.series_name || null, episode_number: editForm.episode_number ? parseInt(editForm.episode_number) : null,
     }).eq("id", movieId);
     if (!error) {
       setMovie({ ...movie!, title: editForm.title, description: editForm.description, tagline: editForm.tagline,
@@ -322,6 +328,44 @@ export default function MoviePage() {
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-4 md:px-6"><div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" /></div>
 
+      {/* ═══ SERIES EPISODES ═══ */}
+      {seriesEpisodes.length > 1 && (
+        <section className="py-8 md:py-12 px-4 md:px-6">
+          <div className="max-w-[1400px] mx-auto">
+            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+              <Film size={18} className="text-white" />
+              Episodes
+              <span className="text-white/20 text-sm font-normal ml-2">({seriesEpisodes.length} episodes)</span>
+            </h2>
+            <div className="space-y-2">
+              {seriesEpisodes.map((ep: any, i: number) => (
+                <div
+                  key={ep.id}
+                  onClick={() => { if (ep.id !== movieId) router.push(`/movie/${ep.id}`); }}
+                  className={`flex items-center gap-4 md:gap-6 p-3 md:p-4 rounded-xl border transition-all ${ep.id === movieId ? "bg-white/[0.06] border-white/[0.1]" : "bg-white/[0.02] border-white/[0.04] hover:border-white/[0.1] cursor-pointer"}`}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-white/[0.04] flex items-center justify-center flex-shrink-0">
+                    <span className={`text-sm font-bold ${ep.id === movieId ? "text-white" : "text-white/30"}`}>{ep.episode_number || i + 1}</span>
+                  </div>
+                  <div className="relative w-[100px] md:w-[140px] flex-shrink-0 aspect-video rounded-lg overflow-hidden">
+                    <img src={ep.poster_url || `https://picsum.photos/seed/${ep.id}/320/180`} alt={ep.title} className="w-full h-full object-cover" />
+                    {ep.id === movieId && <div className="absolute inset-0 bg-white/10 flex items-center justify-center"><span className="text-[10px] font-bold tracking-wider uppercase text-white bg-black/60 px-2 py-1 rounded">Playing</span></div>}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm md:text-base font-semibold truncate ${ep.id === movieId ? "text-white" : "text-white/60"}`}>{ep.title}</p>
+                    <p className="text-[12px] text-white/20 mt-1 line-clamp-1">{ep.description || ""}</p>
+                    <div className="flex items-center gap-3 mt-1.5">
+                      {ep.duration && <span className="text-[11px] text-white/15 flex items-center gap-1"><Clock size={10} />{ep.duration}</span>}
+                      <span className="text-[11px] text-white/15">{ep.year || 2026}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* UP NEXT */}
       {upNextMovie && (<section className="py-6 md:py-8 px-4 md:px-6"><div className="max-w-[1400px] mx-auto"><h2 className="text-lg font-bold mb-4 flex items-center gap-2"><SkipForward size={18} className="text-white" />Up Next</h2><div onClick={() => router.push(`/movie/${upNextMovie.id}`)} className="flex items-center gap-4 md:gap-6 bg-white/[0.03] border border-white/[0.04] hover:border-white/15 rounded-xl p-3 md:p-4 cursor-pointer transition-all group"><div className="relative w-[70px] md:w-[90px] flex-shrink-0 aspect-[2/3] rounded-lg overflow-hidden"><img src={upNextMovie.poster} alt={upNextMovie.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" /><div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center"><div className="w-8 h-8 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"><Play size={14} fill="white" className="text-white ml-0.5" /></div></div></div><div className="flex-1 min-w-0"><p className="text-xs text-white/20 uppercase tracking-wider font-medium mb-1">Playing Next</p><h3 className="text-base md:text-lg font-bold text-white truncate group-hover:text-white transition-colors">{upNextMovie.title}</h3><div className="flex items-center gap-2 mt-1"><span className="text-yellow-400 text-xs flex items-center gap-0.5"><Star size={10} fill="currentColor" />{upNextMovie.rating}</span><span className="text-white/20 text-xs">{upNextMovie.year} · {upNextMovie.genre} · {upNextMovie.duration}</span></div></div><div className="flex-shrink-0 hidden sm:flex"><button className="flex items-center gap-2 px-5 py-2.5 bg-white text-black rounded-lg font-semibold text-sm hover:bg-white/80 transition-all"><Play size={14} fill="white" />Play Next</button></div></div></div></section>)}
 
@@ -371,6 +415,16 @@ export default function MoviePage() {
               <div>
                 <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Poster URL</label>
                 <input value={editForm.poster_url} onChange={e => setEditForm({...editForm, poster_url: e.target.value})} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all" placeholder="Direct image URL" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Series Name</label>
+                  <input value={editForm.series_name} onChange={e => setEditForm({...editForm, series_name: e.target.value})} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all" placeholder="e.g. Breakup Letters AI" />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-2">Episode #</label>
+                  <input type="number" value={editForm.episode_number} onChange={e => setEditForm({...editForm, episode_number: e.target.value})} className="w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-4 py-3 text-[14px] text-white focus:outline-none focus:border-white/[0.12] transition-all" placeholder="1" />
+                </div>
               </div>
             </div>
             <div className="px-6 py-4 border-t border-white/[0.06] flex justify-end gap-3">

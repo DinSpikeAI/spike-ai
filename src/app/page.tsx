@@ -67,6 +67,8 @@ interface Movie {
   upvotes_count: number;
   video_url?: string;
   sort_order?: number;
+  series_name?: string;
+  episode_number?: number;
 }
 
 interface Category {
@@ -1623,6 +1625,8 @@ export default function HomePage() {
             upvotes_count: row.upvotes_count || 0,
             video_url: row.video_url || undefined,
             sort_order: row.sort_order || 0,
+            series_name: row.series_name || undefined,
+            episode_number: row.episode_number || undefined,
           };
 
           // Add to primary category
@@ -1771,7 +1775,13 @@ export default function HomePage() {
     return 0;
   });
 
-  const filteredMovies = uniqueMovies.filter((m) => {
+  // Hide non-first episodes from grid (series show only ep1)
+  const gridMovies = uniqueMovies.filter((m) => {
+    if (m.series_name && m.episode_number && m.episode_number > 1) return false;
+    return true;
+  });
+
+  const filteredMovies = gridMovies.filter((m) => {
     const genreMatch =
       selectedGenre === "All" ||
       m.genre?.toLowerCase() === selectedGenre.toLowerCase();

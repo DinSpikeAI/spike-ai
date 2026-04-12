@@ -54,7 +54,7 @@ export default function SubmitPage() {
   const [form, setForm] = useState({
     title: '', description: '', genre: '', category: '',
     duration: '', creator_name: '', video_url: '',
-    trailer_url: '', poster_url: '', tagline: '',
+    trailer_url: '', poster_url: '', tagline: '', series_name: '', episode_number: '',
   })
   const [selectedModels, setSelectedModels] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
@@ -111,7 +111,7 @@ export default function SubmitPage() {
         category: form.category, duration: form.duration || null,
         creator_name: form.creator_name, video_url: form.video_url || null,
         trailer_url: form.trailer_url || null, poster_url: form.poster_url || null,
-        tagline: form.tagline || null, ai_models: selectedModels, status: 'pending',
+        tagline: form.tagline || null, ai_models: selectedModels, status: 'pending', series_name: form.series_name || null, episode_number: form.episode_number ? parseInt(form.episode_number) : null,
       })
       if (error) throw error
       setSubmitted(true)
@@ -291,6 +291,10 @@ export default function SubmitPage() {
               <div className="grid grid-cols-2 gap-4">
                 <InputField label="Duration" placeholder="e.g. 14m" value={form.duration} onChange={v => update('duration', v)} />
                 <InputField label="Creator / Studio" required placeholder="Your name or studio" value={form.creator_name} onChange={v => update('creator_name', v)} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <InputField label="Series Name" placeholder="e.g. Breakup Letters AI" value={form.series_name} onChange={v => update('series_name', v)} hint="Leave empty for standalone films" />
+                <InputField label="Episode #" placeholder="e.g. 1" value={form.episode_number} onChange={v => update('episode_number', v)} />
               </div>
             </section>
 
