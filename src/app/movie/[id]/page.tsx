@@ -217,7 +217,21 @@ export default function MoviePage() {
     } catch {}
   };
 
-  const creator = movie ? getCreatorForMovie(movie) : null;
+  const [creatorProfile, setCreatorProfile] = useState<any>(null);
+
+  // ── Load Creator Profile from DB ──
+  useEffect(() => {
+    if (!supabase || !movie?.creator_name) return;
+    async function loadCreator() {
+      const { data } = await supabase!.from("profiles").select("id, display_name, avatar_url, bio, user_type").eq("display_name", movie!.creator_name).single();
+      if (data) setCreatorProfile(data);
+    }
+    loadCreator();
+  }, [movie?.creator_name]);
+
+  const creator = creatorProfile
+    ? { id: creatorProfile.id, name: creatorProfile.display_name, bio: creatorProfile.bio || "AI filmmaker on Spike AI.", avatar: creatorProfile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(creatorProfile.display_name)}&background=8B5CF6&color=fff&size=200`, followers: 0, films: 1, joined: "2026", specialties: [movie?.genre || "Film"] }
+    : movie ? getCreatorForMovie(movie) : null;
   const moviesPool = dbMovies.length > 0 ? dbMovies : ALL_MOVIES;
 
   // Up Next: next episode if series, otherwise random
