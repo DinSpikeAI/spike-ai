@@ -89,18 +89,18 @@ function markdownToHtml(md: string): string {
 
     // Headings
     const h3 = block.match(/^### (.+)$/)
-    if (h3) { htmlBlocks.push(`<h3 id="${slugify(h3[1])}">${h3[1]}</h3>`); continue }
+    if (h3) { htmlBlocks.push(`<h3 id="${slugify(h3[1])}">${escapeHtml(h3[1])}</h3>`); continue }
     const h2 = block.match(/^## (.+)$/)
-    if (h2) { htmlBlocks.push(`<h2 id="${slugify(h2[1])}">${h2[1]}</h2>`); continue }
+    if (h2) { htmlBlocks.push(`<h2 id="${slugify(h2[1])}">${escapeHtml(h2[1])}</h2>`); continue }
     const h1 = block.match(/^# (.+)$/)
-    if (h1) { htmlBlocks.push(`<h1>${h1[1]}</h1>`); continue }
+    if (h1) { htmlBlocks.push(`<h1>${escapeHtml(h1[1])}</h1>`); continue }
 
     // Horizontal rule
     if (/^---+$/.test(block)) { htmlBlocks.push('<hr />'); continue }
 
     // Images
     const img = block.match(/^!\[([^\]]*)\]\(([^)]+)\)$/)
-    if (img) { htmlBlocks.push(`<img src="${img[2]}" alt="${img[1]}" class="rounded-xl w-full my-8" />`); continue }
+    if (img) { htmlBlocks.push(`<img src="${safeUrl(img[2])}" alt="${escapeHtml(img[1])}" class="rounded-xl w-full my-8" />`); continue }
 
     // Paragraph (default)
     htmlBlocks.push(`<p>${inlineFormat(block.replace(/\n/g, '<br />'))}</p>`)
@@ -109,13 +109,27 @@ function markdownToHtml(md: string): string {
   return htmlBlocks.join('\n')
 }
 
-function inlineFormat(text: string): string {
+function escapeHtml(text: string): string {
   return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function safeUrl(url: string): string {
+  const trimmed = url.trim()
+  if (trimmed.startsWith('/') || trimmed.startsWith('https://') || trimmed.startsWith('http://')) return trimmed
+  return '#'
+}
+
+function inlineFormat(text: string): string {
+  return escapeHtml(text)
     .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/`(.+?)`/g, '<code class="text-[13px] bg-white/[0.06] px-1.5 py-0.5 rounded text-purple-300/70">$1</code>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, label, href) => `<a href="${safeUrl(href)}">${label}</a>`)
 }
 
 function formatDate(dateStr: string): string {
