@@ -52,4 +52,4 @@ export const FALLBACK_CATEGORIES: Category[] = [];
 
 export const ALL_GENRES = ["All", "Sci-Fi", "Horror", "Drama", "Thriller", "Fantasy", "Action", "Cyberpunk", "Romance", "Art House", "Anime"];
 
-export const ALL_AI_MODELS = ["All", "Runway Gen-4", "Runway Gen-3", "Midjourney", "Stable Diffusion XL", "Stable Video", "Kling AI", "Pika Labs", "ElevenLabs"];
+export const ALL_AI_MODELS = ["All", "Runway Gen-4", "Runway Gen-3", "Midjourney", "Stable Diffusion XL", "Stable Video", "Sora", "Kling AI", "Pika Labs", "ElevenLabs", "Hailuo", "Luma Dream Machine", "Seedance", "Veo3"];
