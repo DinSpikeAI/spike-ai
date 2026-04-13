@@ -47,6 +47,7 @@ export default function ProfilePage() {
   const [bannerUrl, setBannerUrl] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [stats, setStats] = useState({ watchlist: 0, upvotes: 0, films: 0 });
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
@@ -98,6 +99,25 @@ export default function ProfilePage() {
     if (!error) { showToast("Profile saved"); await supabase.auth.updateUser({ data: { display_name: displayName.trim() } }); }
     else showToast("Error saving");
     setSaving(false);
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !supabase || !user) return;
+    if (file.size > 5 * 1024 * 1024) { showToast("Image must be under 5MB"); return; }
+    setUploadingAvatar(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = "avatars/" + user.id + "." + ext;
+      const { error: upErr } = await supabase.storage.from("media").upload(path, file, { upsert: true });
+      if (upErr) { showToast("Upload failed"); setUploadingAvatar(false); return; }
+      const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+      const url = urlData.publicUrl + "?t=" + Date.now();
+      setAvatarUrl(url);
+      await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+      showToast("Avatar updated");
+    } catch { showToast("Upload error"); }
+    setUploadingAvatar(false);
   };
 
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -190,12 +210,18 @@ export default function ProfilePage() {
 
         {/* ── Centered Header ── */}
         <div className="flex flex-col items-center text-center -mt-16 pb-10">
-          <div className="w-[128px] h-[128px] rounded-full overflow-hidden border-4 border-[#08080c] shadow-2xl shadow-black/80 mb-6">
+          <div className="relative group mb-6">
+          <div className="w-[128px] h-[128px] rounded-full overflow-hidden border-4 border-[#08080c] shadow-2xl shadow-black/80">
             {avatarUrl ? (
               <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-white/25" style={{ background: "linear-gradient(135deg, #1a1a22 0%, #111116 100%)" }}>{initial}</div>
             )}
+          </div>
+          <label className="absolute bottom-0 right-0 w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-lg cursor-pointer hover:bg-white/90 transition-all">
+            {uploadingAvatar ? <Loader2 size={14} className="text-black/50 animate-spin" /> : <Camera size={14} className="text-black/70" />}
+            <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+          </label>
           </div>
           <div className="flex items-center gap-3 mb-2">
             <h1 className="text-[32px] font-bold tracking-tight">{displayName || "User"}</h1>
