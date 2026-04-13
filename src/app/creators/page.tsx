@@ -188,7 +188,7 @@ function CreatorCard({ creator }: { creator: Creator }) {
             style={{ background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d, #e8c65a)" }}
           />
           {/* Photo container */}
-          <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-[3px] border-[#0c0c12] shadow-2xl shadow-black/60">
+          <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-[3px] border-[#0c0c12] shadow-2xl shadow-black/60">
             <img
               src={creator.avatar}
               alt={creator.name}
@@ -400,19 +400,21 @@ export default function CreatorsPage() {
         </div>
 
         {/* Divider */}
-        <div className="w-full max-w-[620px]">
+        <div className="w-full max-w-[1100px]">
           <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         </div>
 
         {/* Founders */}
-        <div className="py-14 md:py-20 w-full max-w-[620px]" style={{ animation: "reveal 1s cubic-bezier(0.16,1,0.3,1) 0.2s both" }}>
-          {FOUNDERS.map((creator) => (
-            <CreatorCard key={creator.id} creator={creator} />
-          ))}
+        <div className="py-14 md:py-20 w-full max-w-[1100px]" style={{ animation: "reveal 1s cubic-bezier(0.16,1,0.3,1) 0.2s both" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
+            {FOUNDERS.map((creator) => (
+              <CreatorCard key={creator.id} creator={creator} />
+            ))}
+          </div>
         </div>
 
         {/* More Coming */}
-        <div className="w-full max-w-[620px] text-center pb-20">
+        <div className="w-full max-w-[1100px] text-center pb-20">
           <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mb-16" />
 
           <div className="flex items-center justify-center gap-4 mb-8">
