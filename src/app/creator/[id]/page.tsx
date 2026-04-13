@@ -300,7 +300,7 @@ export default function CreatorPage() {
 
             {/* Bio */}
             {creator.bio && (
-              <p className="text-white/30 text-sm leading-relaxed max-w-2xl mb-5">{creator.bio}</p>
+              <p className="text-white/30 text-sm leading-relaxed max-w-2xl mb-5 whitespace-pre-line">{creator.bio}</p>
             )}
 
             {/* Social Links */}
