@@ -197,7 +197,7 @@ export default function SubmitPage() {
             Submitting films is available to approved creators. Apply to join our creator community and start sharing your AI cinema.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="/spike_apply_en.html" className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold hover:brightness-110 transition-all">
+            <a href="/become-creator" className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-violet-600 to-purple-600 text-white font-semibold hover:brightness-110 transition-all">
               <Sparkles className="w-4 h-4" />
               Apply as Creator
             </a>
