@@ -418,9 +418,11 @@ export default function HomePage() {
     const trending = [...gridMovies].sort((a, b) => (b.upvotes_count || 0) - (a.upvotes_count || 0));
     result.push({ title: "Trending Now", slug: "trending", genre: "All", movies: trending });
 
-    // Row 2: New on Spike AI (reversed order)
-    const newest = [...gridMovies].reverse();
-    result.push({ title: "New on Spike AI", slug: "new", genre: "All", movies: newest });
+    // Row 2: New on Spike AI - only when 15+ films
+    if (gridMovies.length >= 15) {
+      const newest = [...gridMovies].reverse();
+      result.push({ title: "New on Spike AI", slug: "new", genre: "All", movies: newest });
+    }
 
     // Genre rows (films appear in multiple rows like Netflix)
     const genreMap = {};
@@ -433,7 +435,7 @@ export default function HomePage() {
     });
 
     Object.entries(genreMap)
-      .filter(([, movies]) => movies.length >= 2)
+      .filter(([, movies]) => movies.length >= 3 && gridMovies.length >= 15)
       .sort((a, b) => b[1].length - a[1].length)
       .forEach(([genre, movies]) => {
         result.push({ title: genre, slug: genre.toLowerCase().replace(/\s+/g, "-"), genre, movies });
