@@ -123,6 +123,29 @@ const FOUNDERS: Creator[] = [
       { label: "Focus", value: "AI Video" },
     ],
   },
+  {
+    id: "dreamshot-studio",
+    name: "Dreamshot AI Studio",
+    badge: "Pioneer Creator",
+    role: "AI Video Production Studio",
+    avatar: "/creators/dreamshot-studio.jpg",
+    bio: "A creative studio blending professional filmmaking with AI-powered production. Combines charismatic on-camera talent with AI-generated environments to produce commercials, concept videos, and viral content. Every project is built on precise shot lists and meticulous direction.",
+    highlight: "Produces both hybrid content (human presenter with AI backgrounds and VFX) and fully AI-generated concept films. Uses professional cinema gear alongside tools like Kling, Midjourney, and Seedance to build visual worlds without the constraints of physical locations or large crews.",
+    toolkit: ["Kling", "Midjourney", "Flux", "Seedance", "After Effects", "Canon R6 II"],
+    works: [
+      { title: "Hybrid Brand Films", type: "Human + AI Production", note: "Studio-shot presenters composited into AI-generated worlds" },
+      { title: "Full AI Concepts", type: "100% AI Production", note: "Complete commercials and event films built entirely with AI tools" },
+    ],
+    links: [
+      { label: "Instagram", url: "https://www.instagram.com/dreamshot.ai.studio" },
+      { label: "Facebook", url: "https://www.facebook.com/moshe.schwartz.79" },
+    ],
+    stats: [
+      { label: "Specialty", value: "AI Ads" },
+      { label: "AI tools", value: "6+" },
+      { label: "Approach", value: "Hybrid" },
+    ],
+  },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
