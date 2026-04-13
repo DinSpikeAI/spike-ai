@@ -46,7 +46,7 @@ const STATUS_STYLES: Record<string, { bg: string; text: string; icon: any }> = {
 };
 
 const CATEGORIES = ["Trending", "AI Horror", "Sci-Fi Visions", "Award Winning", "AI Anime", "Action", "Fantasy", "Runway Masterpieces"];
-const GENRES = ["Sci-Fi", "Horror", "Drama", "Thriller", "Fantasy", "Action", "Cyberpunk", "Romance", "Art House", "Animation", "Comedy", "Mystery", "Musical", "Documentary"];
+const GENRES = ["Sci-Fi", "Horror", "Drama", "Thriller", "Fantasy", "Action", "Cyberpunk", "Romance", "Art House", "Animation", "Comedy", "Mystery", "Musical", "Documentary", "Anime", "Dark Comedy", "Satire", "Psychological"];
 const AI_MODELS = ["Runway Gen-4", "Runway Gen-3", "Midjourney", "Stable Diffusion XL", "Stable Video", "Kling AI", "Pika Labs", "ElevenLabs", "Other"];
 
 /* ═══════════════════════════════════════════════════════════════
