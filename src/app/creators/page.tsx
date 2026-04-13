@@ -99,6 +99,30 @@ const FOUNDERS: Creator[] = [
       { label: "Focus", value: "Storytelling" },
     ],
   },
+  {
+    id: "boaz-levkovitch",
+    name: "Boaz Levkovitch",
+    badge: "Pioneer Creator",
+    role: "Creative Director \u00b7 Founder of Climax Ltd.",
+    avatar: "/creators/boaz-levkovitch.jpg",
+    bio: "Creative Director with over 16 years of experience in advertising, branding, and design. Founder of Climax Ltd., a creative studio specializing in branding, visual identity, and AI-generated video content. Delivering high-impact creative solutions for clients across high-tech, real estate, and finance.",
+    highlight: "Bezalel Academy graduate pioneering the use of AI tools to create innovative, engaging video content for brands. Bridges traditional creative direction with cutting-edge AI production across diverse industries.",
+    toolkit: ["AI Video Production", "After Effects", "Branding", "Art Direction"],
+    works: [
+      { title: "AI Brand Campaigns", type: "Commercial Content", note: "AI-driven video production for corporate and commercial clients" },
+      { title: "Visual Identity Systems", type: "Branding", note: "End-to-end brand strategies for high-tech, real estate, and finance" },
+    ],
+    links: [
+      { label: "Website", url: "https://www.climax-design.co.il" },
+      { label: "Facebook", url: "https://www.facebook.com/boaz.levkovitch" },
+      { label: "Email", url: "mailto:boaz@climax-design.co.il" },
+    ],
+    stats: [
+      { label: "Experience", value: "16+ yrs" },
+      { label: "Specialty", value: "Branding" },
+      { label: "Focus", value: "AI Video" },
+    ],
+  },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
