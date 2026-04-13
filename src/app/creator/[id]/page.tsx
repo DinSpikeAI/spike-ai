@@ -66,6 +66,7 @@ export default function CreatorPage() {
   useEffect(() => {
     async function load() {
       setLoading(true);
+      try {
       window.scrollTo(0, 0);
 
       if (!supabase) {
@@ -149,6 +150,7 @@ export default function CreatorPage() {
 
       setLoading(false);
       setTimeout(() => setIsLoaded(true), 100);
+      } catch (err) { console.error("Creator page error:", err); setNotFound(true); setLoading(false); }
     }
 
     load();
