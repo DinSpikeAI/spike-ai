@@ -51,7 +51,7 @@ function getEmbedUrl(url: string, quality: "auto" | "hd" | "4k"): string | null 
    MOVIE DATA (standalone fallback)
    ═══════════════════════════════════════════════════════════════ */
 
-interface Movie { id: string; title: string; year: number; rating: number; duration: string; poster: string; image?: string; aiModels: string[]; genre?: string; description?: string; tagline?: string; maturity?: string; director?: string; creator?: string; creator_name?: string; video_url?: string; upvotes_count?: number; series_name?: string; episode_number?: number; }
+interface Movie { id: string; title: string; year: number; rating: number; duration: string; poster: string; image?: string; aiModels: string[]; genre?: string; description?: string; tagline?: string; maturity?: string; director?: string; creator?: string; creator_name?: string; video_url?: string; upvotes_count?: number; trailer_url?: string | null; series_name?: string; episode_number?: number; }
 interface Creator { id: string; name: string; bio: string; avatar: string; followers: number; films: number; joined: string; specialties: string[]; }
 
 const CREATORS: Creator[] = [
@@ -109,7 +109,7 @@ export default function MoviePage() {
       if (supabase && looksLikeUuid) {
         const { data, error } = await supabase.from("movies").select("*").eq("id", movieId).single();
         if (!error && data) {
-          setMovie({ id: data.id, title: data.title, year: data.year || 2026, rating: Number(data.rating) || 0, duration: data.duration || "", poster: getSmartPoster(data.poster_url, data.video_url, data.id), image: getSmartHeroImage(data.hero_image, data.video_url, data.poster_url, data.id), aiModels: data.ai_models || [], genre: data.genre || "Sci-Fi", description: data.description || "", tagline: data.tagline || "", maturity: data.maturity || "16+", director: data.creator_name || "AI Creator", creator_name: data.creator_name || "", video_url: data.video_url, upvotes_count: data.upvotes_count || 0, series_name: data.series_name || undefined, episode_number: data.episode_number || undefined });
+          setMovie({ id: data.id, title: data.title, year: data.year || 2026, rating: Number(data.rating) || 0, duration: data.duration || "", poster: getSmartPoster(data.poster_url, data.video_url, data.id), image: getSmartHeroImage(data.hero_image, data.video_url, data.poster_url, data.id), aiModels: data.ai_models || [], genre: data.genre || "Sci-Fi", description: data.description || "", tagline: data.tagline || "", maturity: data.maturity || "16+", director: data.creator_name || "AI Creator", creator_name: data.creator_name || "", video_url: data.video_url, upvotes_count: data.upvotes_count || 0, trailer_url: data.trailer_url || null, series_name: data.series_name || undefined, episode_number: data.episode_number || undefined });
           setVotes(data.upvotes_count || 0);
           setViewCount(data.view_count || 0);
           setIsDbMovie(true);
