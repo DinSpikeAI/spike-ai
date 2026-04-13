@@ -412,14 +412,18 @@ export default function HomePage() {
   // ─── Build rows for streaming layout ───
   const buildRows = (): Category[] => {
     if (gridMovies.length === 0) return [];
+    const result: Category[] = [];
 
-    // Under 20 films: single row
-    if (gridMovies.length < 20) {
-      return [{ title: "New on Spike AI", slug: "new", genre: "All", movies: gridMovies }];
-    }
+    // Row 1: Trending (by upvotes)
+    const trending = [...gridMovies].sort((a, b) => (b.upvotes_count || 0) - (a.upvotes_count || 0));
+    result.push({ title: "Trending Now", slug: "trending", genre: "All", movies: trending });
 
-    // 20+ films: split by genre
-    const genreMap: Record<string, Movie[]> = {};
+    // Row 2: New on Spike AI (reversed order)
+    const newest = [...gridMovies].reverse();
+    result.push({ title: "New on Spike AI", slug: "new", genre: "All", movies: newest });
+
+    // Genre rows (films appear in multiple rows like Netflix)
+    const genreMap = {};
     gridMovies.forEach((m) => {
       const genres = (m.genre || "Other").split(",").map(g => g.trim());
       genres.forEach((g) => {
@@ -428,15 +432,14 @@ export default function HomePage() {
       });
     });
 
-    return Object.entries(genreMap)
+    Object.entries(genreMap)
       .filter(([, movies]) => movies.length >= 2)
       .sort((a, b) => b[1].length - a[1].length)
-      .map(([genre, movies]) => ({
-        title: genre,
-        slug: genre.toLowerCase().replace(/\s+/g, "-"),
-        genre,
-        movies,
-      }));
+      .forEach(([genre, movies]) => {
+        result.push({ title: genre, slug: genre.toLowerCase().replace(/\s+/g, "-"), genre, movies });
+      });
+
+    return result;
   };
 
   const rows = buildRows();
