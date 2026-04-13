@@ -146,6 +146,30 @@ const FOUNDERS: Creator[] = [
       { label: "Approach", value: "Hybrid" },
     ],
   },
+  {
+    id: "eran-tzipel",
+    name: "Eran Tzipel",
+    badge: "Pioneer Creator",
+    role: "AI Creative Director",
+    avatar: "/creators/eran-tzipel.jpg",
+    bio: "AI Creative Director with a background in Industrial Engineering. Produces cinematic AI content that blends authentic footage with AI-generated environments. Known for viral storytelling that reaches hundreds of thousands of viewers organically.",
+    highlight: "Generated over 330,000 organic views for \"The Pilot,\" an AI cinematic series, within 36 hours across TikTok, YouTube, and Meta. Specializes in hybrid production for brands, safety training films, and architectural visualizations.",
+    toolkit: ["Kling V3", "Veo3", "Runway", "ElevenLabs", "Midjourney", "Nano Banana"],
+    works: [
+      { title: "The Pilot", type: "AI Cinematic Thriller", note: "Viral series with 330K+ organic views in 36 hours" },
+      { title: "Architectural Walk-throughs", type: "AI Visualization", note: "Cinematic AI-generated property showcases" },
+      { title: "Industrial Training Films", type: "Corporate AI Production", note: "Safety training content using AI environments" },
+    ],
+    links: [
+      { label: "YouTube", url: "https://www.youtube.com/@erantzipel" },
+      { label: "Facebook", url: "https://www.facebook.com/eran.tzipel" },
+    ],
+    stats: [
+      { label: "Top views", value: "330K+" },
+      { label: "AI tools", value: "6+" },
+      { label: "Focus", value: "Cinematic" },
+    ],
+  },
 ];
 
 /* ═══════════════════════════════════════════════════════════════
