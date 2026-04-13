@@ -4,11 +4,12 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Sparkles, Film, ArrowRight,
-  ChevronDown, ExternalLink,
+  ChevronDown, ExternalLink, Loader2,
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 /* ═══════════════════════════════════════════════════════════════
-   FOUNDING CREATORS DATA
+   CREATOR INTERFACE
    ═══════════════════════════════════════════════════════════════ */
 
 interface Creator {
@@ -25,152 +26,33 @@ interface Creator {
   stats: { label: string; value: string }[];
 }
 
-const FOUNDERS: Creator[] = [
-  {
-    id: "maya-shoshani",
-    name: "Maya Shoshani",
+function mapDbToCreator(row: any): Creator {
+  const links: { label: string; url: string }[] = [];
+  if (row.website) links.push({ label: "Website", url: row.website });
+  if (row.social_instagram) links.push({ label: "Instagram", url: `https://instagram.com/${row.social_instagram.replace("@", "")}` });
+  if (row.social_youtube) links.push({ label: "YouTube", url: row.social_youtube.startsWith("http") ? row.social_youtube : `https://youtube.com/${row.social_youtube}` });
+  if (row.social_facebook) links.push({ label: "Facebook", url: `https://facebook.com/${row.social_facebook}` });
+  if (row.social_x) links.push({ label: "X", url: `https://x.com/${row.social_x.replace("@", "")}` });
+  if (row.email) links.push({ label: "Email", url: `mailto:${row.email}` });
+
+  return {
+    id: row.id,
+    name: row.name,
     badge: "Pioneer Creator",
-    role: "Director \u00b7 Independent Filmmaker",
-    avatar: "/creators/maya-shoshani.jpg",
-    bio: "Storyteller passionate about telling emotional truths through technology, animation, humor, and psychological sensitivity. I tell stories about people \u2013 through the objects, machines, rituals, digital moments and things they hold onto when life gets overwhelming.",
-    highlight: "Invested over 300 hours in a single 14-minute film with an original composed score. Creator of \"Breakup Letters AI\" \u2013 a 5-part cinematic AI animated series submitted to 20+ international film festivals.",
-    toolkit: ["Kling", "Sora", "Veo3", "Wan 2.6", "Minimax", "Seedance", "After Effects"],
-    works: [
-      { title: "Breakup Letters AI", type: "Animated Series \u00b7 5 Episodes", note: "AI tools speak in their own voices \u00b7 Animation, Drama, Dark Comedy" },
-      { title: "Untitled Short Film", type: "Psychological Drama \u00b7 14 min", note: "Exploring emotional states \u00b7 Original composed score" },
-      { title: "Zen & Chaos", type: "Animated Comedy Series", note: "An angry sushi tries to find his center \u00b7 Absurdist comedy" },
-    ],
-    links: [
-      { label: "Portfolio", url: "https://www.behance.net/mayas-vision" },
-      { label: "LinkedIn", url: "https://www.linkedin.com/in/maya-shoshani-296147164/" },
-      { label: "Facebook", url: "https://www.facebook.com/maya.shoshani.9" },
-      { label: "Instagram", url: "https://www.instagram.com/mayas.vision" },
-    ],
+    role: row.role || "AI Creator",
+    avatar: row.avatar_url || "",
+    bio: row.bio || "",
+    highlight: row.highlight || row.bio || "",
+    toolkit: row.toolkit || [],
+    works: [],
+    links,
     stats: [
-      { label: "Hours per film", value: "300+" },
-      { label: "Festival submissions", value: "20+" },
-      { label: "AI tools mastered", value: "7" },
+      { label: "AI tools", value: String((row.toolkit || []).length) },
+      { label: "Role", value: (row.role || "Creator").split(" · ")[0].split(" ").slice(0, 2).join(" ") },
+      { label: "Status", value: "Pioneer" },
     ],
-  },
-  {
-    id: "yuval-avadya",
-    name: "Yuval Avadya",
-    badge: "Pioneer Creator",
-    role: "AI Creative Director",
-    avatar: "/creators/yuval-avadya.jpg",
-    bio: "Turning imagination into reality with AI. Creating cinematic visuals for brands worldwide, pushing the boundaries of what's possible with generative video and AI-driven storytelling.",
-    highlight: "Specializes in high-end AI-generated brand content and cinematic visuals. Known for blending commercial creativity with cutting-edge AI video tools to deliver visuals that feel both futuristic and emotionally grounded.",
-    toolkit: ["Kling", "Seedance", "Nano Banana"],
-    works: [
-      { title: "Brand Campaigns", type: "AI Commercial Content", note: "Cinematic AI visuals for brands worldwide" },
-      { title: "AI Creative Reels", type: "Short-Form Content", note: "High-end AI-generated visual storytelling" },
-    ],
-    links: [
-      { label: "Instagram", url: "https://www.instagram.com/yuvimedia.ai" },
-      { label: "Personal", url: "https://www.instagram.com/yuvalavadya" },
-      { label: "Email", url: "mailto:yuvimgmt@gmail.com" },
-    ],
-    stats: [
-      { label: "Specialty", value: "Brands" },
-      { label: "AI tools mastered", value: "3" },
-      { label: "Focus", value: "Commercial" },
-    ],
-  },
-  {
-    id: "victor-leonativ",
-    name: "Victor Leonativ",
-    badge: "Pioneer Creator",
-    role: "AI Video Editor \u00b7 Creative Director",
-    avatar: "/creators/victor-leonativ.jpg",
-    bio: "Fusing years of traditional video editorial expertise with a high-fidelity AI stack. I don't just generate \u2013 I curate the intersection of human intuition and algorithmic precision to deliver the next evolution of social storytelling.",
-    highlight: "Veteran video editor who bridges the gap between traditional filmmaking craft and AI-powered creation. Brings editorial instinct and cinematic timing to every AI-generated frame.",
-    toolkit: ["Kling", "Runway", "After Effects", "Premiere Pro"],
-    works: [
-      { title: "AI Social Storytelling", type: "Short-Form Series", note: "Next-gen social content fusing editorial craft with AI generation" },
-      { title: "Creative Direction Reel", type: "Portfolio Showcase", note: "Traditional editing expertise meets AI-powered visuals" },
-    ],
-    links: [
-      { label: "Portfolio", url: "https://vectorcreations.wixsite.com/portfolio" },
-      { label: "YouTube", url: "https://www.youtube.com/@VXTEPS" },
-    ],
-    stats: [
-      { label: "Background", value: "Editorial" },
-      { label: "Approach", value: "Hybrid" },
-      { label: "Focus", value: "Storytelling" },
-    ],
-  },
-  {
-    id: "boaz-levkovitch",
-    name: "Boaz Levkovitch",
-    badge: "Pioneer Creator",
-    role: "Creative Director \u00b7 Founder of Climax Ltd.",
-    avatar: "/creators/boaz-levkovitch.jpg",
-    bio: "Creative Director with over 16 years of experience in advertising, branding, and design. Founder of Climax Ltd., a creative studio specializing in branding, visual identity, and AI-generated video content. Delivering high-impact creative solutions for clients across high-tech, real estate, and finance.",
-    highlight: "Bezalel Academy graduate pioneering the use of AI tools to create innovative, engaging video content for brands. Bridges traditional creative direction with cutting-edge AI production across diverse industries.",
-    toolkit: ["AI Video Production", "After Effects", "Branding", "Art Direction"],
-    works: [
-      { title: "AI Brand Campaigns", type: "Commercial Content", note: "AI-driven video production for corporate and commercial clients" },
-      { title: "Visual Identity Systems", type: "Branding", note: "End-to-end brand strategies for high-tech, real estate, and finance" },
-    ],
-    links: [
-      { label: "Website", url: "https://www.climax-design.co.il" },
-      { label: "Facebook", url: "https://www.facebook.com/boaz.levkovitch" },
-      { label: "Email", url: "mailto:boaz@climax-design.co.il" },
-    ],
-    stats: [
-      { label: "Experience", value: "16+ yrs" },
-      { label: "Specialty", value: "Branding" },
-      { label: "Focus", value: "AI Video" },
-    ],
-  },
-  {
-    id: "dreamshot-studio",
-    name: "Dreamshot AI Studio",
-    badge: "Pioneer Creator",
-    role: "AI Video Production Studio",
-    avatar: "/creators/dreamshot-studio.jpg",
-    bio: "A creative studio blending professional filmmaking with AI-powered production. Combines charismatic on-camera talent with AI-generated environments to produce commercials, concept videos, and viral content. Every project is built on precise shot lists and meticulous direction.",
-    highlight: "Produces both hybrid content (human presenter with AI backgrounds and VFX) and fully AI-generated concept films. Uses professional cinema gear alongside tools like Kling, Midjourney, and Seedance to build visual worlds without the constraints of physical locations or large crews.",
-    toolkit: ["Kling", "Midjourney", "Flux", "Seedance", "After Effects", "Canon R6 II"],
-    works: [
-      { title: "Hybrid Brand Films", type: "Human + AI Production", note: "Studio-shot presenters composited into AI-generated worlds" },
-      { title: "Full AI Concepts", type: "100% AI Production", note: "Complete commercials and event films built entirely with AI tools" },
-    ],
-    links: [
-      { label: "Instagram", url: "https://www.instagram.com/dreamshot.ai.studio" },
-      { label: "Facebook", url: "https://www.facebook.com/moshe.schwartz.79" },
-    ],
-    stats: [
-      { label: "Specialty", value: "AI Ads" },
-      { label: "AI tools", value: "6+" },
-      { label: "Approach", value: "Hybrid" },
-    ],
-  },
-  {
-    id: "eran-tzipel",
-    name: "Eran Tzipel",
-    badge: "Pioneer Creator",
-    role: "AI Creative Director",
-    avatar: "/creators/eran-tzipel.jpg",
-    bio: "AI Creative Director with a background in Industrial Engineering. Produces cinematic AI content that blends authentic footage with AI-generated environments. Known for viral storytelling that reaches hundreds of thousands of viewers organically.",
-    highlight: "Generated over 330,000 organic views for \"The Pilot,\" an AI cinematic series, within 36 hours across TikTok, YouTube, and Meta. Specializes in hybrid production for brands, safety training films, and architectural visualizations.",
-    toolkit: ["Kling V3", "Veo3", "Runway", "ElevenLabs", "Midjourney", "Nano Banana"],
-    works: [
-      { title: "The Pilot", type: "AI Cinematic Thriller", note: "Viral series with 330K+ organic views in 36 hours" },
-      { title: "Architectural Walk-throughs", type: "AI Visualization", note: "Cinematic AI-generated property showcases" },
-      { title: "Industrial Training Films", type: "Corporate AI Production", note: "Safety training content using AI environments" },
-    ],
-    links: [
-      { label: "YouTube", url: "https://www.youtube.com/@erantzipel" },
-      { label: "Facebook", url: "https://www.facebook.com/eran.tzipel" },
-    ],
-    stats: [
-      { label: "Top views", value: "330K+" },
-      { label: "AI tools", value: "6+" },
-      { label: "Focus", value: "Cinematic" },
-    ],
-  },
-];
+  };
+}
 
 /* ═══════════════════════════════════════════════════════════════
    CREATOR CARD
@@ -324,6 +206,7 @@ function CreatorCard({ creator }: { creator: Creator }) {
           </div>
 
           {/* Selected Works */}
+          {creator.works.length > 0 && (
           <div className="mb-10">
             <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/15 mb-4">Selected Works</p>
             <div className="space-y-3">
@@ -343,6 +226,7 @@ function CreatorCard({ creator }: { creator: Creator }) {
               ))}
             </div>
           </div>
+          )}
 
           {/* Links */}
           <div className="flex flex-wrap justify-center gap-3">
@@ -366,6 +250,22 @@ function CreatorCard({ creator }: { creator: Creator }) {
 
 export default function CreatorsPage() {
   const router = useRouter();
+  const [creators, setCreators] = useState<Creator[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      if (!supabase) { setLoading(false); return; }
+      const { data } = await supabase
+        .from("pioneer_creators")
+        .select("*")
+        .eq("visible", true)
+        .order("sort_order", { ascending: true });
+      if (data) setCreators(data.map(mapDbToCreator));
+      setLoading(false);
+    }
+    load();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#060608] text-white relative overflow-hidden">
@@ -430,11 +330,17 @@ export default function CreatorsPage() {
 
         {/* Founders */}
         <div className="py-14 md:py-20 w-full max-w-[1100px]" style={{ animation: "reveal 1s cubic-bezier(0.16,1,0.3,1) 0.2s both" }}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
-            {FOUNDERS.map((creator) => (
-              <CreatorCard key={creator.id} creator={creator} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-20"><Loader2 size={24} className="animate-spin text-white/15" /></div>
+          ) : creators.length === 0 ? (
+            <div className="text-center py-20"><p className="text-white/15">No creators yet</p></div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
+              {creators.map((creator) => (
+                <CreatorCard key={creator.id} creator={creator} />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* More Coming */}
