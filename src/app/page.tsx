@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase, getSmartPoster } from "@/lib/supabase";
 import { Movie, Category, HeroSlide, COLLECTIONS, FALLBACK_CATEGORIES } from "./components/types";
+import CategoryRow from "./components/CategoryRow";
 import Navbar from "./components/Navbar";
 import SearchOverlay from "./components/SearchOverlay";
 import HeroSection from "./components/HeroSection";
@@ -406,6 +407,40 @@ export default function HomePage() {
           ? selectedModel
           : "";
 
+  const isFiltering = selectedGenre !== "All" || selectedModel !== "All";
+
+  // ─── Build rows for streaming layout ───
+  const buildRows = (): Category[] => {
+    if (gridMovies.length === 0) return [];
+
+    // Under 20 films: single row
+    if (gridMovies.length < 20) {
+      return [{ title: "New on Spike AI", slug: "new", genre: "All", movies: gridMovies }];
+    }
+
+    // 20+ films: split by genre
+    const genreMap: Record<string, Movie[]> = {};
+    gridMovies.forEach((m) => {
+      const genres = (m.genre || "Other").split(",").map(g => g.trim());
+      genres.forEach((g) => {
+        if (!genreMap[g]) genreMap[g] = [];
+        if (!genreMap[g].some(x => x.id === m.id)) genreMap[g].push(m);
+      });
+    });
+
+    return Object.entries(genreMap)
+      .filter(([, movies]) => movies.length >= 2)
+      .sort((a, b) => b[1].length - a[1].length)
+      .map(([genre, movies]) => ({
+        title: genre,
+        slug: genre.toLowerCase().replace(/\s+/g, "-"),
+        genre,
+        movies,
+      }));
+  };
+
+  const rows = buildRows();
+
   // ─── Pre-mount: black screen to prevent splash double-flash ───
   if (!mounted) {
     return <div className="min-h-screen bg-[#050505]" />;
@@ -469,32 +504,49 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Section Title */}
-          {dbReady && filteredMovies.length > 0 && (
-            <h2 className="text-lg md:text-xl font-semibold mb-6 text-white/70 tracking-wide">
-              {activeFilterLabel ? `${activeFilterLabel}` : "All Films"}
-              
-            </h2>
+          {/* ═══ STREAMING ROWS (no filter active) ═══ */}
+          {dbReady && !isFiltering && rows.length > 0 && (
+            <div className="space-y-2">
+              {rows.map((row, idx) => (
+                <CategoryRow
+                  key={row.slug}
+                  category={row}
+                  index={idx}
+                  isAdmin={isAdmin}
+                  onDeleteMovie={handleDeleteMovie}
+                  userVotedIds={userVotedIds}
+                  watchlistIds={watchlistIds}
+                  onWatchlistToggle={handleWatchlistToggle}
+                />
+              ))}
+            </div>
           )}
 
-          {/* Single Grid of All Movies */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-            {filteredMovies.map((movie, index) => (
-              <MovieCard
-                key={movie.id}
-                movie={movie}
-                rank={index < 10 && selectedGenre === "All" && selectedModel === "All" ? index + 1 : undefined}
-                isAdmin={isAdmin}
-                onDelete={handleDeleteMovie}
-                userVoted={userVotedIds.has(movie.id)}
-                inWatchlist={watchlistIds.has(movie.id)}
-                onWatchlistToggle={handleWatchlistToggle}
-              />
-            ))}
-          </div>
+          {/* ═══ FILTERED GRID (when genre/model filter active) ═══ */}
+          {dbReady && isFiltering && filteredMovies.length > 0 && (
+            <>
+              <h2 className="text-lg md:text-xl font-semibold mb-6 text-white/70 tracking-wide">
+                {activeFilterLabel}
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+                {filteredMovies.map((movie, index) => (
+                  <MovieCard
+                    key={movie.id}
+                    movie={movie}
+                    rank={index < 10 ? index + 1 : undefined}
+                    isAdmin={isAdmin}
+                    onDelete={handleDeleteMovie}
+                    userVoted={userVotedIds.has(movie.id)}
+                    inWatchlist={watchlistIds.has(movie.id)}
+                    onWatchlistToggle={handleWatchlistToggle}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
-        {dbReady && filteredMovies.length === 0 && (
+        {dbReady && ((isFiltering && filteredMovies.length === 0) || (!isFiltering && rows.length === 0 && gridMovies.length === 0)) && (
           <div className="text-center py-24">
             <p className="text-white/30 text-lg font-light tracking-wide">
               No films found{activeFilterLabel ? ` for "${activeFilterLabel}"` : ""}
