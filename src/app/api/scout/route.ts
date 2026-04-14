@@ -85,41 +85,104 @@ function detectGenre(text: string): string | null {
   return null;
 }
 
-function calculateScore(video: any, channel: any): number {
+/* ─── Engagement-Based Scoring v2 ───
+   Weighs quality over raw numbers.
+   A 500-sub creator with 10K views per video scores higher
+   than a 50K-sub creator with 2K views.
+   ─── Breakdown ───
+   Engagement ratio (views/subs):  0-3 points
+   Raw reach (views):              0-2 points
+   Recency:                        0-2 points
+   AI tools specificity:           0-2 points
+   Upload activity:                0-1 point
+   Total max: 10
+*/
+
+interface EngagementData {
+  engagementRatio: number;
+  uploadFrequency: string;
+  channelAgeDays: number;
+  subscriberCount: number;
+  viewCount: number;
+}
+
+function calculateScore(video: any, channel: any): { score: number; engagement: EngagementData } {
   let score = 0;
 
-  // Views (0-3 points)
   const views = parseInt(video.statistics?.viewCount || "0");
-  if (views >= 100000) score += 3;
-  else if (views >= 10000) score += 2;
-  else if (views >= 1000) score += 1;
-
-  // Subscriber count (0-3 points)
   const subs = parseInt(channel?.statistics?.subscriberCount || "0");
-  if (subs >= 50000) score += 3;
-  else if (subs >= 10000) score += 2;
-  else if (subs >= 1000) score += 1;
+  const totalVids = parseInt(channel?.statistics?.videoCount || "0");
+  const channelCreated = channel?.snippet?.publishedAt
+    ? new Date(channel.snippet.publishedAt)
+    : new Date();
+  const channelAgeDays = Math.max(1, Math.floor((Date.now() - channelCreated.getTime()) / 86400000));
 
-  // Recency - published in last 30 days (0-2 points)
+  // ── Engagement ratio: views-to-subscribers (0-3 points) ──
+  // This is the key metric. High ratio = content resonates beyond subscriber base
+  let engagementRatio = 0;
+  if (subs > 0) {
+    engagementRatio = views / subs;
+    if (engagementRatio >= 10) score += 3;       // Viral: 10x more views than subs
+    else if (engagementRatio >= 3) score += 2;    // Strong: 3x
+    else if (engagementRatio >= 1) score += 1;    // Healthy: views >= subs
+  } else if (views >= 5000) {
+    // No subs data but good views = probably good
+    score += 2;
+  }
+
+  // ── Raw reach (0-2 points) ──
+  // Still matters, but weighted less than ratio
+  if (views >= 50000) score += 2;
+  else if (views >= 5000) score += 1;
+
+  // ── Recency (0-2 points) ──
   const published = new Date(video.snippet?.publishedAt || 0);
-  const daysSince = (Date.now() - published.getTime()) / (1000 * 60 * 60 * 24);
+  const daysSince = (Date.now() - published.getTime()) / 86400000;
   if (daysSince <= 7) score += 2;
   else if (daysSince <= 30) score += 1;
 
-  // AI tools detected (0-2 points)
+  // ── AI tools specificity (0-2 points) ──
   const text = `${video.snippet?.title || ""} ${video.snippet?.description || ""}`;
   const tools = detectAiTools(text);
   if (tools.length >= 2) score += 2;
   else if (tools.length >= 1) score += 1;
 
-  return Math.min(score, 10);
+  // ── Upload frequency / channel activity (0-1 point) ──
+  // Active creators are more likely to engage
+  let uploadFrequency = "unknown";
+  if (totalVids > 0 && channelAgeDays > 0) {
+    const videosPerMonth = (totalVids / channelAgeDays) * 30;
+    if (videosPerMonth >= 4) {
+      score += 1;
+      uploadFrequency = "weekly+";
+    } else if (videosPerMonth >= 1) {
+      uploadFrequency = "monthly";
+    } else {
+      uploadFrequency = "rare";
+    }
+  }
+
+  return {
+    score: Math.min(score, 10),
+    engagement: {
+      engagementRatio: Math.round(engagementRatio * 100) / 100,
+      uploadFrequency,
+      channelAgeDays,
+      subscriberCount: subs,
+      viewCount: views,
+    },
+  };
 }
 
-function buildNotes(video: any, views: number, subs: number, tools: string[]): string {
+function buildNotes(video: any, views: number, subs: number, tools: string[], engagement?: EngagementData): string {
   const parts: string[] = [];
   parts.push(`Video: "${video.snippet?.title}"`);
   parts.push(`Views: ${views.toLocaleString()}`);
   parts.push(`Channel subs: ${subs.toLocaleString()}`);
+  if (engagement) {
+    parts.push(`V/S ratio: ${engagement.engagementRatio}x`);
+    if (engagement.uploadFrequency !== "unknown") parts.push(`Uploads: ${engagement.uploadFrequency}`);
+  }
   if (tools.length > 0) parts.push(`AI tools: ${tools.join(", ")}`);
   const published = new Date(video.snippet?.publishedAt || 0);
   parts.push(`Published: ${published.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}`);
@@ -240,7 +303,7 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
       const tools = detectAiTools(text);
       const genre = detectGenre(text);
       const views = parseInt(video.statistics?.viewCount || "0");
-      const score = calculateScore(video, channel);
+      const { score, engagement } = calculateScore(video, channel);
 
       // Skip very low quality (score 1 or below)
       if (score <= 1) {
@@ -257,8 +320,14 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
         ai_tools: tools,
         genre: genre,
         score: score,
-        notes: buildNotes(video, views, subs, tools),
+        notes: buildNotes(video, views, engagement.subscriberCount, tools, engagement),
         status: "new",
+        // Engagement metrics (new columns)
+        engagement_ratio: engagement.engagementRatio,
+        upload_frequency: engagement.uploadFrequency,
+        channel_age_days: engagement.channelAgeDays,
+        subscriber_count: engagement.subscriberCount,
+        view_count: engagement.viewCount,
       };
 
       const { error } = await supabase.from("creator_leads").insert(lead);

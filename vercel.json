@@ -33,6 +33,18 @@
       "schedule": "40 7 * * *"
     },
     {
+      "path": "/api/x-scout",
+      "schedule": "45 7 * * *"
+    },
+    {
+      "path": "/api/auto-comment",
+      "schedule": "50 7 * * *"
+    },
+    {
+      "path": "/api/outreach-sequence",
+      "schedule": "25 7 * * *"
+    },
+    {
       "path": "/api/tweet",
       "schedule": "0 9 * * *"
     },
