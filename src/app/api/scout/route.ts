@@ -230,6 +230,13 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
       const channelUrl = `https://youtube.com/channel/${channelId}`;
       const channel = channelMap.get(channelId);
 
+      // Skip large channels (media companies, not indie creators)
+      const subs = parseInt(channel?.statistics?.subscriberCount || "0");
+      if (subs > 500000) {
+        skipped++;
+        continue;
+      }
+
       // Skip if already in pipeline
       if (existingUrls.has(channelUrl)) {
         skipped++;
@@ -240,7 +247,6 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
       const tools = detectAiTools(text);
       const genre = detectGenre(text);
       const views = parseInt(video.statistics?.viewCount || "0");
-      const subs = parseInt(channel?.statistics?.subscriberCount || "0");
       const score = calculateScore(video, channel);
 
       // Skip very low quality (score 1 or below)
