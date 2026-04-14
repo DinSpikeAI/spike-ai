@@ -29,6 +29,10 @@
       "schedule": "35 7 * * *"
     },
     {
+      "path": "/api/partnerships",
+      "schedule": "40 7 * * *"
+    },
+    {
       "path": "/api/tweet",
       "schedule": "0 9 * * *"
     },
