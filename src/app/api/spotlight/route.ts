@@ -94,7 +94,7 @@ async function findTopCreator(supabase: any): Promise<CreatorStats | null> {
   }
 
   // Sort by upvotes, pick top
-  const sorted = Object.values(creators).sort((a, b) => b.totalUpvotes - a.totalUpvotes);
+  const sorted = Object.values(creators).sort((a, b) => b.totalUpvotes - a.totalUpvotes || b.filmCount - a.filmCount);
   return sorted[0] || null;
 }
 
@@ -110,7 +110,7 @@ function buildTweetDraft(creator: CreatorStats): string {
     lines.push(creator.filmCount + " films on Spike AI");
   }
 
-  lines.push(creator.totalUpvotes + " total upvotes");
+  if (creator.totalUpvotes > 0) lines.push(creator.totalUpvotes + " total upvotes");
   lines.push("");
 
   if (creator.topFilm) {
@@ -132,7 +132,7 @@ function buildTweetDraft(creator: CreatorStats): string {
     tweet = [
       "Creator of the Week: " + creator.name,
       "",
-      creator.filmCount + " films, " + creator.totalUpvotes + " upvotes",
+      creator.filmCount + " films on Spike AI",
       "",
       creator.topFilm ? "https://www.spikeai.studio/movie/" + creator.topFilm.id : "https://www.spikeai.studio",
       "",
@@ -152,7 +152,7 @@ function buildBlogDraft(creator: CreatorStats): string {
   lines.push("");
 
   if (creator.filmCount > 1) {
-    lines.push("With " + creator.filmCount + " films and " + creator.totalUpvotes + " total upvotes, " + creator.name + " is one of the most active creators on the platform.");
+    lines.push("With " + creator.filmCount + " films and " + creator.totalUpvotes + " upvotes, " + creator.name + " is one of the most active creators on the platform.");
   } else {
     lines.push(creator.name + " has " + creator.totalUpvotes + " upvotes on their debut film.");
   }
@@ -170,7 +170,7 @@ function buildBlogDraft(creator: CreatorStats): string {
   lines.push("");
 
   if (creator.topFilm) {
-    lines.push("Most popular film: \"" + creator.topFilm.title + "\" (" + creator.topFilm.upvotes + " upvotes)");
+    lines.push(creator.topFilm.upvotes > 0 ? "Most popular film: \"" + creator.topFilm.title + "\" (" + creator.topFilm.upvotes + " upvotes)" : "Latest film: \"" + creator.topFilm.title + "\"");
     lines.push("Watch: https://www.spikeai.studio/movie/" + creator.topFilm.id);
   }
 
