@@ -13,6 +13,14 @@
       "schedule": "10 7 * * *"
     },
     {
+      "path": "/api/reddit-scout",
+      "schedule": "15 7 * * *"
+    },
+    {
+      "path": "/api/draft",
+      "schedule": "20 7 * * *"
+    },
+    {
       "path": "/api/tweet",
       "schedule": "0 9 * * *"
     },
