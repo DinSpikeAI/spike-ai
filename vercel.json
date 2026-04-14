@@ -45,6 +45,10 @@
       "schedule": "25 7 * * *"
     },
     {
+      "path": "/api/manager",
+      "schedule": "0 8 * * *"
+    },
+    {
       "path": "/api/tweet",
       "schedule": "0 9 * * *"
     },

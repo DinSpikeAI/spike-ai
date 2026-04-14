@@ -32,12 +32,20 @@ const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 // ─── Config ───
 const MIN_SCORE = 7;
 const MAX_PER_RUN = 5;
-const STEP_DELAYS_HOURS = {
-  1: 0,     // Step 1: immediately after entering sequence
-  2: 24,    // Step 2: 24 hours after step 1
-  3: 72,    // Step 3: 72 hours (3 days) after step 2
-  4: 96,    // Step 4: 96 hours (4 days) after step 3
-};
+
+// Adaptive timing: high-value leads get faster follow-ups
+function getStepDelay(nextStep: number, score: number): number {
+  if (score >= 9) {
+    // Fast track: 0 → 12h → 48h → 72h
+    return { 2: 12, 3: 48, 4: 72 }[nextStep] || 24;
+  }
+  if (score >= 8) {
+    // Priority: 0 → 18h → 60h → 84h
+    return { 2: 18, 3: 60, 4: 84 }[nextStep] || 24;
+  }
+  // Standard: 0 → 24h → 72h → 96h
+  return { 2: 24, 3: 72, 4: 96 }[nextStep] || 24;
+}
 
 // ─── Telegram ───
 async function sendTelegram(text: string): Promise<boolean> {
@@ -80,6 +88,33 @@ async function askClaude(prompt: string): Promise<string> {
   }
 }
 
+// ─── Creator Memory ───
+
+async function getCreatorMemory(supabase: any, leadId: string): Promise<string> {
+  try {
+    const { data } = await supabase
+      .from("creator_memory")
+      .select("interactions, notes")
+      .eq("lead_id", leadId)
+      .single();
+
+    if (!data) return "";
+
+    const parts: string[] = [];
+    if (data.notes) parts.push(`Background: ${data.notes}`);
+    if (data.interactions && data.interactions.length > 0) {
+      const history = data.interactions
+        .slice(-3)
+        .map((i: any) => `${i.type} on ${new Date(i.date).toLocaleDateString("en-GB")}: "${i.snippet}"`)
+        .join("; ");
+      parts.push(`Previous interactions: ${history}`);
+    }
+    return parts.join("\n");
+  } catch {
+    return "";
+  }
+}
+
 // ─── Step Generators ───
 
 function buildStep1Prompt(lead: any): string {
@@ -97,7 +132,7 @@ Rules:
 - 2-3 sentences max`;
 }
 
-function buildStep2Prompt(lead: any): string {
+function buildStep2Prompt(lead: any, memory: string = ""): string {
   return `You are Dean Moshe, founder of Spike AI (spikeai.studio), the first streaming platform for AI-generated cinema.
 
 Write a short, authentic DM to recruit this creator. This is your FIRST direct contact.
@@ -108,6 +143,7 @@ Creator:
 - Film: "${lead.work_title || "their AI film"}"
 - AI tools: ${(lead.ai_tools || []).join(", ") || "unknown"}
 - Genre: ${lead.genre || "unknown"}
+${memory ? "\nContext from previous interactions:\n" + memory : ""}
 
 Rules:
 - Under 120 words
@@ -187,7 +223,7 @@ async function processSequence(supabase: any): Promise<SequenceResult> {
         .update({
           sequence_step: 1,
           sequence_started_at: now.toISOString(),
-          next_sequence_at: new Date(now.getTime() + STEP_DELAYS_HOURS[2] * 3600000).toISOString(),
+          next_sequence_at: new Date(now.getTime() + getStepDelay(2, lead.score) * 3600000).toISOString(),
         })
         .eq("id", lead.id);
 
@@ -238,8 +274,11 @@ async function processSequence(supabase: any): Promise<SequenceResult> {
       let stepLabel = "";
       let nextStatus = lead.status;
 
+      // Load creator memory for personalized DMs
+      const memory = await getCreatorMemory(supabase, lead.id);
+
       if (nextStep === 2) {
-        draft = await askClaude(buildStep2Prompt(lead));
+        draft = await askClaude(buildStep2Prompt(lead, memory));
         stepLabel = "DM Draft";
         nextStatus = "contacted";
       } else if (nextStep === 3) {
@@ -252,9 +291,9 @@ async function processSequence(supabase: any): Promise<SequenceResult> {
         nextStatus = "followed_up";
       }
 
-      // Calculate next delay
+      // Calculate next delay (adaptive based on score)
       const nextDelay = nextStep < 4
-        ? STEP_DELAYS_HOURS[(nextStep + 1) as keyof typeof STEP_DELAYS_HOURS]
+        ? getStepDelay(nextStep + 1, lead.score)
         : 0;
       const nextAt = nextDelay > 0
         ? new Date(now.getTime() + nextDelay * 3600000).toISOString()
