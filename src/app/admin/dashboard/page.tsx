@@ -6,7 +6,7 @@ import {
   Shield, Film, Trash2, Pencil, Check, X, Loader2, RefreshCw,
   ArrowLeft, ChevronDown, Search, Zap, Clock, XCircle, Eye,
   Save, Plus, AlertTriangle, Inbox, CheckCircle, Ban, Bell, Users,
-  Sparkles,
+  Sparkles, Target,
 } from "lucide-react";
 import { supabase, getSmartPoster, checkIsAdmin } from "@/lib/supabase";
 
@@ -415,6 +415,12 @@ export default function AdminDashboard() {
                 </div>
               )}
             </div>
+            <button
+              onClick={() => router.push("/admin/pipeline")}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white text-sm font-bold rounded-lg hover:bg-purple-500 transition-all"
+            >
+              <Target size={14} /> Pipeline
+            </button>
             <button
               onClick={() => router.push("/submit")}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-500 transition-all"
