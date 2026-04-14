@@ -694,7 +694,7 @@ export default function PipelinePage() {
                 <div>
                   <label className="text-[10px] text-white/30 uppercase tracking-wider font-medium block mb-1">Platform</label>
                   <select value={newLead.platform} onChange={e => setNewLead({ ...newLead, platform: e.target.value })}
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 text-sm text-white/60 outline-none" style={{ colorScheme: "dark" }}>
+                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 text-sm text-white/60 outline-none" style={{ colorScheme: "dark", backgroundColor: "#1a1a1e", color: "#aaa" }}>
                     {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                   </select>
                 </div>
@@ -723,7 +723,7 @@ export default function PipelinePage() {
               <div>
                 <label className="text-[10px] text-white/30 uppercase tracking-wider font-medium block mb-1">Genre</label>
                 <select value={newLead.genre} onChange={e => setNewLead({ ...newLead, genre: e.target.value })}
-                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 text-sm text-white/60 outline-none" style={{ colorScheme: "dark" }}>
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 text-sm text-white/60 outline-none" style={{ colorScheme: "dark", backgroundColor: "#1a1a1e", color: "#aaa" }}>
                   <option value="">Select genre</option>
                   {GENRES.map(g => <option key={g} value={g}>{g}</option>)}
                 </select>
