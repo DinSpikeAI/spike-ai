@@ -11,6 +11,10 @@
     {
       "path": "/api/check",
       "schedule": "10 7 * * *"
+    },
+    {
+      "path": "/api/tweet",
+      "schedule": "0 12 * * *"
     }
   ]
 }
