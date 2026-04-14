@@ -14,7 +14,15 @@
     },
     {
       "path": "/api/tweet",
-      "schedule": "0 12 * * *"
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/tweet",
+      "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/tweet",
+      "schedule": "0 19 * * *"
     }
   ]
 }
