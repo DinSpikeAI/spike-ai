@@ -21,6 +21,14 @@
       "schedule": "20 7 * * *"
     },
     {
+      "path": "/api/auto-enrich",
+      "schedule": "30 7 * * *"
+    },
+    {
+      "path": "/api/auto-cleanup",
+      "schedule": "35 7 * * *"
+    },
+    {
       "path": "/api/tweet",
       "schedule": "0 9 * * *"
     },
@@ -33,12 +41,16 @@
       "schedule": "0 19 * * *"
     },
     {
-      "path": "/api/spotlight",
-      "schedule": "0 8 * * 3"
-    },
-    {
       "path": "/api/seo",
       "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/auto-blog",
+      "schedule": "0 8 * * 0"
+    },
+    {
+      "path": "/api/spotlight",
+      "schedule": "0 8 * * 3"
     }
   ]
 }
