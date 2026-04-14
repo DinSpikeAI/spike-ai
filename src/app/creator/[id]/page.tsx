@@ -312,17 +312,17 @@ export default function CreatorPage() {
               )}
               {creator.social_x && (
                 <a href={creator.social_x.startsWith("http") ? creator.social_x : `https://x.com/${creator.social_x}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-white/5 text-gray-300 rounded-lg border border-white/10 hover:border-white/20 hover:text-white transition-all">
-                  <Twitter size={12} /> X / Twitter
+                  <ExternalLink size={12} /> X / Twitter
                 </a>
               )}
               {creator.social_youtube && (
                 <a href={creator.social_youtube.startsWith("http") ? creator.social_youtube : `https://youtube.com/@${creator.social_youtube}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-white/5 text-gray-300 rounded-lg border border-white/10 hover:border-white/20 hover:text-white transition-all">
-                  <Youtube size={12} /> YouTube
+                  <ExternalLink size={12} /> YouTube
                 </a>
               )}
               {creator.social_instagram && (
                 <a href={creator.social_instagram.startsWith("http") ? creator.social_instagram : `https://instagram.com/${creator.social_instagram}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-white/5 text-gray-300 rounded-lg border border-white/10 hover:border-white/20 hover:text-white transition-all">
-                  <Instagram size={12} /> Instagram
+                  <ExternalLink size={12} /> Instagram
                 </a>
               )}
             </div>
