@@ -295,9 +295,11 @@ async function saveKPIs(supabase: any, data: any): Promise<void> {
   ];
 
   for (const m of metrics) {
-    await supabase.from("agent_metrics").upsert(m, {
-      onConflict: "date,metric_name",
-    }).catch(() => {});
+    try {
+      await supabase.from("agent_metrics").upsert(m, {
+        onConflict: "date,metric_name",
+      });
+    } catch {}
   }
 }
 
