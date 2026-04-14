@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 /* ═══════════════════════════════════════════════════════════════
-   AGENT 6 — Tweet Drafts via Telegram
+   AGENT 6 — AI-Powered Tweet Drafts
    
-   Runs 3x daily via Vercel Cron.
-   Picks a film, builds a ready-to-post tweet, sends to Telegram.
-   You copy-paste to Twitter in 10 seconds.
+   Uses Claude to write creative, varied tweets.
+   Runs 3x daily. Sends drafts to Telegram.
    
    Manual: GET /api/tweet?manual=true
    ═══════════════════════════════════════════════════════════════ */
@@ -15,6 +14,7 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 async function sendTelegram(text: string): Promise<boolean> {
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
@@ -31,7 +31,31 @@ async function sendTelegram(text: string): Promise<boolean> {
   return res.ok;
 }
 
-/* ─── Pick Film ─── */
+async function askClaude(prompt: string): Promise<string> {
+  if (!ANTHROPIC_API_KEY) return "";
+  
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 300,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+
+    if (!res.ok) return "";
+    const data = await res.json();
+    return data.content?.[0]?.text || "";
+  } catch {
+    return "";
+  }
+}
 
 async function pickFilm(supabase: any): Promise<any | null> {
   const { data: movies } = await supabase
@@ -41,63 +65,19 @@ async function pickFilm(supabase: any): Promise<any | null> {
     .order("upvotes_count", { ascending: false });
 
   if (!movies || movies.length === 0) return null;
-
-  // Pick random from top 10 so it varies each time
   const pool = movies.slice(0, Math.min(10, movies.length));
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-/* ─── Build Tweet Text ─── */
-
-function buildTweet(movie: any): string {
-  const lines: string[] = [];
-  
-  lines.push(movie.title);
-  lines.push("");
-
-  if (movie.description) {
-    const desc = movie.description.length > 100 
-      ? movie.description.slice(0, 97) + "..." 
-      : movie.description;
-    lines.push(desc);
-    lines.push("");
-  }
-
-  if (movie.creator_name) {
-    lines.push("Creator: " + movie.creator_name);
-  }
-
-  if (movie.ai_models && movie.ai_models.length > 0) {
-    lines.push("Made with: " + movie.ai_models.join(", "));
-  }
-
-  lines.push("");
-  lines.push("Watch free on Spike AI");
-  lines.push("https://www.spikeai.studio/movie/" + movie.id);
-  lines.push("");
-  lines.push("#AIcinema #AIfilm #AIart");
-
-  let tweet = lines.join("\n");
-
-  // Trim to 280 chars if needed
-  if (tweet.length > 280) {
-    const short = [
-      movie.title,
-      "",
-      movie.creator_name ? "Creator: " + movie.creator_name : "",
-      "",
-      "Watch free on Spike AI",
-      "https://www.spikeai.studio/movie/" + movie.id,
-      "",
-      "#AIcinema #AIfilm",
-    ].filter(Boolean);
-    tweet = short.join("\n");
-  }
-
-  return tweet;
-}
-
-/* ─── API Route ─── */
+// Rotate tweet styles
+const TWEET_STYLES = [
+  "Write a hype tweet that makes people want to watch this film RIGHT NOW. Create urgency and excitement.",
+  "Write a thoughtful tweet that highlights the artistic merit and technical achievement of this AI film.",
+  "Write a casual, conversational tweet as if recommending this film to a friend. Keep it natural.",
+  "Write a tweet that focuses on the creator and celebrates their work. Make the creator feel appreciated.",
+  "Write a tweet that poses a question to the audience about AI cinema, using this film as an example.",
+  "Write a tweet that compares what AI cinema can do today vs 2 years ago, using this film as proof.",
+];
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
@@ -120,9 +100,44 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: "No approved films" });
     }
 
-    const tweet = buildTweet(movie);
+    // Pick random style
+    const style = TWEET_STYLES[Math.floor(Math.random() * TWEET_STYLES.length)];
 
-    // Send to Telegram as ready-to-copy draft
+    const prompt = `You manage the Twitter account @SpikeAI_ for Spike AI, a streaming platform for AI-generated cinema.
+
+${style}
+
+Film info:
+- Title: ${movie.title}
+- Creator: ${movie.creator_name || "Independent Creator"}
+- Description: ${movie.description || "An AI-generated film"}
+- Genre: ${movie.genre || "AI Cinema"}
+- AI tools used: ${(movie.ai_models || []).join(", ") || "AI tools"}
+- Link: https://www.spikeai.studio/movie/${movie.id}
+
+Rules:
+- MUST be under 280 characters total (this is critical)
+- Include the film link
+- Include 1-2 relevant hashtags (choose from: #AIcinema #AIfilm #AIart #SpikeAI or genre-specific ones)
+- Don't use emojis excessively (max 1-2)
+- Don't start with "Just watched" or "Check out" - be more creative
+- Write ONLY the tweet text, nothing else`;
+
+    let tweet = await askClaude(prompt);
+
+    // Fallback if Claude fails
+    if (!tweet) {
+      tweet = movie.title + "\n\n" +
+        (movie.creator_name ? "Creator: " + movie.creator_name + "\n" : "") +
+        "\nWatch free on Spike AI\nhttps://www.spikeai.studio/movie/" + movie.id +
+        "\n\n#AIcinema #AIfilm";
+    }
+
+    // Ensure under 280
+    if (tweet.length > 280) {
+      tweet = tweet.slice(0, 277) + "...";
+    }
+
     const message = [
       "🐦 <b>Tweet Draft — Ready to Post</b>",
       "",
@@ -132,8 +147,10 @@ export async function GET(request: NextRequest) {
       "",
       "━━━━━━━━━━━━━━━━━━━━",
       "",
-      "📋 Copy the text above and paste in Twitter",
+      "📋 Copy and paste to Twitter",
       "📏 " + tweet.length + "/280 characters",
+      "🎬 Film: " + movie.title,
+      "🎨 Style: " + style.split(".")[0],
     ].join("\n");
 
     const sent = await sendTelegram(message);
@@ -144,6 +161,7 @@ export async function GET(request: NextRequest) {
       tweet,
       chars: tweet.length,
       film: movie.title,
+      style: style.split(".")[0],
       timestamp: new Date().toISOString(),
     });
   } catch (err: any) {

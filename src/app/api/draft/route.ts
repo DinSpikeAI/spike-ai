@@ -2,12 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 /* ═══════════════════════════════════════════════════════════════
-   AGENT 9 — DM Drafter
+   AGENT 9 — AI-Powered DM Drafter
    
-   Runs daily at 7:20 AM UTC via Vercel Cron.
-   Takes Hot Leads (score 7+, status "new") from pipeline,
-   builds personalized DM drafts + YouTube comment drafts,
-   sends them to Telegram ready to copy-paste.
+   Uses Claude to write personalized DMs based on creator briefs.
+   Runs daily at 7:20 AM UTC.
    
    Manual: GET /api/draft?manual=true
    ═══════════════════════════════════════════════════════════════ */
@@ -16,6 +14,7 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 async function sendTelegram(text: string): Promise<boolean> {
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
@@ -32,113 +31,74 @@ async function sendTelegram(text: string): Promise<boolean> {
   return res.ok;
 }
 
-/* ─── DM Templates by Platform ─── */
+async function askClaude(prompt: string): Promise<string> {
+  if (!ANTHROPIC_API_KEY) return "[Claude unavailable - missing API key]";
+  
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 500,
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
 
-function buildDM(lead: any): string {
-  const name = lead.name || "there";
-  const filmTitle = lead.work_title || "your latest AI film";
-  const tools = (lead.ai_tools || []).join(", ");
-  const genre = lead.genre || "";
-  const platform = lead.platform || "youtube";
+    if (!res.ok) {
+      const err = await res.text();
+      return "[Claude error: " + err.slice(0, 100) + "]";
+    }
 
-  // Extract interesting details from notes
-  const notes = lead.notes || "";
-  const viewsMatch = notes.match(/Views: ([\d,]+)/);
-  const views = viewsMatch ? viewsMatch[1] : null;
-
-  // Genre-specific compliments
-  let genreHook = "";
-  if (genre.toLowerCase().includes("horror")) genreHook = "The atmosphere you created is genuinely unsettling in the best way.";
-  else if (genre.toLowerCase().includes("sci-fi")) genreHook = "The world-building in this is incredible.";
-  else if (genre.toLowerCase().includes("anime")) genreHook = "The animation style is stunning.";
-  else if (genre.toLowerCase().includes("fantasy")) genreHook = "The visual storytelling here is next level.";
-  else if (genre.toLowerCase().includes("drama")) genreHook = "The emotional depth really comes through.";
-  else if (genre.toLowerCase().includes("action")) genreHook = "The energy and pacing are fantastic.";
-  else genreHook = "The quality of this work really stands out.";
-
-  // Tool-specific compliment
-  let toolHook = "";
-  if (tools.includes("Runway")) toolHook = "Your use of Runway is some of the best I've seen.";
-  else if (tools.includes("Kling")) toolHook = "You're pushing Kling to its limits here.";
-  else if (tools.includes("Sora")) toolHook = "This is exactly the kind of Sora work that deserves a bigger audience.";
-  else if (tools.includes("Seedance")) toolHook = "Seedance in the right hands looks incredible.";
-  else if (tools.includes("Midjourney")) toolHook = "The Midjourney visuals are beautiful.";
-  else if (tools) toolHook = "The way you're using " + tools.split(",")[0].trim() + " is impressive.";
-
-  // Build DM based on platform
-  if (platform === "reddit") {
-    return [
-      "Hey " + name + ",",
-      "",
-      'Just saw your post "' + filmTitle.slice(0, 60) + '" and had to reach out. ' + genreHook,
-      "",
-      "I'm building Spike AI, a free streaming platform dedicated to AI-generated cinema. We're curating the best AI films from creators like you.",
-      "",
-      "No catch, no fees. You keep full credit and we link to all your socials. Would love to feature your work.",
-      "",
-      "Check it out: spikeai.studio",
-      "",
-      "Dean",
-      "Founder, Spike AI",
-    ].join("\n");
+    const data = await res.json();
+    return data.content?.[0]?.text || "[No response]";
+  } catch (err: any) {
+    return "[Claude error: " + err.message + "]";
   }
-
-  // YouTube / default
-  return [
-    "Hey " + name + ",",
-    "",
-    'Just watched "' + filmTitle.slice(0, 60) + '" — ' + genreHook + (toolHook ? " " + toolHook : ""),
-    "",
-    "I'm building Spike AI, a free streaming platform for AI cinema. Think of it as the home for work like yours — a place where AI filmmakers get the audience they deserve.",
-    "",
-    "We already have creators using " + (tools || "various AI tools") + " and I think your work would be a perfect fit.",
-    "",
-    "Interested? It takes 2 minutes to upload: spikeai.studio/submit",
-    "",
-    "Dean",
-    "Founder, Spike AI",
-  ].join("\n");
 }
 
-/* ─── YouTube Comment Draft ─── */
+async function generateDM(lead: any): Promise<{ dm: string; comment: string }> {
+  const dmPrompt = `You are Dean Moshe, founder of Spike AI (spikeai.studio), the first streaming platform for AI-generated cinema. Write a short, authentic DM to recruit this creator to upload their films on Spike AI.
 
-function buildComment(lead: any): string {
-  const genre = lead.genre || "";
-  const tools = (lead.ai_tools || []).join(", ");
+Creator info:
+- Name: ${lead.name}
+- Platform: ${lead.platform}
+- Film title: ${lead.work_title || "unknown"}
+- AI tools used: ${(lead.ai_tools || []).join(", ") || "unknown"}
+- Genre: ${lead.genre || "unknown"}
+- Additional info: ${lead.notes || "none"}
 
-  let comment = "This is incredible work! ";
+Rules:
+- Keep it under 150 words
+- Be genuine, not salesy
+- Mention their specific film or style
+- Explain Spike AI briefly (free platform for AI cinema)
+- End with a clear call to action (submit at spikeai.studio/submit)
+- Sign as Dean, Founder of Spike AI
+- Don't use emojis
+- Write in English
+- Sound like a real person, not a bot`;
 
-  if (genre.toLowerCase().includes("horror")) comment += "The atmosphere is genuinely chilling. ";
-  else if (genre.toLowerCase().includes("sci-fi")) comment += "The world-building here is next level. ";
-  else if (genre.toLowerCase().includes("anime")) comment += "The animation quality is stunning. ";
-  else comment += "The production quality really stands out. ";
+  const commentPrompt = `Write a short YouTube comment (2-3 sentences max) for this AI film:
+- Title: ${lead.work_title || "an AI film"}
+- Genre: ${lead.genre || "unknown"}  
+- AI tools: ${(lead.ai_tools || []).join(", ") || "AI tools"}
 
-  if (tools) {
-    comment += "Amazing what you're doing with " + tools.split(",")[0].trim() + ". ";
-  }
+Rules:
+- Be genuinely impressed, mention something specific about the genre or technique
+- Don't mention Spike AI at all - this is just to warm up the creator
+- Sound natural, like a real viewer
+- No emojis
+- Keep it very short`;
 
-  comment += "Would love to see more like this.";
+  const dm = await askClaude(dmPrompt);
+  const comment = lead.platform === "youtube" ? await askClaude(commentPrompt) : "";
 
-  return comment;
-}
-
-/* ─── Main ─── */
-
-async function run(supabase: any): Promise<{ drafts: number; leads: any[] }> {
-  // Get hot leads that haven't been contacted yet
-  const { data: leads } = await supabase
-    .from("creator_leads")
-    .select("*")
-    .eq("status", "new")
-    .gte("score", 7)
-    .order("score", { ascending: false })
-    .limit(5);
-
-  if (!leads || leads.length === 0) {
-    return { drafts: 0, leads: [] };
-  }
-
-  return { drafts: leads.length, leads };
+  return { dm, comment };
 }
 
 export async function GET(request: NextRequest) {
@@ -156,17 +116,25 @@ export async function GET(request: NextRequest) {
 
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
-    const { drafts, leads } = await run(supabase);
 
-    if (drafts === 0) {
+    // Get hot leads not yet contacted
+    const { data: leads } = await supabase
+      .from("creator_leads")
+      .select("*")
+      .eq("status", "new")
+      .gte("score", 7)
+      .order("score", { ascending: false })
+      .limit(5);
+
+    if (!leads || leads.length === 0) {
       await sendTelegram("✉️ <b>DM Drafts</b>\n\nNo hot leads (score 7+) waiting. Pipeline is clear!");
-      return NextResponse.json({ success: true, drafts: 0, timestamp: new Date().toISOString() });
+      return NextResponse.json({ success: true, drafts: 0 });
     }
 
-    // Send each draft as separate Telegram message
+    let count = 0;
+
     for (const lead of leads) {
-      const dm = buildDM(lead);
-      const comment = lead.platform === "youtube" ? buildComment(lead) : null;
+      const { dm, comment } = await generateDM(lead);
 
       const lines = [
         "✉️ <b>DM Draft for " + lead.name + "</b>",
@@ -189,24 +157,24 @@ export async function GET(request: NextRequest) {
       lines.push("━━━━━━━━━━━━━━━━━━━━");
       lines.push("");
       lines.push("💡 <b>Tips:</b>");
-      lines.push("  • Post the comment FIRST, then send the DM");
-      lines.push("  • Edit the compliment to be specific to what you noticed");
-      lines.push("  • Reference something unique about their film");
+      lines.push("  • Post comment FIRST, wait a day, then send DM");
+      lines.push("  • Edit anything that doesn't sound like you");
+      lines.push("  • After sending, update status in Pipeline");
       if (lead.profile_url) lines.push("  • Profile: " + lead.profile_url);
 
       await sendTelegram(lines.filter(Boolean).join("\n"));
+      count++;
     }
 
-    // Summary
     await sendTelegram(
-      "📋 <b>DM Summary</b>\n\n" + drafts + " drafts sent for:\n" +
+      "📋 <b>DM Summary</b>\n\n" + count + " AI-written drafts sent for:\n" +
       leads.map((l: any) => "  • " + l.name + " (" + l.platform + ", score " + l.score + ")").join("\n") +
-      "\n\nAfter sending, update their status in Pipeline → 'contacted'"
+      "\n\n✏️ Written by Claude AI, personalized per creator"
     );
 
     return NextResponse.json({
       success: true,
-      drafts,
+      drafts: count,
       names: leads.map((l: any) => l.name),
       timestamp: new Date().toISOString(),
     });
