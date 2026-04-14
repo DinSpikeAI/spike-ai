@@ -122,7 +122,7 @@ export default function SubmitPage() {
       const { error } = await supabase.from('movies').insert({
         title: form.title, description: form.description, genre: selectedGenres.join(', '),
         category: form.category, duration: form.duration || null,
-        creator_name: form.creator_name, video_url: form.video_url || null,
+        creator_name: form.creator_name, creator_id: (await supabase.auth.getSession()).data.session?.user?.id || null, video_url: form.video_url || null,
         trailer_url: form.trailer_url || null, poster_url: form.poster_url || null,
         tagline: form.tagline || null, ai_models: selectedModels, status: 'pending', series_name: form.series_name || null, episode_number: form.episode_number ? parseInt(form.episode_number) : null,
       })

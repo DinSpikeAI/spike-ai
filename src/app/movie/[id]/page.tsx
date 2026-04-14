@@ -241,13 +241,23 @@ export default function MoviePage() {
 
   // ── Load Creator Profile from DB ──
   useEffect(() => {
-    if (!supabase || !movie?.creator_name) return;
+    if (!supabase || !movie) return;
     async function loadCreator() {
-      const { data } = await supabase!.from("profiles").select("id, display_name, avatar_url, bio, user_type").eq("display_name", movie!.creator_name).single();
+      let data = null;
+      // Try creator_id first (reliable)
+      if ((movie as any).creator_id) {
+        const res = await supabase!.from("profiles").select("id, display_name, avatar_url, bio, user_type").eq("id", (movie as any).creator_id).single();
+        if (res.data) data = res.data;
+      }
+      // Fallback to display_name match
+      if (!data && movie!.creator_name) {
+        const res = await supabase!.from("profiles").select("id, display_name, avatar_url, bio, user_type").eq("display_name", movie!.creator_name).single();
+        if (res.data) data = res.data;
+      }
       if (data) setCreatorProfile(data);
     }
     loadCreator();
-  }, [movie?.creator_name]);
+  }, [movie]);
 
   const creator = creatorProfile
     ? { id: creatorProfile.id, name: creatorProfile.display_name, bio: creatorProfile.bio || "AI filmmaker on Spike AI.", avatar: creatorProfile.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(creatorProfile.display_name)}&background=8B5CF6&color=fff&size=200`, followers: 0, films: 1, joined: "2026", specialties: [movie?.genre || "Film"] }
