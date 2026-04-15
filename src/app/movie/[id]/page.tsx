@@ -93,6 +93,17 @@ export default function MoviePage() {
   const [dbMovies, setDbMovies] = useState<Movie[]>([]);
   const [seriesEpisodes, setSeriesEpisodes] = useState<any[]>([]);
   const [isOwner, setIsOwner] = useState(false);
+
+  // ── Auth Gate: must be signed in to watch ──
+  const handlePlay = async () => {
+    if (!supabase) { setPlaying(true); return; }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user) {
+      router.push("/auth");
+      return;
+    }
+    setPlaying(true);
+  };
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<any>(null);
   const [editSaving, setEditSaving] = useState(false);
@@ -332,7 +343,7 @@ export default function MoviePage() {
             </div>
           </div>
         ) : (
-          <div className="relative w-full h-full cursor-pointer group" onClick={() => movie.video_url && setPlaying(true)}>
+          <div className="relative w-full h-full cursor-pointer group" onClick={() => movie.video_url && handlePlay()}>
             <img src={heroImg} alt={movie.title} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/80 via-transparent to-transparent" />
@@ -362,7 +373,7 @@ export default function MoviePage() {
 
               {/* ═══ ACTION BUTTONS ═══ */}
               <div className="flex items-center gap-3 mb-6 flex-wrap">
-                {movie.video_url && <button onClick={() => setPlaying(true)} className="flex items-center gap-2 px-8 py-3 bg-white text-black font-bold text-sm rounded-full hover:bg-white/90 transition-all"><Play size={16} fill="black" /> Play</button>}
+                {movie.video_url && <button onClick={() => handlePlay()} className="flex items-center gap-2 px-8 py-3 bg-white text-black font-bold text-sm rounded-full hover:bg-white/90 transition-all"><Play size={16} fill="black" /> Play</button>}
                 {movie.trailer_url && <a href={movie.trailer_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2.5 px-7 py-3.5 bg-white/10 border border-white/20 text-white font-bold text-[15px] rounded-xl hover:bg-white/20 transition-all cursor-pointer"><Play size={18} />Trailer</a>}
                 <button onClick={handleUpvote} className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm border transition-all ${popAnim ? "scale-110" : ""} ${voted ? "bg-white/15 border-white/30 text-white" : "bg-white/5 border-white/10 text-white/60 hover:text-white hover:border-white/20"}`}><Flame size={16} fill={voted ? "currentColor" : "none"} />{votes > 0 ? votes.toLocaleString() : "Upvote"}</button>
                 <button onClick={handleWatchlist} className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold text-sm border transition-all ${saved ? "bg-white/15 border-white/25 text-white" : "bg-white/5 border-white/10 text-white/60 hover:text-white hover:border-white/20"}`}>{saved ? <Check size={16} /> : <Plus size={16} />}{saved ? "In My List" : "My List"}</button>
