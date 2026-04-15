@@ -45,9 +45,9 @@ function mapDbToCreator(row: any): Creator {
     bio: row.bio || "",
     highlight: row.highlight || row.bio || "",
     toolkit: row.toolkit || [],
-    works: [],
+    works: (row.works || []).map((w: any) => ({ title: w.title || "", type: w.type || "", note: w.note || "" })),
     links,
-    stats: [
+    stats: row.custom_stats || [
       { label: "AI tools", value: String((row.toolkit || []).length) },
       { label: "Role", value: (row.role || "Creator").split(" · ")[0].split(" ").slice(0, 2).join(" ") },
       { label: "Status", value: "Pioneer" },
@@ -247,6 +247,159 @@ function CreatorCard({ creator }: { creator: Creator }) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   FEATURED CREATOR CARD — Large, centered, expandable
+   ═══════════════════════════════════════════════════════════════ */
+
+function FeaturedCreatorCard({ creator }: { creator: Creator }) {
+  const [expanded, setExpanded] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState(0);
+
+  useEffect(() => {
+    if (contentRef.current) setContentHeight(contentRef.current.scrollHeight);
+    const handleResize = () => { if (contentRef.current && expanded) setContentHeight(contentRef.current.scrollHeight); };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [expanded]);
+
+  return (
+    <div className="flex flex-col items-center w-full max-w-[700px]">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="group cursor-pointer flex flex-col items-center text-center focus:outline-none"
+      >
+        {/* Avatar — extra large with gold glow */}
+        <div className="relative mb-7">
+          <div className={`absolute -inset-3 rounded-full transition-all duration-700 ${
+            expanded
+              ? "opacity-100 shadow-[0_0_50px_rgba(212,168,75,0.35)]"
+              : "opacity-60 group-hover:opacity-100 group-hover:shadow-[0_0_40px_rgba(212,168,75,0.25)]"
+          }`}
+            style={{ background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d, #e8c65a)" }}
+          />
+          <div className="relative w-52 h-52 md:w-64 md:h-64 rounded-full overflow-hidden border-[4px] border-[#0c0c12] shadow-2xl shadow-black/60">
+            <img src={creator.avatar} alt={creator.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 flex items-center justify-center">
+              <ChevronDown size={24} className={`text-white/0 group-hover:text-white/60 transition-all duration-500 ${expanded ? "rotate-180" : ""}`} />
+            </div>
+          </div>
+          {/* Large Gold Badge */}
+          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 gold-badge">
+            <div className="relative flex items-center justify-center px-6 py-2.5 rounded-[5px]"
+              style={{
+                background: "linear-gradient(145deg, #d4a84b 0%, #f5d77a 20%, #c9953c 40%, #f5d77a 55%, #b8862d 75%, #e8c65a 100%)",
+                boxShadow: "0 3px 12px rgba(180,130,40,0.5), 0 1px 3px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,235,170,0.5)",
+                border: "1px solid rgba(218,175,80,0.6)",
+              }}>
+              <div className="absolute inset-0 rounded-[5px] opacity-[0.08]"
+                style={{ backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.15) 1px, rgba(255,255,255,0.15) 2px)" }} />
+              <span className="relative text-[10px] md:text-[11px] font-extrabold tracking-[0.25em] uppercase"
+                style={{ color: "#8b6914", textShadow: "0 1px 0 rgba(255,235,170,0.5)" }}>
+                {creator.badge}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Name — extra large */}
+        <h3 className="text-4xl md:text-6xl font-bold tracking-tight text-white/95 group-hover:text-white transition-colors mt-3">
+          {creator.name}
+        </h3>
+        <p className="text-[13px] md:text-[15px] text-white/25 tracking-widest uppercase mt-2.5">{creator.role}</p>
+
+        {/* Tap hint */}
+        <div className={`flex items-center gap-1.5 mt-5 transition-all duration-500 ${expanded ? "text-white/25" : "text-white/10 group-hover:text-white/25"}`}>
+          <span className="text-[10px] font-medium tracking-[0.15em] uppercase">
+            {expanded ? "Tap to close" : "Tap to explore"}
+          </span>
+          <ChevronDown size={12} className={`transition-transform duration-500 ${expanded ? "rotate-180" : "group-hover:translate-y-0.5"}`} />
+        </div>
+      </button>
+
+      {/* ── Expanded Section ── */}
+      <div className="w-full overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+        style={{ maxHeight: expanded ? `${contentHeight}px` : "0px", opacity: expanded ? 1 : 0 }}>
+        <div ref={contentRef} className="pt-10 pb-6">
+
+          <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mb-10" />
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-3 mb-10">
+            {creator.stats.map((stat) => (
+              <div key={stat.label} className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 text-center">
+                <p className="text-2xl md:text-3xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent mb-1">{stat.value}</p>
+                <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-white/20">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Highlight */}
+          <div className="mb-10 px-6 py-6 rounded-2xl bg-gradient-to-br from-amber-500/[0.04] to-yellow-500/[0.02] border border-amber-500/[0.08]">
+            <Sparkles size={14} className="text-amber-400/40 mb-3" />
+            <p className="text-[15px] text-white/50 leading-[1.8] italic">
+              &quot;{creator.highlight}&quot;
+            </p>
+          </div>
+
+          {/* Bio */}
+          <div className="mb-10">
+            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/15 mb-4">About</p>
+            <p className="text-[14px] text-white/35 leading-[1.8]">{creator.bio}</p>
+          </div>
+
+          {/* Works */}
+          {creator.works.length > 0 && (
+          <div className="mb-10">
+            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/15 mb-4">Selected Works</p>
+            <div className="space-y-3">
+              {creator.works.map((work) => (
+                <div key={work.title} className="flex items-center justify-between p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-all duration-300 group/work">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/10 to-yellow-500/5 border border-amber-500/10 flex items-center justify-center flex-shrink-0">
+                      <Film size={16} className="text-amber-400/40" />
+                    </div>
+                    <div>
+                      <p className="text-[14px] font-semibold text-white/70 group-hover/work:text-white/90 transition-colors">{work.title}</p>
+                      <p className="text-[11px] text-white/20 mt-0.5">{work.type}</p>
+                    </div>
+                  </div>
+                  <span className="text-[11px] text-white/15 hidden sm:block">{work.note}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          )}
+
+          {/* Toolkit */}
+          <div className="mb-10">
+            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/15 mb-4">AI Toolkit</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {creator.toolkit.map((tool) => (
+                <span key={tool} className="px-3.5 py-1.5 rounded-full text-[12px] font-medium text-white/45 bg-white/[0.04] border border-white/[0.06] hover:border-amber-500/20 hover:text-amber-200/50 transition-all duration-300 cursor-default">
+                  {tool}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Links */}
+          <div className="flex flex-wrap justify-center gap-3">
+            {creator.links.map((link) => (
+              <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium text-white/30 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] hover:text-white/50 transition-all duration-300">
+                <ExternalLink size={12} />
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    CREATORS PAGE
    ═══════════════════════════════════════════════════════════════ */
 
@@ -338,66 +491,12 @@ export default function CreatorsPage() {
             <div className="text-center py-20"><p className="text-white/15">No creators yet</p></div>
           ) : (
             <>
-              {/* ═══ Featured Creators — Large, Centered ═══ */}
+              {/* ═══ Featured Creators — Large, Centered, Expandable ═══ */}
               {creators.filter(c => c.featured).length > 0 && (
                 <div className="mb-16 md:mb-20">
                   <div className="flex flex-col items-center gap-14 md:gap-16">
                     {creators.filter(c => c.featured).map((creator) => (
-                      <div key={creator.id} className="flex flex-col items-center">
-                        <button
-                          onClick={() => {
-                            const el = document.getElementById(`featured-${creator.id}`);
-                            if (el) el.classList.toggle("expanded-featured");
-                          }}
-                          className="group cursor-pointer flex flex-col items-center text-center focus:outline-none"
-                        >
-                          <div className="relative mb-6">
-                            <div className="absolute -inset-2 rounded-full opacity-60"
-                              style={{ background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d, #e8c65a)", filter: "blur(8px)" }} />
-                            <div className="relative w-44 h-44 md:w-52 md:h-52 rounded-full overflow-hidden border-[3px] border-[#0c0c12] shadow-2xl shadow-black/60">
-                              <img src={creator.avatar} alt={creator.name}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                            </div>
-                            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 gold-badge">
-                              <div className="relative flex items-center justify-center px-5 py-2 rounded-[5px]"
-                                style={{
-                                  background: "linear-gradient(145deg, #d4a84b 0%, #f5d77a 20%, #c9953c 40%, #f5d77a 55%, #b8862d 75%, #e8c65a 100%)",
-                                  boxShadow: "0 2px 8px rgba(180,130,40,0.4), 0 1px 2px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,235,170,0.5)",
-                                  border: "1px solid rgba(218,175,80,0.6)",
-                                }}>
-                                <span className="relative text-[10px] font-extrabold tracking-[0.25em] uppercase"
-                                  style={{ color: "#8b6914", textShadow: "0 1px 0 rgba(255,235,170,0.5)" }}>
-                                  {creator.badge}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <h3 className="text-4xl md:text-5xl font-bold tracking-tight text-white/95 group-hover:text-white transition-colors mt-3">
-                            {creator.name}
-                          </h3>
-                          <p className="text-[13px] md:text-[14px] text-white/25 tracking-widest uppercase mt-2">{creator.role}</p>
-                          <p className="text-[14px] text-white/30 leading-relaxed max-w-md mt-4">{creator.highlight}</p>
-                          <div className="flex flex-wrap justify-center gap-2 mt-5">
-                            {creator.toolkit.map((tool) => (
-                              <span key={tool} className="px-3.5 py-1.5 rounded-full text-[12px] font-medium text-white/45 bg-white/[0.04] border border-white/[0.06]">
-                                {tool}
-                              </span>
-                            ))}
-                          </div>
-                          {creator.links.length > 0 && (
-                            <div className="flex flex-wrap justify-center gap-3 mt-5">
-                              {creator.links.map((link) => (
-                                <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium text-white/30 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] hover:text-white/50 transition-all">
-                                  <ExternalLink size={12} />
-                                  {link.label}
-                                </a>
-                              ))}
-                            </div>
-                          )}
-                        </button>
-                      </div>
+                      <FeaturedCreatorCard key={creator.id} creator={creator} />
                     ))}
                   </div>
                   <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mt-16" />
