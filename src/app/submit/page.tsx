@@ -19,7 +19,7 @@ const GENRES = [
 
 const CATEGORIES = [
   'Trending', 'AI Horror', 'Sci-Fi Visions', 'Award Winning',
-  'AI Anime', 'Action', 'Fantasy', 'Runway Masterpieces'
+  'AI Anime', 'AI Documentary', 'Action', 'Fantasy', 'Runway Masterpieces'
 ]
 
 /* ═══════════════════════════════════════════

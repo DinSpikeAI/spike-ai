@@ -197,6 +197,7 @@ export default function HomePage() {
           "Fantasy": "Fantasy",
           "Thriller": "Sci-Fi Visions",
           "Cyberpunk": "Sci-Fi Visions",
+          "Documentary": "AI Documentary",
         };
 
         const categoryMap: Record<string, Movie[]> = {};
@@ -241,6 +242,7 @@ export default function HomePage() {
           { key: "Runway Masterpieces", title: "Runway Masterpieces", slug: "sora" },
           { key: "AI Horror", title: "AI Horror", slug: "horror" },
           { key: "Sci-Fi Visions", title: "Sci-Fi Visions", slug: "scifi" },
+          { key: "AI Documentary", title: "AI Documentary", slug: "documentary" },
           { key: "Award Winning", title: "Award Winning", slug: "awards" },
           { key: "AI Anime", title: "AI Anime", slug: "anime" },
           { key: "Action", title: "Action & Thriller", slug: "action" },
