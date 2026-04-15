@@ -249,6 +249,7 @@ export default function MoviePage() {
   };
 
   const [creatorProfile, setCreatorProfile] = useState<any>(null);
+  const [pioneerCreator, setPioneerCreator] = useState<any>(null);
 
   // ── Load Creator Profile from DB ──
   useEffect(() => {
@@ -266,6 +267,12 @@ export default function MoviePage() {
         if (res.data) data = res.data;
       }
       if (data) setCreatorProfile(data);
+
+      // Check if pioneer creator
+      if (movie!.creator_name) {
+        const { data: pc } = await supabase!.from("pioneer_creators").select("name, avatar_url, role, featured").eq("visible", true).ilike("name", `%${movie!.creator_name}%`).limit(1);
+        if (pc && pc.length > 0) setPioneerCreator(pc[0]);
+      }
     }
     loadCreator();
   }, [movie]);
@@ -384,7 +391,36 @@ export default function MoviePage() {
               <p className="text-white/50 text-sm md:text-base leading-relaxed max-w-2xl mb-6 whitespace-pre-line">{movie.description || "An AI-generated cinematic experience pushing the boundaries of artificial creativity."}</p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
-                {creator && (<div className="bg-white/[0.03] rounded-xl p-5 border border-white/[0.04] hover:border-white/10 transition-colors"><div className="flex items-center gap-3 mb-3"><img src={creator.avatar} alt={creator.name} className="w-10 h-10 rounded-full object-cover border border-white/10" /><div><p className="text-sm font-semibold text-white">{creator.name}</p><p className="text-[10px] text-white font-medium tracking-wider uppercase">Creator</p></div></div><div className="flex items-center gap-4 mb-3"><span className="text-xs text-white/20"><span className="text-white font-semibold">{creator.followers.toLocaleString()}</span> followers</span><span className="text-xs text-white/20"><span className="text-white font-semibold">{creator.films}</span> {creator.films === 1 ? "film" : "films"}</span></div><button onClick={() => router.push(`/creator/${creator.id}`)} className="flex items-center gap-1 text-white text-xs font-medium hover:text-[#e0e0e0] transition-colors" style={{display: creatorProfile ? "flex" : "none"}}>View Profile <ExternalLink size={11} /></button></div>)}
+                {creator && pioneerCreator ? (
+                  <div onClick={() => router.push(`/studio/${pioneerCreator.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-")}`)} className="rounded-xl p-5 cursor-pointer transition-all hover:scale-[1.02]" style={{ background: "rgba(212,168,83,0.04)", border: "1px solid rgba(212,168,83,0.15)" }}>
+                    <div className="flex items-center gap-3 mb-3">
+                      <img src={pioneerCreator.avatar_url || creator.avatar} alt={creator.name} className="w-11 h-11 rounded-full object-cover" style={{ border: "2px solid rgba(212,168,83,0.4)", boxShadow: "0 0 12px rgba(212,168,83,0.2)" }} />
+                      <div>
+                        <p className="text-sm font-semibold" style={{ color: "rgba(212,168,83,0.9)" }}>{creator.name}</p>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-[8px] font-extrabold tracking-[0.2em] uppercase px-2 py-0.5 rounded" style={{ background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d)", color: "#5c3d0e" }}>Pioneer Creator</span>
+                        </div>
+                      </div>
+                    </div>
+                    {pioneerCreator.role && <p className="text-[11px] mb-3" style={{ color: "rgba(212,168,83,0.35)" }}>{pioneerCreator.role}</p>}
+                    <div className="flex items-center gap-1 text-xs font-medium" style={{ color: "rgba(212,168,83,0.5)" }}>Visit Gold Studio <ExternalLink size={11} /></div>
+                  </div>
+                ) : creator && (
+                  <div className="bg-white/[0.03] rounded-xl p-5 border border-white/[0.04] hover:border-white/10 transition-colors">
+                    <div className="flex items-center gap-3 mb-3">
+                      <img src={creator.avatar} alt={creator.name} className="w-10 h-10 rounded-full object-cover border border-white/10" />
+                      <div>
+                        <p className="text-sm font-semibold text-white">{creator.name}</p>
+                        <p className="text-[10px] text-white font-medium tracking-wider uppercase">Creator</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 mb-3">
+                      <span className="text-xs text-white/20"><span className="text-white font-semibold">{creator.followers.toLocaleString()}</span> followers</span>
+                      <span className="text-xs text-white/20"><span className="text-white font-semibold">{creator.films}</span> {creator.films === 1 ? "film" : "films"}</span>
+                    </div>
+                    <button onClick={() => router.push(`/creator/${creator.id}`)} className="flex items-center gap-1 text-white text-xs font-medium hover:text-[#e0e0e0] transition-colors" style={{display: creatorProfile ? "flex" : "none"}}>View Profile <ExternalLink size={11} /></button>
+                  </div>
+                )}
                 {movie.aiModels && movie.aiModels.length > 0 && (<div className="bg-white/[0.03] rounded-xl p-5 border border-white/[0.04] hover:border-white/10 transition-colors"><div className="flex items-center gap-2 mb-3"><Cpu size={16} className="text-white" /><p className="text-xs text-white/20 uppercase tracking-wider font-medium">AI Models Used</p></div><div className="flex flex-wrap gap-2">{movie.aiModels.map((m, i) => (<span key={i} className="px-3 py-1.5 text-xs font-medium bg-white/5 text-gray-300 rounded-lg border border-white/10">{m}</span>))}</div></div>)}
               </div>
             </div>
