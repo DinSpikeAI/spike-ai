@@ -58,7 +58,19 @@ export default function AuthPage() {
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => {
     if (!supabase) return;
-    supabase.auth.getSession().then(({ data }) => { if (data.session) router.push("/"); });
+    supabase.auth.getSession().then(({ data }) => { 
+      if (data.session) {
+        try {
+          const returnTo = sessionStorage.getItem("returnTo");
+          if (returnTo) {
+            sessionStorage.removeItem("returnTo");
+            window.location.replace(returnTo);
+            return;
+          }
+        } catch {}
+        router.push("/");
+      }
+    });
   }, [router]);
 
   const switchView = (v: View) => {

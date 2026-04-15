@@ -28,6 +28,18 @@ let __cache: {
 
 export default function HomePage() {
   const router = useRouter();
+
+  // ── OAuth return redirect (must run first) ──
+  useEffect(() => {
+    try {
+      const returnTo = sessionStorage.getItem("returnTo");
+      if (returnTo) {
+        sessionStorage.removeItem("returnTo");
+        window.location.replace(returnTo);
+      }
+    } catch {}
+  }, []);
+
   const [searchOpen, setSearchOpen] = useState(false);
   const [selectedGenre, setSelectedGenre] = useState("All");
   const [selectedModel, setSelectedModel] = useState("All");
@@ -300,15 +312,6 @@ export default function HomePage() {
   // ─── Auto-Start Splash (Zero-Click) ───
   useEffect(() => {
     setMounted(true);
-
-    // Return to page after OAuth (e.g., become-creator)
-    const returnTo = sessionStorage.getItem("returnTo");
-    if (returnTo) {
-      sessionStorage.removeItem("returnTo");
-      router.push(returnTo);
-      return;
-    }
-
     const hasSeenIntro = sessionStorage.getItem("hasSeenIntro");
     if (hasSeenIntro) {
       setSplashChecked(true);
