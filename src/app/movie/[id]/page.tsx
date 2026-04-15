@@ -270,7 +270,16 @@ export default function MoviePage() {
 
       // Check if pioneer creator
       if (movie!.creator_name) {
-        const { data: pc } = await supabase!.from("pioneer_creators").select("name, avatar_url, role, featured").eq("visible", true).ilike("name", `%${movie!.creator_name}%`).limit(1);
+        const creatorName = movie!.creator_name;
+        // Try exact ilike match first
+        let { data: pc } = await supabase!.from("pioneer_creators").select("name, avatar_url, role, featured").eq("visible", true).ilike("name", `%${creatorName}%`).limit(1);
+        // Fallback: load all and normalize match (handles accented chars)
+        if (!pc || pc.length === 0) {
+          const { data: allPc } = await supabase!.from("pioneer_creators").select("name, avatar_url, role, featured").eq("visible", true);
+          const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+          const found = (allPc || []).find((c: any) => normalize(c.name) === normalize(creatorName));
+          if (found) pc = [found];
+        }
         if (pc && pc.length > 0) setPioneerCreator(pc[0]);
       }
     }
