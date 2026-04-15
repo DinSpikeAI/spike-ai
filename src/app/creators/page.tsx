@@ -278,8 +278,10 @@ function FeaturedCreatorCard({ creator }: { creator: Creator }) {
             style={{ background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d, #e8c65a)" }}
           />
           <div className="relative w-52 h-52 md:w-64 md:h-64 rounded-full overflow-hidden border-[4px] border-[#0c0c12] shadow-2xl shadow-black/60">
-            <img src={creator.avatar} alt={creator.name}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <img src={`/creators/${creator.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-")}-featured.jpg`}
+              alt={creator.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              onError={(e) => { (e.target as HTMLImageElement).src = creator.avatar; }} />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-500 flex items-center justify-center">
               <ChevronDown size={24} className={`text-white/0 group-hover:text-white/60 transition-all duration-500 ${expanded ? "rotate-180" : ""}`} />
             </div>
