@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apply as Creator - Spike AI</title>
+  <meta name="description" content="Join Spike AI as a creator. Upload your AI-generated films to the world's first AI cinema streaming platform.">
+  <link rel="icon" href="/icons/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #050505;
+      color: #e5e5e5;
+      font-family: 'Inter', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    a { color: rgba(255,255,255,0.5); text-decoration: none; }
+    a:hover { color: white; }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      color: white;
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: white;
+      margin-bottom: 12px;
+    }
+    .subtitle {
+      font-size: 15px;
+      color: rgba(255,255,255,0.4);
+      font-weight: 300;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .field { margin-bottom: 24px; }
+    label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 8px;
+    }
+    label .required { color: rgba(255,255,255,0.4); }
+
+    input, textarea, select {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: white;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(255,255,255,0.2);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.05);
+    }
+    input::placeholder, textarea::placeholder {
+      color: rgba(255,255,255,0.15);
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    select { cursor: pointer; }
+    select option { background: #0c0c0e; color: white; }
+
+    .checkbox-group { margin-bottom: 28px; }
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+    }
+    .checkbox-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: white;
+    }
+    .checkbox-row span {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.5;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+    .tool-btn {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.4);
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .tool-btn:hover { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); }
+    .tool-btn.selected {
+      border-color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 36px 0;
+    }
+
+    .legal-section {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 28px;
+    }
+    .legal-section h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 12px;
+    }
+    .legal-section p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.3);
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      border: none;
+      background: white;
+      color: black;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .btn-submit:hover { background: rgba(255,255,255,0.9); transform: scale(1.01); }
+    .btn-submit:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .success-msg {
+      text-align: center;
+      padding: 80px 20px;
+    }
+    .success-msg h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 16px;
+    }
+    .success-msg p {
+      font-size: 15px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.6;
+    }
+    .check-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      border: 2px solid rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 28px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      margin-top: 40px;
+    }
+    .footer p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.15);
+    }
+
+    @media (max-width: 640px) {
+      .tools-grid { grid-template-columns: repeat(2, 1fr); }
+      h1 { font-size: 26px; }
+      .container { padding: 40px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo">spike AI</div>
+
+  <div id="form-section">
+    <h1>Join as Creator</h1>
+    <p class="subtitle">
+      Spike AI is the home for AI-generated cinema. We give creators a dedicated space to showcase their work, reach new audiences, and get recognized. Free to join, free to upload.
+    </p>
+
+    <form id="applyForm" onsubmit="return handleSubmit(event)">
+
+      <div class="field">
+        <label>Your Name / Studio Name <span class="required">*</span></label>
+        <input type="text" name="name" required placeholder="e.g. Daniel Overton or Ovey Studios">
+      </div>
+
+      <div class="field">
+        <label>Email <span class="required">*</span></label>
+        <input type="email" name="email" required placeholder="your@email.com">
+      </div>
+
+      <div class="field">
+        <label>Your Best AI Film (YouTube or Vimeo link) <span class="required">*</span></label>
+        <input type="url" name="film_url" required placeholder="https://youtube.com/watch?v=...">
+      </div>
+
+      <div class="field">
+        <label>Website / Portfolio (optional)</label>
+        <input type="url" name="website" placeholder="https://...">
+      </div>
+
+      <div class="field">
+        <label>YouTube Channel or Social Link</label>
+        <input type="url" name="social" placeholder="https://youtube.com/@yourchannel">
+      </div>
+
+      <div class="field">
+        <label>Tell us about your work</label>
+        <textarea name="bio" placeholder="What kind of AI films do you make? What's your creative vision?"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Country</label>
+        <input type="text" name="country" placeholder="e.g. United Kingdom">
+      </div>
+
+      <label>AI Tools You Use <span class="required">*</span></label>
+      <div class="tools-grid" id="toolsGrid">
+        <div class="tool-btn" onclick="toggleTool(this)">Runway Gen-4</div>
+        <div class="tool-btn" onclick="toggleTool(this)">Kling AI</div>
+        <div class="tool-btn" onclick="toggleTool(this)">Sora</div>
+        <div class="tool-btn" onclick="toggleTool(this)">Pika Labs</div>
+        <div class="tool-btn" onclick="toggleTool(this)">Hailuo</div>
+        <div class="tool-btn" onclick="toggleTool(this)">Midjourney</div>
+        <div class="tool-btn" onclick="toggleTool(this)">ElevenLabs</div>
+        <div class="tool-btn" onclick="toggleTool(this)">Seedance</div>
+        <div class="tool-btn" onclick="toggleTool(this)">Veo</div>
+        <div class="tool-btn" onclick="toggleTool(this)">Luma</div>
+        <div class="tool-btn" onclick="toggleTool(this)">Google Gemini</div>
+        <div class="tool-btn" onclick="toggleTool(this)">Other</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="legal-section">
+        <h3>Creator Agreement</h3>
+        <p>By submitting this application, you confirm that:</p>
+        <p>1. You own or have the rights to all content you upload to Spike AI.</p>
+        <p>2. Your films do not contain deepfakes of real people without their consent.</p>
+        <p>3. You grant Spike AI a non-exclusive license to display, promote, and distribute your content on the platform and associated marketing channels.</p>
+        <p>4. You will tag all AI tools used in the creation of each film.</p>
+        <p>5. Spike AI may feature your work in platform showcases, social media, and creator spotlights.</p>
+      </div>
+
+      <div class="checkbox-group">
+        <div class="checkbox-row">
+          <input type="checkbox" id="agree" required>
+          <span>I have read and agree to the Creator Agreement above, the <a href="/terms" target="_blank">Terms of Service</a>, and the <a href="/community-guidelines" target="_blank">Community Guidelines</a>.</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">Submit Application</button>
+    </form>
+  </div>
+
+  <div id="success-section" style="display:none">
+    <div class="success-msg">
+      <div class="check-circle">&#10003;</div>
+      <h2>Application Received</h2>
+      <p>
+        Thanks for applying to Spike AI. We review every application personally and will get back to you within 48 hours.
+        <br><br>
+        In the meantime, feel free to explore the platform at <a href="https://www.spikeai.studio" style="color:white;text-decoration:underline">spikeai.studio</a>
+      </p>
+      <p style="margin-top:24px;font-size:13px">
+        - Dean Moshe, Founder of Spike AI
+      </p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2026 Spike AI. The home for AI-generated cinema.</p>
+    <p style="margin-top:8px">
+      <a href="/terms">Terms</a> &nbsp;|&nbsp;
+      <a href="/privacy">Privacy</a> &nbsp;|&nbsp;
+      <a href="/community-guidelines">Guidelines</a>
+    </p>
+  </div>
+</div>
+
+<script>
+  function toggleTool(el) {
+    el.classList.toggle('selected');
+  }
+
+  function getSelectedTools() {
+    return Array.from(document.querySelectorAll('.tool-btn.selected'))
+      .map(el => el.textContent.trim());
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const form = document.getElementById('applyForm');
+    const tools = getSelectedTools();
+
+    if (tools.length === 0) {
+      alert('Please select at least one AI tool you use.');
+      return false;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    const data = {
+      name: form.name.value,
+      email: form.email.value,
+      film_url: form.film_url.value,
+      website: form.website.value,
+      social: form.social.value,
+      bio: form.bio.value,
+      country: form.country.value,
+      ai_tools: tools,
+      submitted_at: new Date().toISOString(),
+    };
+
+    try {
+      const res = await fetch('/api/creator-apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('success-section').style.display = 'block';
+        window.scrollTo(0, 0);
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Submit Application';
+        alert('Something went wrong. Please try again.');
+      }
+    } catch {
+      btn.disabled = false;
+      btn.textContent = 'Submit Application';
+      alert('Connection error. Please try again.');
+    }
+
+    return false;
+  }
+</script>
+
+</body>
+</html>
