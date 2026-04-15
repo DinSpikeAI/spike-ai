@@ -547,7 +547,7 @@ export default function HomePage() {
               <h2 className="text-lg md:text-xl font-semibold mb-6 text-white/70 tracking-wide">
                 {activeFilterLabel}
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-5">
                 {filteredMovies.map((movie, index) => (
                   <MovieCard
                     key={movie.id}
