@@ -24,6 +24,7 @@ interface Creator {
   works: { title: string; type: string; note: string }[];
   links: { label: string; url: string }[];
   stats: { label: string; value: string }[];
+  featured: boolean;
 }
 
 function mapDbToCreator(row: any): Creator {
@@ -51,6 +52,7 @@ function mapDbToCreator(row: any): Creator {
       { label: "Role", value: (row.role || "Creator").split(" · ")[0].split(" ").slice(0, 2).join(" ") },
       { label: "Status", value: "Pioneer" },
     ],
+    featured: row.featured || false,
   };
 }
 
@@ -335,11 +337,82 @@ export default function CreatorsPage() {
           ) : creators.length === 0 ? (
             <div className="text-center py-20"><p className="text-white/15">No creators yet</p></div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
-              {creators.map((creator) => (
-                <CreatorCard key={creator.id} creator={creator} />
-              ))}
-            </div>
+            <>
+              {/* ═══ Featured Creators — Large, Centered ═══ */}
+              {creators.filter(c => c.featured).length > 0 && (
+                <div className="mb-16 md:mb-20">
+                  <div className="flex flex-col items-center gap-14 md:gap-16">
+                    {creators.filter(c => c.featured).map((creator) => (
+                      <div key={creator.id} className="flex flex-col items-center">
+                        <button
+                          onClick={() => {
+                            const el = document.getElementById(`featured-${creator.id}`);
+                            if (el) el.classList.toggle("expanded-featured");
+                          }}
+                          className="group cursor-pointer flex flex-col items-center text-center focus:outline-none"
+                        >
+                          <div className="relative mb-6">
+                            <div className="absolute -inset-2 rounded-full opacity-60"
+                              style={{ background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d, #e8c65a)", filter: "blur(8px)" }} />
+                            <div className="relative w-44 h-44 md:w-52 md:h-52 rounded-full overflow-hidden border-[3px] border-[#0c0c12] shadow-2xl shadow-black/60">
+                              <img src={creator.avatar} alt={creator.name}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                            </div>
+                            <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 gold-badge">
+                              <div className="relative flex items-center justify-center px-5 py-2 rounded-[5px]"
+                                style={{
+                                  background: "linear-gradient(145deg, #d4a84b 0%, #f5d77a 20%, #c9953c 40%, #f5d77a 55%, #b8862d 75%, #e8c65a 100%)",
+                                  boxShadow: "0 2px 8px rgba(180,130,40,0.4), 0 1px 2px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,235,170,0.5)",
+                                  border: "1px solid rgba(218,175,80,0.6)",
+                                }}>
+                                <span className="relative text-[10px] font-extrabold tracking-[0.25em] uppercase"
+                                  style={{ color: "#8b6914", textShadow: "0 1px 0 rgba(255,235,170,0.5)" }}>
+                                  {creator.badge}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <h3 className="text-4xl md:text-5xl font-bold tracking-tight text-white/95 group-hover:text-white transition-colors mt-3">
+                            {creator.name}
+                          </h3>
+                          <p className="text-[13px] md:text-[14px] text-white/25 tracking-widest uppercase mt-2">{creator.role}</p>
+                          <p className="text-[14px] text-white/30 leading-relaxed max-w-md mt-4">{creator.highlight}</p>
+                          <div className="flex flex-wrap justify-center gap-2 mt-5">
+                            {creator.toolkit.map((tool) => (
+                              <span key={tool} className="px-3.5 py-1.5 rounded-full text-[12px] font-medium text-white/45 bg-white/[0.04] border border-white/[0.06]">
+                                {tool}
+                              </span>
+                            ))}
+                          </div>
+                          {creator.links.length > 0 && (
+                            <div className="flex flex-wrap justify-center gap-3 mt-5">
+                              {creator.links.map((link) => (
+                                <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium text-white/30 bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.12] hover:text-white/50 transition-all">
+                                  <ExternalLink size={12} />
+                                  {link.label}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent mt-16" />
+                </div>
+              )}
+
+              {/* ═══ Regular Creators Grid ═══ */}
+              {creators.filter(c => !c.featured).length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
+                  {creators.filter(c => !c.featured).map((creator) => (
+                    <CreatorCard key={creator.id} creator={creator} />
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </div>
 
