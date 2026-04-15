@@ -270,6 +270,12 @@
         <input type="text" name="country" placeholder="e.g. United Kingdom">
       </div>
 
+      <div class="field">
+        <label>WhatsApp / Phone (optional)</label>
+        <input type="tel" name="phone" placeholder="+44 7700 900000">
+        <p style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:6px">Join our creators WhatsApp group for updates and networking.</p>
+      </div>
+
       <label>AI Tools You Use <span class="required">*</span></label>
       <div class="tools-grid" id="toolsGrid">
         <div class="tool-btn" onclick="toggleTool(this)">Runway Gen-4</div>
@@ -366,6 +372,7 @@
       social: form.social.value,
       bio: form.bio.value,
       country: form.country.value,
+      phone: form.phone.value,
       ai_tools: tools,
       submitted_at: new Date().toISOString(),
     };

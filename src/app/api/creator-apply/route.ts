@@ -54,6 +54,7 @@ export async function POST(request: NextRequest) {
       score: 8,
       notes: [
         `Email: ${body.email}`,
+        body.phone ? `Phone: ${body.phone}` : "",
         body.country ? `Country: ${body.country}` : "",
         body.bio ? `Bio: ${body.bio}` : "",
         body.website ? `Website: ${body.website}` : "",
@@ -72,6 +73,7 @@ export async function POST(request: NextRequest) {
       "",
       `<b>${body.name}</b>`,
       `Email: ${body.email}`,
+      body.phone ? `Phone: ${body.phone}` : "",
       body.country ? `Country: ${body.country}` : "",
       `Film: ${body.film_url}`,
       body.website ? `Website: ${body.website}` : "",

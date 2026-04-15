@@ -39,6 +39,7 @@ export default function BecomeCreatorPage() {
   const [socialYoutube, setSocialYoutube] = useState("");
   const [sampleWorkUrl, setSampleWorkUrl] = useState("");
   const [country, setCountry] = useState("");
+  const [phone, setPhone] = useState("");
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -114,7 +115,7 @@ export default function BecomeCreatorPage() {
             name: displayName.trim(), email: user.email,
             film_url: sampleWorkUrl.trim(), website: website.trim(),
             social: socialYoutube.trim(), bio: bio.trim(),
-            country: country.trim(), ai_tools: selectedTools,
+            country: country.trim(), ai_tools: selectedTools, phone: phone.trim(),
           }),
         });
       } catch {}
@@ -304,6 +305,13 @@ export default function BecomeCreatorPage() {
           <label style={labelStyle}>Country</label>
           <input value={country} onChange={(e) => setCountry(e.target.value)}
             placeholder="e.g. United Kingdom" style={inputStyle} />
+        </div>
+
+        <div style={fieldStyle}>
+          <label style={labelStyle}>WhatsApp / Phone (optional)</label>
+          <input value={phone} onChange={(e) => setPhone(e.target.value)}
+            placeholder="+44 7700 900000" style={inputStyle} />
+          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", marginTop: 6 }}>Join our creators WhatsApp group for updates and networking.</p>
         </div>
 
         {/* AI Tools Grid */}
