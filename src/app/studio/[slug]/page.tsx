@@ -108,9 +108,9 @@ export default function StudioPage() {
         <div style={{ ...S.section, paddingTop: 64, paddingBottom: 48 }}>
           {/* Avatar */}
           <div style={{ position: "relative", marginBottom: 28 }}>
-            <div style={{ position: "absolute", inset: -12, borderRadius: "50%", opacity: 0.7, background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d, #e8c65a)", filter: "blur(10px)" }} />
-            <div style={{ position: "relative", width: 220, height: 220, borderRadius: "50%", overflow: "hidden", border: "3px solid rgba(212,168,83,0.4)", boxShadow: "0 0 60px rgba(212,168,83,0.2), 0 20px 60px rgba(0,0,0,0.5)" }}>
-              <img src={studio.avatar} alt={studio.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <div style={{ position: "absolute", inset: -12, borderRadius: 28, opacity: 0.7, background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d, #e8c65a)", filter: "blur(10px)" }} />
+            <div style={{ position: "relative", width: 280, height: 180, borderRadius: 24, overflow: "hidden", border: "3px solid rgba(212,168,83,0.4)", background: "#0a0a0c", boxShadow: "0 0 60px rgba(212,168,83,0.2), 0 20px 60px rgba(0,0,0,0.5)" }}>
+              <img src={studio.avatar} alt={studio.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
             </div>
             <div style={{ position: "absolute", bottom: -16, left: "50%", transform: "translateX(-50%)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 50, background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d)", boxShadow: "0 2px 12px rgba(180,130,40,0.5), inset 0 1px 1px rgba(255,235,170,0.5)" }}>
