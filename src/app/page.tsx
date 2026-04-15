@@ -300,6 +300,15 @@ export default function HomePage() {
   // ─── Auto-Start Splash (Zero-Click) ───
   useEffect(() => {
     setMounted(true);
+
+    // Return to page after OAuth (e.g., become-creator)
+    const returnTo = sessionStorage.getItem("returnTo");
+    if (returnTo) {
+      sessionStorage.removeItem("returnTo");
+      router.push(returnTo);
+      return;
+    }
+
     const hasSeenIntro = sessionStorage.getItem("hasSeenIntro");
     if (hasSeenIntro) {
       setSplashChecked(true);

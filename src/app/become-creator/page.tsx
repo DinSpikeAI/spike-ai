@@ -75,6 +75,7 @@ export default function BecomeCreatorPage() {
   const handleGoogleSignIn = async () => {
     if (!supabase) return;
     setGoogleLoading(true);
+    sessionStorage.setItem("returnTo", "/become-creator");
     try {
       await supabase.auth.signInWithOAuth({
         provider: "google",
