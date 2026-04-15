@@ -172,25 +172,25 @@ export default function BecomeCreatorPage() {
     fontSize: 20,
     fontWeight: 600,
     letterSpacing: "0.18em",
-    color: "rgba(255,255,255,0.5)",
+    color: "white",
     textAlign: "center" as const,
     marginBottom: 48,
   };
 
   const titleStyle: React.CSSProperties = {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: 800,
-    letterSpacing: "-0.01em",
+    letterSpacing: "-0.02em",
     color: "white",
-    marginBottom: 12,
+    marginBottom: 14,
   };
 
   const subtitleStyle: React.CSSProperties = {
     fontSize: 15,
-    color: "rgba(255,255,255,0.4)",
+    color: "rgba(255,255,255,0.35)",
     fontWeight: 300,
-    lineHeight: 1.6,
-    marginBottom: 40,
+    lineHeight: 1.7,
+    marginBottom: 44,
   };
 
   const labelStyle: React.CSSProperties = {
@@ -199,25 +199,26 @@ export default function BecomeCreatorPage() {
     fontWeight: 700,
     letterSpacing: "0.2em",
     textTransform: "uppercase" as const,
-    color: "rgba(255,255,255,0.25)",
-    marginBottom: 8,
+    color: "rgba(255,255,255,0.3)",
+    marginBottom: 10,
   };
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
     background: "rgba(255,255,255,0.03)",
-    border: "1px solid rgba(255,255,255,0.06)",
-    borderRadius: 10,
-    padding: "14px 16px",
+    border: "1px solid rgba(255,255,255,0.08)",
+    borderRadius: 12,
+    padding: "16px 18px",
     color: "white",
     fontSize: 14,
     fontFamily: "inherit",
     outline: "none",
     boxSizing: "border-box" as const,
+    transition: "border-color 0.3s, box-shadow 0.3s",
   };
 
   const fieldStyle: React.CSSProperties = {
-    marginBottom: 24,
+    marginBottom: 28,
   };
 
   return (
@@ -238,10 +239,10 @@ export default function BecomeCreatorPage() {
           <div style={{ marginBottom: 40 }}>
             <button onClick={handleGoogleSignIn} disabled={googleLoading}
               style={{
-                width: "100%", padding: "15px 20px", background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, color: "rgba(255,255,255,0.8)",
+                width: "100%", padding: "16px 20px", background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.12)", borderRadius: 14, color: "rgba(255,255,255,0.85)",
                 fontSize: 15, fontWeight: 500, display: "flex", alignItems: "center", justifyContent: "center",
-                gap: 12, cursor: "pointer", fontFamily: "inherit",
+                gap: 12, cursor: "pointer", fontFamily: "inherit", transition: "all 0.3s",
               }}>
               {googleLoading ? <Loader2 size={18} className="animate-spin" style={{ color: "rgba(255,255,255,0.4)" }} /> : <><GoogleIcon className="w-5 h-5" /> Sign in with Google to apply</>}
             </button>
@@ -308,14 +309,14 @@ export default function BecomeCreatorPage() {
         {/* AI Tools Grid */}
         <div style={{ marginBottom: 28 }}>
           <label style={labelStyle}>AI Tools You Use <span style={{ color: "rgba(255,255,255,0.4)" }}>*</span></label>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginTop: 4 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginTop: 6 }}>
             {AI_TOOLS.map((tool) => (
               <button key={tool} onClick={() => toggleTool(tool)} type="button"
                 style={{
-                  padding: "10px 12px", borderRadius: 8,
-                  border: selectedTools.includes(tool) ? "1px solid rgba(255,255,255,0.3)" : "1px solid rgba(255,255,255,0.06)",
-                  background: selectedTools.includes(tool) ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.03)",
-                  color: selectedTools.includes(tool) ? "white" : "rgba(255,255,255,0.4)",
+                  padding: "12px 12px", borderRadius: 10,
+                  border: selectedTools.includes(tool) ? "1px solid rgba(255,255,255,0.35)" : "1px solid rgba(255,255,255,0.08)",
+                  background: selectedTools.includes(tool) ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.03)",
+                  color: selectedTools.includes(tool) ? "white" : "rgba(255,255,255,0.45)",
                   fontSize: 12, fontWeight: 500, textAlign: "center" as const, cursor: "pointer",
                   fontFamily: "inherit", transition: "all 0.2s",
                 }}>
@@ -330,10 +331,10 @@ export default function BecomeCreatorPage() {
 
         {/* Creator Agreement */}
         <div style={{
-          background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.04)",
-          borderRadius: 12, padding: 20, marginBottom: 28,
+          background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+          borderRadius: 14, padding: 24, marginBottom: 28,
         }}>
-          <h3 style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.6)", marginBottom: 12 }}>Creator Agreement</h3>
+          <h3 style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.65)", marginBottom: 14 }}>Creator Agreement</h3>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", lineHeight: 1.7, marginBottom: 8 }}>By submitting this application, you confirm that:</p>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", lineHeight: 1.7, marginBottom: 8 }}>1. You own or have the rights to all content you upload to Spike AI.</p>
           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", lineHeight: 1.7, marginBottom: 8 }}>2. Your films do not contain deepfakes of real people without their consent.</p>
@@ -366,8 +367,10 @@ export default function BecomeCreatorPage() {
         {user ? (
           <button onClick={handleSubmit} disabled={submitting}
             style={{
-              width: "100%", padding: 16, borderRadius: 12, border: "none",
-              background: "white", color: "black", fontSize: 15, fontWeight: 700,
+              width: "100%", padding: 18, borderRadius: 50, border: "none",
+              background: "linear-gradient(180deg, #ffffff 0%, #e8e8eb 100%)",
+              boxShadow: "0 0 0 1px rgba(255,255,255,0.12), 0 4px 24px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
+              color: "black", fontSize: 15, fontWeight: 700, letterSpacing: "0.02em",
               cursor: submitting ? "default" : "pointer", opacity: submitting ? 0.3 : 1,
               fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             }}>
