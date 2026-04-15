@@ -255,20 +255,23 @@ export default function MoviePage() {
   useEffect(() => {
     if (!supabase || !movie) return;
     async function loadCreator() {
-      let data = null;
-      // Try creator_id first (reliable)
-      if ((movie as any).creator_id) {
-        const res = await supabase!.from("profiles").select("id, display_name, avatar_url, bio, user_type").eq("id", (movie as any).creator_id).single();
-        if (res.data) data = res.data;
-      }
-      // Fallback to display_name match
-      if (!data && movie!.creator_name) {
-        const res = await supabase!.from("profiles").select("id, display_name, avatar_url, bio, user_type").eq("display_name", movie!.creator_name).single();
-        if (res.data) data = res.data;
-      }
-      if (data) setCreatorProfile(data);
+      try {
+        let data = null;
+        // Try creator_id first (reliable)
+        if ((movie as any).creator_id) {
+          const res = await supabase!.from("profiles").select("id, display_name, avatar_url, bio, user_type").eq("id", (movie as any).creator_id).maybeSingle();
+          if (res.data) data = res.data;
+        }
+        // Fallback to display_name match
+        if (!data && movie!.creator_name) {
+          const res = await supabase!.from("profiles").select("id, display_name, avatar_url, bio, user_type").eq("display_name", movie!.creator_name).maybeSingle();
+          if (res.data) data = res.data;
+        }
+        if (data) setCreatorProfile(data);
+      } catch {}
 
-      // Check if pioneer creator
+      // Check if pioneer creator (separate try-catch so it always runs)
+      try {
       if (movie!.creator_name) {
         const creatorName = movie!.creator_name;
         // Try exact ilike match first
@@ -282,6 +285,7 @@ export default function MoviePage() {
         }
         if (pc && pc.length > 0) setPioneerCreator(pc[0]);
       }
+      } catch {}
     }
     loadCreator();
   }, [movie]);
