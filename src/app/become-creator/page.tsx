@@ -9,6 +9,17 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
+function GoogleIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+    </svg>
+  );
+}
+
 export default function BecomeCreatorPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
@@ -16,10 +27,10 @@ export default function BecomeCreatorPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [alreadyCreator, setAlreadyCreator] = useState(false);
-  const [alreadyPending, setAlreadyPending] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [displayName, setDisplayName] = useState("");
@@ -30,6 +41,7 @@ export default function BecomeCreatorPage() {
   const [socialInstagram, setSocialInstagram] = useState("");
   const [sampleWorkUrl, setSampleWorkUrl] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -41,7 +53,7 @@ export default function BecomeCreatorPage() {
       setUser(session.user);
       const { data: profile } = await supabase!.from("profiles").select("*").eq("id", session.user.id).single();
       if (profile) {
-        setDisplayName(profile.display_name || "");
+        setDisplayName(profile.display_name || session.user.user_metadata?.full_name || "");
         setBio(profile.bio || "");
         setWebsite(profile.website || "");
         setSocialX(profile.social_x || "");
@@ -50,14 +62,37 @@ export default function BecomeCreatorPage() {
         setSampleWorkUrl(profile.sample_work_url || "");
         setAvatarUrl(profile.avatar_url || session.user.user_metadata?.avatar_url || "");
         if (profile.user_type === "creator") setAlreadyCreator(true);
-        if (profile.creator_request === "pending") setAlreadyPending(true);
       } else {
+        setDisplayName(session.user.user_metadata?.full_name || "");
         setAvatarUrl(session.user.user_metadata?.avatar_url || "");
       }
       setLoading(false);
     }
     load();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        setDisplayName(prev => prev || session.user.user_metadata?.full_name || "");
+        setAvatarUrl(prev => prev || session.user.user_metadata?.avatar_url || "");
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
+
+  const handleGoogleSignIn = async () => {
+    if (!supabase) return;
+    setGoogleLoading(true);
+    setError(null);
+    try {
+      await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/become-creator` },
+      });
+    } catch {
+      setError("Sign in failed. Please try again.");
+      setGoogleLoading(false);
+    }
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -67,12 +102,10 @@ export default function BecomeCreatorPage() {
     try {
       const ext = file.name.split(".").pop();
       const path = `avatars/${user.id}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("media").upload(path, file, { upsert: true });
-      if (upErr) { setError("Upload failed"); setUploadingAvatar(false); return; }
+      await supabase.storage.from("media").upload(path, file, { upsert: true });
       const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
-      const url = urlData.publicUrl + "?t=" + Date.now();
-      setAvatarUrl(url);
-      await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+      setAvatarUrl(urlData.publicUrl + "?t=" + Date.now());
+      await supabase.from("profiles").update({ avatar_url: urlData.publicUrl }).eq("id", user.id);
     } catch { setError("Upload error"); }
     setUploadingAvatar(false);
   };
@@ -80,8 +113,8 @@ export default function BecomeCreatorPage() {
   const handleSubmit = async () => {
     if (!supabase || !user) return;
     if (!displayName.trim()) { setError("Please enter your name"); return; }
-    if (!bio.trim()) { setError("Tell us about yourself and your work"); return; }
-    if (!sampleWorkUrl.trim()) { setError("Add a link to your work so we can review it"); return; }
+    if (!sampleWorkUrl.trim()) { setError("Add a link to your work"); return; }
+    if (!termsAccepted) { setError("Please accept the terms"); return; }
     setSubmitting(true);
     setError(null);
     const { error: e } = await supabase.from("profiles").update({
@@ -90,92 +123,64 @@ export default function BecomeCreatorPage() {
       social_instagram: socialInstagram.trim(), sample_work_url: sampleWorkUrl.trim(),
       creator_request: "pending", avatar_url: avatarUrl,
     }).eq("id", user.id);
-    if (!e) { setSubmitted(true); } else { setError("Something went wrong. Please try again."); }
+    if (!e) {
+      setSubmitted(true);
+      try {
+        await fetch("/api/creator-apply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: displayName.trim(), email: user.email,
+            film_url: sampleWorkUrl.trim(), website: website.trim(),
+            social: socialYoutube.trim() || socialX.trim() || socialInstagram.trim(),
+            bio: bio.trim(), ai_tools: [],
+          }),
+        });
+      } catch {}
+    } else { setError("Something went wrong. Please try again."); }
     setSubmitting(false);
   };
 
-  const inputClass = "w-full px-5 py-[17px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[15px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 focus:bg-white/[0.07] focus:shadow-[0_0_25px_rgba(139,92,246,0.1)] transition-all duration-300";
+  const inputClass = "w-full px-5 py-[15px] bg-white/[0.04] border border-white/[0.07] rounded-xl text-[14px] text-white placeholder-white/20 focus:outline-none focus:border-white/20 focus:bg-white/[0.06] transition-all duration-300";
 
   const Shell = ({ children }: { children: React.ReactNode }) => (
-    <div className="min-h-screen bg-[#07070a] flex flex-col relative overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[15%] left-[20%] w-[500px] h-[500px] rounded-full opacity-[0.07]"
-          style={{ background: "radial-gradient(circle, rgba(139,92,246,0.8) 0%, transparent 70%)", animation: "glow 10s ease-in-out infinite" }} />
-        <div className="absolute bottom-[10%] right-[15%] w-[400px] h-[400px] rounded-full opacity-[0.05]"
-          style={{ background: "radial-gradient(circle, rgba(59,130,246,0.8) 0%, transparent 70%)", animation: "glow 14s ease-in-out infinite reverse" }} />
-        <div className="absolute top-[60%] left-[60%] w-[300px] h-[300px] rounded-full opacity-[0.04]"
-          style={{ background: "radial-gradient(circle, rgba(236,72,153,0.7) 0%, transparent 70%)", animation: "glow 18s ease-in-out infinite" }} />
-        <div className="absolute inset-0 opacity-[0.015]"
-          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")` }} />
-      </div>
-      <nav className={`relative z-20 px-8 py-7 transition-all duration-1000 ${mounted ? "opacity-100" : "opacity-0"}`}>
-        <div className="max-w-[1000px] mx-auto flex items-center gap-5">
-          <button onClick={() => router.push("/")} className="w-10 h-10 rounded-full border border-white/[0.08] flex items-center justify-center text-white/20 hover:text-white hover:border-white/20 transition-all cursor-pointer">
-            <ArrowLeft size={16} />
+    <div className="min-h-screen bg-[#050505] flex flex-col relative overflow-hidden">
+      <nav className={`relative z-20 px-6 py-5 transition-all duration-1000 ${mounted ? "opacity-100" : "opacity-0"}`}>
+        <div className="max-w-[640px] mx-auto flex items-center gap-4">
+          <button onClick={() => router.push("/")} className="w-9 h-9 rounded-full border border-white/[0.08] flex items-center justify-center text-white/20 hover:text-white hover:border-white/20 transition-all cursor-pointer">
+            <ArrowLeft size={15} />
           </button>
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push("/")}>
-            <Image src="/spike-icon-512.png" alt="Spike AI" width={28} height={28} className="rounded-lg" />
-            <span className="text-[15px] font-semibold tracking-[0.25em] text-white/25 uppercase">spike AI</span>
-          </div>
+          <span className="text-[15px] font-semibold tracking-[0.18em] text-white/30 cursor-pointer" onClick={() => router.push("/")}>spike AI</span>
         </div>
       </nav>
-      <div className="flex-1 flex items-center justify-center px-6 pb-20 relative z-20">
-        <div className={`transition-all duration-1000 ease-out ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+      <div className="flex-1 flex items-start justify-center px-5 pb-20 pt-4 relative z-20">
+        <div className={`w-full max-w-[640px] transition-all duration-700 ${mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
           {children}
         </div>
       </div>
     </div>
   );
 
-  if (loading) return <Shell><Loader2 className="w-5 h-5 text-white/10 animate-spin" /></Shell>;
-
-  if (!user) return (
-    <Shell>
-      <div className="text-center">
-        <div className="relative inline-block mb-12">
-          <div className="w-28 h-28 rounded-[28px] bg-gradient-to-br from-violet-500/30 to-blue-500/20 border border-violet-400/15 flex items-center justify-center">
-            <Film size={40} className="text-violet-300/60" />
-          </div>
-          <div className="absolute -inset-6 rounded-[40px] bg-violet-500/[0.06] blur-2xl -z-10" />
-        </div>
-        <h1 className="text-[44px] md:text-[52px] font-bold tracking-[-0.02em] leading-[1.08] text-white mb-5">Sign in{"\n"}to apply.</h1>
-        <p className="text-[17px] text-white/30 mb-14">You need an account to become a creator.</p>
-        <button onClick={() => router.push("/auth")} className="px-12 py-[17px] bg-white text-black text-[15px] font-bold rounded-full inline-flex items-center gap-3 cursor-pointer hover:bg-white/90 transition-all active:scale-[0.97]">Sign In <ArrowRight size={17} strokeWidth={2.5} /></button>
-      </div>
-    </Shell>
-  );
+  if (loading) return <Shell><div className="flex justify-center py-20"><Loader2 className="w-5 h-5 text-white/10 animate-spin" /></div></Shell>;
 
   if (alreadyCreator) return (
     <Shell>
-      <div className="text-center">
-        <div className="relative inline-block mb-12">
-          <div className="w-28 h-28 rounded-[28px] bg-gradient-to-br from-emerald-500/30 to-teal-500/20 border border-emerald-400/15 flex items-center justify-center">
-            <Check size={40} className="text-emerald-300/60" />
-          </div>
-          <div className="absolute -inset-6 rounded-[40px] bg-emerald-500/[0.06] blur-2xl -z-10" />
-        </div>
-        <h1 className="text-[44px] md:text-[52px] font-bold tracking-[-0.02em] leading-[1.08] text-white mb-5">You&apos;re{"\n"}a creator.</h1>
-        <p className="text-[17px] text-white/30 mb-14">Submit films and manage your profile.</p>
-        <div className="flex flex-col items-center gap-4">
-          <button onClick={() => router.push("/submit")} className="px-12 py-[17px] bg-white text-black text-[15px] font-bold rounded-full inline-flex items-center gap-3 cursor-pointer hover:bg-white/90 transition-all active:scale-[0.97]">Submit Film <ArrowRight size={17} strokeWidth={2.5} /></button>
-          <button onClick={() => router.push("/profile")} className="text-white/20 text-[13px] hover:text-white/40 transition-colors cursor-pointer">Go to profile</button>
-        </div>
+      <div className="text-center py-16">
+        <div className="w-20 h-20 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto mb-6"><Check size={32} className="text-white/40" /></div>
+        <h1 className="text-3xl font-bold text-white mb-3">You&apos;re already a creator</h1>
+        <p className="text-white/30 text-[15px] mb-10">Start uploading your AI films.</p>
+        <button onClick={() => router.push("/submit")} className="px-10 py-4 bg-white text-black text-[14px] font-bold rounded-full cursor-pointer hover:bg-white/90 transition-all">Submit Film</button>
       </div>
     </Shell>
   );
 
-  if (alreadyPending || submitted) return (
+  if (submitted) return (
     <Shell>
-      <div className="text-center">
-        <div className="relative inline-block mb-12">
-          <div className="w-28 h-28 rounded-[28px] bg-gradient-to-br from-violet-500/30 to-pink-500/20 border border-violet-400/15 flex items-center justify-center">
-            <Sparkles size={40} className="text-violet-300/60" />
-          </div>
-          <div className="absolute -inset-6 rounded-[40px] bg-violet-500/[0.06] blur-2xl -z-10" />
-        </div>
-        <h1 className="text-[44px] md:text-[52px] font-bold tracking-[-0.02em] leading-[1.08] text-white mb-5">Application{"\n"}sent.</h1>
-        <p className="text-[17px] text-white/30 mb-3">We&apos;ll review and get back to you soon.</p>
-        <p className="text-[14px] text-white/12 mb-14">Pioneer Creator spots are limited to the first 50.</p>
+      <div className="text-center py-16">
+        <div className="w-20 h-20 rounded-full bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto mb-6"><Sparkles size={32} className="text-white/40" /></div>
+        <h1 className="text-3xl font-bold text-white mb-3">Application sent</h1>
+        <p className="text-white/30 text-[15px] mb-3">We review every application personally and will get back to you within 48 hours.</p>
+        <p className="text-white/15 text-[13px] mb-10">Pioneer Creator spots are limited.</p>
         <button onClick={() => router.push("/")} className="text-white/20 text-[14px] hover:text-white/40 transition-colors cursor-pointer">&larr; Back to home</button>
       </div>
     </Shell>
@@ -185,122 +190,127 @@ export default function BecomeCreatorPage() {
 
   return (
     <Shell>
-      <div className="w-full max-w-[680px] text-center">
+      <div className="text-center mb-8">
+        <h1 className="text-[32px] md:text-[40px] font-bold tracking-tight text-white mb-2">Join as Creator</h1>
+        <p className="text-[15px] text-white/30">{user ? "Fill in your details and apply." : "Create your account and apply in one step."}</p>
+      </div>
 
-        {/* Title */}
-        <h1 className="text-[46px] md:text-[58px] font-bold tracking-[-0.03em] leading-[1.06] text-white mb-3"
-          style={{ textShadow: "0 0 80px rgba(139, 92, 246, 0.15)" }}>
-          Creator Registration
-        </h1>
-        <p className="text-[16px] text-white/25 mb-10">Apply to join Spike AI as a Pioneer Creator. Share your AI films with a global audience.</p>
+      <div className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-6 md:p-8">
 
-        {/* ═══ Form Card ═══ */}
-        <div className="max-w-[640px] mx-auto">
-          <div className="relative rounded-2xl overflow-hidden">
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-br from-violet-500/25 via-blue-500/15 to-pink-500/15" />
-            <div className="relative rounded-2xl bg-[#0c0c14]/95 backdrop-blur-2xl p-10">
+        {!user && (
+          <div className="mb-8">
+            <label className="block text-[10px] font-bold tracking-[0.2em] text-white/20 uppercase mb-3">Step 1 - Create Account</label>
+            <button onClick={handleGoogleSignIn} disabled={googleLoading}
+              className="w-full py-4 bg-white text-black text-[14px] font-semibold rounded-xl flex items-center justify-center gap-3 cursor-pointer hover:bg-white/90 transition-all disabled:opacity-50">
+              {googleLoading ? <Loader2 size={18} className="animate-spin" /> : <><GoogleIcon className="w-5 h-5" /> Sign in with Google</>}
+            </button>
+            <div className="flex items-center gap-3 my-6">
+              <div className="flex-1 h-px bg-white/[0.06]" />
+              <span className="text-[10px] text-white/15 uppercase tracking-[0.15em]">then fill your details below</span>
+              <div className="flex-1 h-px bg-white/[0.06]" />
+            </div>
+          </div>
+        )}
 
-              {/* Avatar Upload */}
-              <div className="flex justify-center mb-8">
-                <div className="relative group">
-                  <div className="w-28 h-28 rounded-full overflow-hidden border-2 border-white/[0.1] shadow-xl shadow-black/40 group-hover:border-violet-400/30 transition-all duration-300">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-violet-800 to-indigo-900 flex items-center justify-center text-3xl font-bold text-white/30">{initial}</div>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingAvatar}
-                    className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-lg hover:bg-white/90 transition-all cursor-pointer active:scale-90"
-                  >
-                    {uploadingAvatar ? <Loader2 size={13} className="text-black/50 animate-spin" /> : <Camera size={13} className="text-black/70" />}
-                  </button>
-                  <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
-                  <div className="absolute -inset-3 rounded-full bg-violet-500/[0.06] blur-xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </div>
+        {user && (
+          <div className="flex items-center gap-3 mb-6 p-3 bg-white/[0.03] rounded-xl border border-white/[0.05]">
+            {avatarUrl ? <img src={avatarUrl} alt="" className="w-9 h-9 rounded-full object-cover" />
+              : <div className="w-9 h-9 rounded-full bg-white/[0.06] flex items-center justify-center text-sm font-bold text-white/30">{initial}</div>}
+            <div className="text-left">
+              <p className="text-[13px] font-medium text-white/70">{user.user_metadata?.full_name || user.email}</p>
+              <p className="text-[11px] text-white/25">Signed in</p>
+            </div>
+            <Check size={16} className="text-green-400/50 ml-auto" />
+          </div>
+        )}
+
+        {user && (
+          <div className="flex justify-center mb-6">
+            <div className="relative group">
+              <div className="w-20 h-20 rounded-full overflow-hidden border border-white/[0.08] group-hover:border-white/20 transition-all">
+                {avatarUrl ? <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                  : <div className="w-full h-full bg-white/[0.04] flex items-center justify-center text-2xl font-bold text-white/20">{initial}</div>}
               </div>
+              <button onClick={() => fileInputRef.current?.click()} disabled={uploadingAvatar}
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-lg hover:bg-white/90 transition-all cursor-pointer">
+                {uploadingAvatar ? <Loader2 size={12} className="text-black/50 animate-spin" /> : <Camera size={12} className="text-black/70" />}
+              </button>
+              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+            </div>
+          </div>
+        )}
 
-              <div className="space-y-5 text-left">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-[10px] font-bold tracking-[0.15em] text-white/20 uppercase mb-2">Your Name / Studio Name *</label>
+            <input value={displayName} onChange={(e) => { setDisplayName(e.target.value); setError(null); }} placeholder="e.g. Daniel Overton or Ovey Studios" className={inputClass} />
+          </div>
 
-                {/* Name */}
-                <div>
-                  <label className="block text-[11px] font-semibold tracking-[0.2em] text-violet-300/35 uppercase mb-2.5 ml-1">Your Name *</label>
-                  <input value={displayName} onChange={(e) => { setDisplayName(e.target.value); setError(null); }}
-                    placeholder="How you want to be known" className={inputClass} />
-                </div>
+          <div>
+            <label className="block text-[10px] font-bold tracking-[0.15em] text-white/20 uppercase mb-2">Link to Your Best AI Film *</label>
+            <input value={sampleWorkUrl} onChange={(e) => { setSampleWorkUrl(e.target.value); setError(null); }} placeholder="YouTube or Vimeo link" className={inputClass} />
+          </div>
 
-                {/* Bio */}
-                <div>
-                  <label className="block text-[11px] font-semibold tracking-[0.2em] text-violet-300/35 uppercase mb-2.5 ml-1">About You *</label>
-                  <textarea value={bio} onChange={(e) => { setBio(e.target.value); setError(null); }} rows={4}
-                    placeholder="Tell us about your work with AI cinema..."
-                    className={inputClass + " resize-none"} />
-                </div>
+          <div>
+            <label className="block text-[10px] font-bold tracking-[0.15em] text-white/20 uppercase mb-2">About You</label>
+            <textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="What kind of AI films do you make?" className={inputClass + " resize-none"} />
+          </div>
 
-                {/* Sample Work */}
-                <div>
-                  <label className="block text-[11px] font-semibold tracking-[0.2em] text-violet-300/35 uppercase mb-2.5 ml-1">Link to Your Work *</label>
-                  <input value={sampleWorkUrl} onChange={(e) => { setSampleWorkUrl(e.target.value); setError(null); }}
-                    placeholder="YouTube, Vimeo, or portfolio" className={inputClass} />
-                </div>
-
-                {/* Divider */}
-                <div className="flex items-center gap-3 py-1">
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-                  <span className="text-[10px] text-white/12 uppercase tracking-[0.2em]">optional</span>
-                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
-                </div>
-
-                {/* Website */}
-                <div>
-                  <label className="block text-[11px] font-semibold tracking-[0.2em] text-violet-300/35 uppercase mb-2.5 ml-1">Website</label>
-                  <input value={website} onChange={(e) => setWebsite(e.target.value)}
-                    placeholder="https://yoursite.com" className={inputClass} />
-                </div>
-
-                {/* Socials */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-[10px] font-semibold tracking-[0.15em] text-violet-300/25 uppercase mb-2 ml-1">X</label>
-                    <input value={socialX} onChange={(e) => setSocialX(e.target.value)} placeholder="@handle"
-                      className="w-full px-3.5 py-[15px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 transition-all duration-300" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold tracking-[0.15em] text-violet-300/25 uppercase mb-2 ml-1">YouTube</label>
-                    <input value={socialYoutube} onChange={(e) => setSocialYoutube(e.target.value)} placeholder="@channel"
-                      className="w-full px-3.5 py-[15px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 transition-all duration-300" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold tracking-[0.15em] text-violet-300/25 uppercase mb-2 ml-1">Instagram</label>
-                    <input value={socialInstagram} onChange={(e) => setSocialInstagram(e.target.value)} placeholder="@user"
-                      className="w-full px-3.5 py-[15px] bg-white/[0.05] border border-white/[0.08] rounded-xl text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-violet-400/40 transition-all duration-300" />
-                  </div>
-                </div>
-
-                {/* Error */}
-                {error && (
-                  <div className="flex items-start gap-3 p-4 bg-red-500/[0.08] border border-red-500/[0.15] rounded-xl" style={{ animation: "shake 0.4s ease" }}>
-                    <AlertCircle size={15} className="text-red-400/70 flex-shrink-0 mt-0.5" />
-                    <p className="text-[13px] text-red-300/70 leading-relaxed">{error}</p>
-                  </div>
-                )}
-
-                {/* CTA — WHITE */}
-                <button onClick={handleSubmit} disabled={submitting}
-                  className="w-full mt-3 py-[17px] bg-white text-black text-[15px] font-bold tracking-wide rounded-full flex items-center justify-center gap-2.5 disabled:opacity-30 cursor-pointer active:scale-[0.97] hover:bg-white/90 hover:shadow-[0_0_30px_rgba(255,255,255,0.1)] transition-all">
-                  {submitting ? <Loader2 size={19} className="animate-spin text-black/40" /> : <><Sparkles size={16} /> Apply as Pioneer Creator</>}
-                </button>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-[10px] font-bold tracking-[0.12em] text-white/15 uppercase mb-2">YouTube</label>
+              <input value={socialYoutube} onChange={(e) => setSocialYoutube(e.target.value)} placeholder="@channel"
+                className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.07] rounded-xl text-[13px] text-white placeholder-white/15 focus:outline-none focus:border-white/20 transition-all" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold tracking-[0.12em] text-white/15 uppercase mb-2">X / Twitter</label>
+              <input value={socialX} onChange={(e) => setSocialX(e.target.value)} placeholder="@handle"
+                className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.07] rounded-xl text-[13px] text-white placeholder-white/15 focus:outline-none focus:border-white/20 transition-all" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold tracking-[0.12em] text-white/15 uppercase mb-2">Instagram</label>
+              <input value={socialInstagram} onChange={(e) => setSocialInstagram(e.target.value)} placeholder="@user"
+                className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.07] rounded-xl text-[13px] text-white placeholder-white/15 focus:outline-none focus:border-white/20 transition-all" />
             </div>
           </div>
 
-          <p className="text-[11px] text-white/10 text-center mt-7">
-            Pioneer Creator badge is permanent. No fees, no contracts.
-          </p>
+          <div>
+            <label className="block text-[10px] font-bold tracking-[0.15em] text-white/15 uppercase mb-2">Website (optional)</label>
+            <input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://yoursite.com" className={inputClass} />
+          </div>
+
+          <div className="mt-4 p-4 bg-white/[0.02] border border-white/[0.04] rounded-xl">
+            <p className="text-[11px] text-white/25 leading-relaxed mb-3">
+              By applying, you confirm: you own or have rights to all content you upload. Your films do not contain deepfakes of real people without consent. You grant Spike AI a non-exclusive license to display and promote your content. You will tag all AI tools used in each film.
+            </p>
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input type="checkbox" checked={termsAccepted} onChange={(e) => { setTermsAccepted(e.target.checked); setError(null); }}
+                className="mt-0.5 w-4 h-4 accent-white flex-shrink-0" />
+              <span className="text-[12px] text-white/40 leading-relaxed">
+                I agree to the <a href="/terms" target="_blank" className="text-white/60 underline">Terms of Service</a> and <a href="/community-guidelines" target="_blank" className="text-white/60 underline">Community Guidelines</a>.
+              </span>
+            </label>
+          </div>
+
+          {error && (
+            <div className="flex items-start gap-3 p-4 bg-red-500/[0.06] border border-red-500/[0.12] rounded-xl">
+              <AlertCircle size={15} className="text-red-400/60 flex-shrink-0 mt-0.5" />
+              <p className="text-[13px] text-red-300/60">{error}</p>
+            </div>
+          )}
+
+          {user ? (
+            <button onClick={handleSubmit} disabled={submitting}
+              className="w-full py-4 bg-white text-black text-[14px] font-bold rounded-xl flex items-center justify-center gap-2 disabled:opacity-30 cursor-pointer hover:bg-white/90 transition-all mt-2">
+              {submitting ? <Loader2 size={18} className="animate-spin" /> : <><Sparkles size={16} /> Apply as Creator</>}
+            </button>
+          ) : (
+            <p className="text-center text-[12px] text-white/20 py-2">Sign in with Google above to submit your application.</p>
+          )}
         </div>
       </div>
+
+      <p className="text-[11px] text-white/10 text-center mt-6">Free to join. No fees, no contracts.</p>
     </Shell>
   );
 }
