@@ -271,7 +271,7 @@ export default function StudioPage() {
 
       {/* ═══ Films Section ═══ */}
       {movies.length > 0 && (
-        <div className="relative z-10 max-w-[1000px] mx-auto px-6 py-16 md:py-20" style={{ animation: "studioReveal 1s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
+        <div className="relative z-10 py-16 md:py-20" style={{ animation: "studioReveal 1s cubic-bezier(0.16,1,0.3,1) 0.3s both" }}>
           <div className="flex items-center justify-center gap-3 mb-10">
             <Film size={18} style={{ color: "rgba(212,168,83,0.4)" }} />
             <h2 className="text-2xl md:text-3xl font-bold" style={{ color: "rgba(212,168,83,0.7)" }}>Films</h2>
@@ -280,10 +280,10 @@ export default function StudioPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-[800px] mx-auto">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6 px-6">
             {movies.map((movie) => (
               <div key={movie.id} onClick={() => router.push(`/movie/${movie.id}`)}
-                className="group cursor-pointer rounded-xl overflow-hidden border border-[#d4a853]/[0.08] hover:border-[#d4a853]/25 transition-all duration-500 bg-[#d4a853]/[0.02]"
+                className="group cursor-pointer rounded-xl overflow-hidden border border-[#d4a853]/[0.08] hover:border-[#d4a853]/25 transition-all duration-500 bg-[#d4a853]/[0.02] w-[280px] md:w-[300px]"
                 style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
                 <div className="relative aspect-video overflow-hidden">
                   <img src={movie.poster} alt={movie.title}
@@ -336,7 +336,7 @@ export default function StudioPage() {
       <div className="relative z-10 max-w-[1000px] mx-auto px-6 py-16 md:py-20" style={{ animation: "studioReveal 1s cubic-bezier(0.16,1,0.3,1) 0.5s both" }}>
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-[10px] font-bold tracking-[0.3em] uppercase mb-6" style={{ color: "rgba(212,168,83,0.3)" }}>About</h2>
-          <p className="text-[15px] leading-[2] mb-12 text-left" style={{ color: "rgba(255,255,255,0.35)" }}>{studio.bio}</p>
+          <p className="text-[15px] leading-[2] mb-12 text-center" style={{ color: "rgba(255,255,255,0.35)" }}>{studio.bio}</p>
 
           {/* Selected Works */}
           {studio.works.length > 0 && (
