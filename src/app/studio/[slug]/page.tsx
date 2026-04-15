@@ -55,15 +55,27 @@ export default function StudioPage() {
     async function load() {
       if (!supabase) { setLoading(false); return; }
 
-      // Find creator by slug match (case insensitive)
-      const { data: creators } = await supabase
+      // Try multiple ways to find the creator
+      let match: any = null;
+
+      // Try 1: direct ilike match
+      const { data: d1 } = await supabase
         .from("pioneer_creators")
         .select("*")
-        .eq("visible", true);
+        .eq("visible", true)
+        .ilike("name", `%${slug}%`)
+        .limit(1);
+      if (d1 && d1.length > 0) match = d1[0];
 
-      const match = (creators || []).find((c: any) =>
-        c.name.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() === slug.toLowerCase().trim()
-      );
+      // Try 2: load all and normalize (handles accented chars)
+      if (!match) {
+        const { data: all } = await supabase
+          .from("pioneer_creators")
+          .select("*")
+          .eq("visible", true);
+        const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+        match = (all || []).find((c: any) => normalize(c.name) === normalize(slug));
+      }
 
       if (!match) { setLoading(false); return; }
 
