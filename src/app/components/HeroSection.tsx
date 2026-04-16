@@ -121,22 +121,18 @@ export default function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
         {/* Title */}
         {(() => {
           const len = slide.title.length;
-          // Smooth scale: short titles get huge font, long titles get smaller
-          const baseSizeVw = len <= 10 ? 8 : len <= 15 ? 7 : len <= 20 ? 5.5 : len <= 30 ? 4.5 : len <= 40 ? 3.5 : 2.8;
-          const minPx = len <= 15 ? 42 : len <= 25 ? 36 : 28;
-          const maxPx = len <= 10 ? 120 : len <= 15 ? 100 : len <= 20 ? 85 : len <= 30 ? 72 : 60;
+          const baseSizeVw = len <= 10 ? 8 : len <= 15 ? 7 : len <= 20 ? 6 : len <= 30 ? 5 : 4;
+          const minPx = len <= 15 ? 48 : len <= 25 ? 40 : 34;
+          const maxPx = len <= 10 ? 120 : len <= 15 ? 100 : len <= 20 ? 90 : len <= 30 ? 80 : 68;
           return (
             <h2
               key={`title-${activeSlide}`}
-              className="animate-fade-in-up font-bold text-white tracking-wider leading-[0.9] mb-4 md:mb-5"
+              className="animate-fade-in-up font-bold text-white tracking-wider leading-[0.95] mb-4 md:mb-5"
               style={{
                 fontSize: `clamp(${minPx}px, ${baseSizeVw}vw, ${maxPx}px)`,
                 textShadow: "0 4px 30px rgba(0,0,0,0.6), 0 0 80px rgba(229,9,20,0.1)",
-                whiteSpace: "pre-line",
                 animationDelay: "0.15s",
                 animationFillMode: "backwards",
-                maxWidth: "65%",
-                wordBreak: "break-word",
               }}
             >
               {slide.title}
