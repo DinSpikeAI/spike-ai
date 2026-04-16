@@ -119,29 +119,30 @@ export default function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
         </div>
 
         {/* Title */}
-        <h2
-          key={`title-${activeSlide}`}
-          className={`animate-fade-in-up font-bold text-white tracking-wider leading-[0.9] mb-4 md:mb-5 ${
-            slide.title.length > 25
-              ? "text-3xl sm:text-4xl md:text-6xl"
-              : slide.title.length > 15
-              ? "text-4xl sm:text-5xl md:text-7xl"
-              : "text-4xl sm:text-6xl md:text-8xl"
-          }`}
-          style={{
-            textShadow: "0 4px 30px rgba(0,0,0,0.6), 0 0 80px rgba(229,9,20,0.1)",
-            whiteSpace: "pre-line",
-            animationDelay: "0.15s",
-            animationFillMode: "backwards",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical" as any,
-            overflow: "hidden",
-            maxWidth: "70%",
-          }}
-        >
-          {slide.title}
-        </h2>
+        {(() => {
+          const len = slide.title.length;
+          // Smooth scale: short titles get huge font, long titles get smaller
+          const baseSizeVw = len <= 10 ? 8 : len <= 15 ? 7 : len <= 20 ? 5.5 : len <= 30 ? 4.5 : len <= 40 ? 3.5 : 2.8;
+          const minPx = len <= 15 ? 42 : len <= 25 ? 36 : 28;
+          const maxPx = len <= 10 ? 120 : len <= 15 ? 100 : len <= 20 ? 85 : len <= 30 ? 72 : 60;
+          return (
+            <h2
+              key={`title-${activeSlide}`}
+              className="animate-fade-in-up font-bold text-white tracking-wider leading-[0.9] mb-4 md:mb-5"
+              style={{
+                fontSize: `clamp(${minPx}px, ${baseSizeVw}vw, ${maxPx}px)`,
+                textShadow: "0 4px 30px rgba(0,0,0,0.6), 0 0 80px rgba(229,9,20,0.1)",
+                whiteSpace: "pre-line",
+                animationDelay: "0.15s",
+                animationFillMode: "backwards",
+                maxWidth: "65%",
+                wordBreak: "break-word",
+              }}
+            >
+              {slide.title}
+            </h2>
+          );
+        })()}
 
         {/* Meta */}
         <div key={`meta-${activeSlide}`} className="animate-fade-in-up flex items-center gap-4 mb-3 flex-wrap" style={{ animationDelay: "0.25s", animationFillMode: "backwards" }}>
