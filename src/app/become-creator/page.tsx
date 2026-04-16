@@ -40,6 +40,7 @@ export default function BecomeCreatorPage() {
   const [sampleWorkUrl, setSampleWorkUrl] = useState("");
   const [country, setCountry] = useState("");
   const [phone, setPhone] = useState("");
+  const [heardFrom, setHeardFrom] = useState("");
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -116,7 +117,7 @@ export default function BecomeCreatorPage() {
             name: displayName.trim(), email: user.email,
             film_url: sampleWorkUrl.trim(), website: website.trim(),
             social: socialYoutube.trim(), bio: bio.trim(),
-            country: country.trim(), ai_tools: selectedTools, phone: phone.trim(),
+            country: country.trim(), ai_tools: selectedTools, phone: phone.trim(), heard_from: heardFrom.trim(),
           }),
         });
       } catch {}
@@ -313,6 +314,27 @@ export default function BecomeCreatorPage() {
           <input value={phone} onChange={(e) => setPhone(e.target.value)}
             placeholder="+44 7700 900000" style={inputStyle} />
           <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", marginTop: 6 }}>Join our creators WhatsApp group for updates and networking.</p>
+        </div>
+
+        <div style={fieldStyle}>
+          <label style={labelStyle}>How did you hear about us? <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 11 }}>(optional)</span></label>
+          <select value={heardFrom} onChange={(e) => setHeardFrom(e.target.value)} style={inputStyle}>
+            <option value="">Select an option...</option>
+            <option value="Instagram">Instagram</option>
+            <option value="Twitter / X">Twitter / X</option>
+            <option value="TikTok">TikTok</option>
+            <option value="YouTube">YouTube</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="Facebook">Facebook</option>
+            <option value="Reddit">Reddit</option>
+            <option value="Discord">Discord</option>
+            <option value="Friend / Referral">Friend / Referral</option>
+            <option value="Email from Spike AI">Email from Spike AI</option>
+            <option value="Google Search">Google Search</option>
+            <option value="Press / Article">Press / Article</option>
+            <option value="Curious Refuge">Curious Refuge</option>
+            <option value="Other">Other</option>
+          </select>
         </div>
 
         {/* AI Tools Grid */}
