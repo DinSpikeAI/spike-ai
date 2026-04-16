@@ -186,7 +186,7 @@ body {
 
 .movie-card {
   flex-shrink: 0;
-  width: 195px;
+  width: 260px;
   scroll-snap-align: start;
   border-radius: 8px;
   overflow: hidden;
@@ -701,7 +701,7 @@ body {
   }
   
   .movie-card {
-    width: 130px;
+    width: 155px;
   }
   
   .movie-card:hover {
