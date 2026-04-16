@@ -121,12 +121,23 @@ export default function HeroSection({ dbSlides }: { dbSlides: HeroSlide[] }) {
         {/* Title */}
         <h2
           key={`title-${activeSlide}`}
-          className="animate-fade-in-up text-4xl sm:text-6xl md:text-8xl font-bold text-white tracking-wider leading-[0.9] mb-4 md:mb-5"
+          className={`animate-fade-in-up font-bold text-white tracking-wider leading-[0.9] mb-4 md:mb-5 ${
+            slide.title.length > 25
+              ? "text-3xl sm:text-4xl md:text-6xl"
+              : slide.title.length > 15
+              ? "text-4xl sm:text-5xl md:text-7xl"
+              : "text-4xl sm:text-6xl md:text-8xl"
+          }`}
           style={{
             textShadow: "0 4px 30px rgba(0,0,0,0.6), 0 0 80px rgba(229,9,20,0.1)",
             whiteSpace: "pre-line",
             animationDelay: "0.15s",
             animationFillMode: "backwards",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical" as any,
+            overflow: "hidden",
+            maxWidth: "70%",
           }}
         >
           {slide.title}
