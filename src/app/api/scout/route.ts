@@ -14,6 +14,27 @@ import { createClient } from "@supabase/supabase-js";
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+async function sendTelegram(text: string): Promise<boolean> {
+  if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) return false;
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text,
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+      }),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
 
 // Search queries rotated daily
 const SEARCH_QUERIES = [
@@ -286,6 +307,7 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
   let added = 0;
   let skipped = 0;
   const errors: string[] = [];
+  const hotLeads: Array<{ name: string; score: number; url: string; tools: string[] }> = [];
 
   for (const video of videoDetails) {
     try {
@@ -335,11 +357,35 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
         errors.push(`Insert error for ${lead.name}: ${error.message}`);
       } else {
         added++;
-        existingUrls.add(channelUrl); // prevent duplicates within same run
+        existingUrls.add(channelUrl);
+        // Track hot leads (score 9+) for immediate notification
+        if (score >= 9) {
+          hotLeads.push({
+            name: lead.name,
+            score,
+            url: lead.work_url,
+            tools,
+          });
+        }
       }
     } catch (err: any) {
       errors.push(`Error processing video: ${err.message}`);
     }
+  }
+
+  // Fire immediate Telegram alert for hot leads (score 9+) only.
+  // Regular leads will be summarized in the 07:05 daily report.
+  if (hotLeads.length > 0) {
+    const msg = [
+      `🔥 <b>${hotLeads.length} hot lead${hotLeads.length > 1 ? "s" : ""} found!</b>`,
+      "",
+      ...hotLeads.map(l =>
+        `• <b>${l.name}</b> (${l.score}/10) - ${l.tools.join(", ") || "AI"}\n  ${l.url}`
+      ),
+      "",
+      "Sequencer will enroll these automatically in the 07:25 run.",
+    ].join("\n");
+    await sendTelegram(msg);
   }
 
   return { found: videoDetails.length, added, skipped, errors };
@@ -348,14 +394,12 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
 // ─── API Route ───
 
 export async function GET(request: NextRequest) {
-  // Verify cron secret or manual trigger
+  // Cron-only endpoint. Manual trigger via ?manual=true was removed for security.
+  // To run this manually, use the Telegram bot or OpenClaw.
   const authHeader = request.headers.get("authorization");
   const isVercelCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
-  const isManual = request.nextUrl.searchParams.get("manual") === "true";
 
-  // In production, only allow Vercel Cron or manual with admin check
-  // For now, allow both for testing
-  if (!isVercelCron && !isManual) {
+  if (!isVercelCron) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

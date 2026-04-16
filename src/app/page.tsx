@@ -51,7 +51,10 @@ export default function HomePage() {
         if (Date.now() - createdAt < 60000) {
           await fetch("/api/new-user", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "x-supabase-auth": session.access_token,
+            },
             body: JSON.stringify({
               display_name: prof.display_name || session.user.email?.split("@")[0],
               email: session.user.email,

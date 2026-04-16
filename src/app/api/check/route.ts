@@ -149,12 +149,95 @@ async function checkOnboarding(supabase: any): Promise<string[]> {
   return lines;
 }
 
+// ─── Post-signup encouragement drafts ─────────
+// For creators who signed up but haven't uploaded: prepares a
+// ready-to-send DM draft at 3 / 7 / 14 day milestones.
+//
+// Only generates ONE draft per creator per day to avoid spam.
+// Dean manually sends the draft via email/DM.
+
+async function buildEncouragementDrafts(supabase: any): Promise<string[]> {
+  const lines: string[] = [];
+
+  // Get all creator profiles
+  const { data: creators } = await supabase
+    .from("profiles")
+    .select("id, display_name, email, created_at")
+    .eq("user_type", "creator");
+
+  if (!creators || creators.length === 0) return lines;
+
+  // Get all movie creator_ids (these creators already uploaded)
+  const { data: allMovies } = await supabase
+    .from("movies")
+    .select("creator_id, creator_name")
+    .not("creator_id", "is", null);
+
+  const creatorsWithFilms = new Set(
+    (allMovies || []).map((m: any) => m.creator_id).filter(Boolean)
+  );
+
+  // Filter creators without films
+  const noFilms = creators.filter(
+    (c: any) => !creatorsWithFilms.has(c.id)
+  );
+
+  if (noFilms.length === 0) return lines;
+
+  // Find creators hitting the milestone days: 3, 7, 14
+  // Allow ±12 hour window around the exact day
+  type Milestone = 3 | 7 | 14;
+  const matchMilestone = (days: number): Milestone | null => {
+    if (days >= 2.5 && days < 3.5) return 3;
+    if (days >= 6.5 && days < 7.5) return 7;
+    if (days >= 13.5 && days < 14.5) return 14;
+    return null;
+  };
+
+  type DueCreator = { creator: any; milestone: Milestone };
+  const dueToday: DueCreator[] = [];
+
+  for (const c of noFilms) {
+    const days = (Date.now() - new Date(c.created_at).getTime()) / (1000 * 60 * 60 * 24);
+    const m = matchMilestone(days);
+    if (m) dueToday.push({ creator: c, milestone: m });
+  }
+
+  if (dueToday.length === 0) return lines;
+
+  lines.push("");
+  lines.push("💌 <b>Encouragement Drafts</b>");
+  lines.push("<i>Copy + send via email/DM to these creators:</i>");
+  lines.push("");
+
+  for (const { creator, milestone } of dueToday) {
+    const name = creator.display_name || creator.email?.split("@")[0] || "there";
+    let draft = "";
+
+    if (milestone === 3) {
+      draft = `Hi ${name}! Welcome aboard 👋 Just checking in - any questions about uploading your first film on Spike? Happy to help if you hit any snags. If you're still picking which film to share, I'd start with your most visually striking piece - AI cinema rewards showmanship.`;
+    } else if (milestone === 7) {
+      draft = `Hey ${name}, noticed you haven't uploaded yet. No pressure - just want to make sure the process is clear. You can submit at spikeai.studio/submit (takes 2 min). If there's something blocking you - tech issue, not sure which film, anything - just reply and I'll sort it out.`;
+    } else {
+      draft = `Hi ${name}, it's been two weeks since you joined. I'd love to see what you've been working on. Even a 30-second clip counts. The platform is growing fast and early uploads get prime placement. If you've moved on from AI cinema, no worries - but if you're sitting on something, I'd love to showcase it.`;
+    }
+
+    lines.push(`<b>${name}</b> (day ${milestone})`);
+    lines.push(`<pre>${draft}</pre>`);
+    lines.push(creator.email ? `Email: ${creator.email}` : "");
+    lines.push("");
+  }
+
+  return lines;
+}
+
 export async function GET(request: NextRequest) {
+  // Cron-only endpoint. Manual trigger via ?manual=true was removed for security.
+  // To run this manually, use the Telegram bot or OpenClaw.
   const authHeader = request.headers.get("authorization");
   const isVercelCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
-  const isManual = request.nextUrl.searchParams.get("manual") === "true";
 
-  if (!isVercelCron && !isManual) {
+  if (!isVercelCron) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -167,15 +250,17 @@ export async function GET(request: NextRequest) {
 
     const followUpLines = await checkFollowUps(supabase);
     const onboardingLines = await checkOnboarding(supabase);
+    const encouragementLines = await buildEncouragementDrafts(supabase);
 
     const allLines = [
       "🔔 <b>Spike AI — Action Items</b>",
       ...followUpLines,
       ...onboardingLines,
+      ...encouragementLines,
     ];
 
     // Only send if there's something to report
-    if (followUpLines.length === 0 && onboardingLines.length === 0) {
+    if (followUpLines.length === 0 && onboardingLines.length === 0 && encouragementLines.length === 0) {
       allLines.push("");
       allLines.push("✅ Nothing needs attention today.");
     }
@@ -191,6 +276,7 @@ export async function GET(request: NextRequest) {
       sent,
       followUps: followUpLines.length > 0,
       onboarding: onboardingLines.length > 0,
+      encouragement: encouragementLines.length > 0,
       timestamp: new Date().toISOString(),
     });
   } catch (err: any) {

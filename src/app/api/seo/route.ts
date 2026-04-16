@@ -191,11 +191,12 @@ async function generateReport(supabase: any): Promise<{ issues: SEOIssue[]; topi
 }
 
 export async function GET(request: NextRequest) {
+  // Cron-only endpoint. Manual trigger via ?manual=true was removed for security.
+  // To run this manually, use the Telegram bot or OpenClaw.
   const authHeader = request.headers.get("authorization");
   const isVercelCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
-  const isManual = request.nextUrl.searchParams.get("manual") === "true";
 
-  if (!isVercelCron && !isManual) {
+  if (!isVercelCron) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

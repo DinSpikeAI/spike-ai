@@ -135,11 +135,17 @@ export default function AuthPage() {
       await supabase.auth.updateUser({ data: { display_name: finalName, avatar_url: avatarUrl } });
       // Notify Dean via Telegram of new signup
       try {
-        await fetch("/api/new-user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ display_name: finalName, email, provider: "email" }),
-        });
+        const { data: { session: s } } = await supabase.auth.getSession();
+        if (s?.access_token) {
+          await fetch("/api/new-user", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-supabase-auth": s.access_token,
+            },
+            body: JSON.stringify({ display_name: finalName, email, provider: "email" }),
+          });
+        }
       } catch {}
     }
     setSavingProfile(false);

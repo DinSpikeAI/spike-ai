@@ -1,11 +1,12 @@
 import fs from 'fs'
 import path from 'path'
+import { createClient } from '@supabase/supabase-js'
 
 /* ═══════════════════════════════════════════
-   Spike AI — Markdown Blog Engine v2
-   Drop a .md in src/content/blog/ → auto-published.
-   Supports: headings, bold, italic, links, images,
-   blockquotes, unordered lists, code blocks, horizontal rules.
+   Spike AI — Markdown Blog Engine v3
+   Sources:
+     1. src/content/blog/*.md  (hand-curated)
+     2. blog_drafts table      (AI-generated weekly)
    ═══════════════════════════════════════════ */
 
 export interface BlogPost {
@@ -21,6 +22,7 @@ export interface BlogPost {
   content: string
   headings: { id: string; text: string; level: number }[]
   wordCount: number
+  source?: 'file' | 'draft'
 }
 
 const BLOG_DIR = path.join(process.cwd(), 'src/content/blog')
@@ -137,7 +139,7 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
 }
 
-function buildPost(slug: string, raw: string): BlogPost {
+function buildPost(slug: string, raw: string, source: 'file' | 'draft' = 'file'): BlogPost {
   const { data, content } = parseFrontmatter(raw)
   const wordCount = content.split(/\s+/).filter(Boolean).length
   return {
@@ -153,33 +155,93 @@ function buildPost(slug: string, raw: string): BlogPost {
     content: markdownToHtml(content),
     headings: extractHeadings(content),
     wordCount,
+    source,
   }
 }
 
-export function getAllPosts(): BlogPost[] {
+// ─── File-based posts ─────────────────────────
+
+function getFilePosts(): BlogPost[] {
   if (!fs.existsSync(BLOG_DIR)) return []
   const files = fs.readdirSync(BLOG_DIR).filter(f => f.endsWith('.md'))
-  const posts = files.map(file => {
+  return files.map(file => {
     const raw = fs.readFileSync(path.join(BLOG_DIR, file), 'utf-8')
-    return buildPost(file.replace('.md', ''), raw)
+    return buildPost(file.replace('.md', ''), raw, 'file')
   })
-  posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  return posts
 }
 
-export function getPostBySlug(slug: string): BlogPost | null {
+// ─── DB-based posts (auto-generated) ─────────
+
+async function getDraftPosts(): Promise<BlogPost[]> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key) return []
+
+  try {
+    const supabase = createClient(url, key)
+    const { data } = await supabase
+      .from('blog_drafts')
+      .select('slug, content')
+      .eq('published', true)
+    if (!data) return []
+    return data.map((row: any) => buildPost(row.slug, row.content, 'draft'))
+  } catch {
+    return []
+  }
+}
+
+// ─── Public API (now async) ──────────────────
+
+export async function getAllPosts(): Promise<BlogPost[]> {
+  const [files, drafts] = await Promise.all([
+    Promise.resolve(getFilePosts()),
+    getDraftPosts(),
+  ])
+
+  // Dedup by slug — files win if there's a collision
+  const seen = new Set<string>()
+  const combined: BlogPost[] = []
+  for (const p of files) { seen.add(p.slug); combined.push(p) }
+  for (const p of drafts) { if (!seen.has(p.slug)) combined.push(p) }
+
+  combined.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  return combined
+}
+
+export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  // Check filesystem first
   const filePath = path.join(BLOG_DIR, `${slug}.md`)
-  if (!fs.existsSync(filePath)) return null
-  return buildPost(slug, fs.readFileSync(filePath, 'utf-8'))
+  if (fs.existsSync(filePath)) {
+    return buildPost(slug, fs.readFileSync(filePath, 'utf-8'), 'file')
+  }
+
+  // Fall back to DB
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key) return null
+
+  try {
+    const supabase = createClient(url, key)
+    const { data } = await supabase
+      .from('blog_drafts')
+      .select('slug, content')
+      .eq('slug', slug)
+      .eq('published', true)
+      .single()
+    if (!data) return null
+    return buildPost(data.slug, data.content, 'draft')
+  } catch {
+    return null
+  }
 }
 
-export function getAllSlugs(): string[] {
-  if (!fs.existsSync(BLOG_DIR)) return []
-  return fs.readdirSync(BLOG_DIR).filter(f => f.endsWith('.md')).map(f => f.replace('.md', ''))
+export async function getAllSlugs(): Promise<string[]> {
+  const posts = await getAllPosts()
+  return posts.map(p => p.slug)
 }
 
-export function getRelatedPosts(post: BlogPost, limit = 3): BlogPost[] {
-  const all = getAllPosts()
+export async function getRelatedPosts(post: BlogPost, limit = 3): Promise<BlogPost[]> {
+  const all = await getAllPosts()
   const sameCategory = all.filter(p => p.slug !== post.slug && p.category === post.category)
   const others = all.filter(p => p.slug !== post.slug && p.category !== post.category)
   return [...sameCategory, ...others].slice(0, limit)

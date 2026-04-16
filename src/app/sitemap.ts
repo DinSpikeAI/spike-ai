@@ -18,7 +18,7 @@ export default async function sitemap() {
 
   // Add blog posts
   try {
-    const posts = getAllPosts();
+    const posts = await getAllPosts();
     posts.forEach((post) => {
       pages.push({
         url: `${SITE_URL}/blog/${post.slug}`,

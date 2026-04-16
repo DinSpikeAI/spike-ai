@@ -179,8 +179,12 @@ async function getKPIs(supabase: any): Promise<string> {
 
 async function triggerAgent(agentPath: string): Promise<string> {
   try {
-    const res = await fetch(`https://www.spikeai.studio${agentPath}?manual=true`, {
+    // Use CRON_SECRET to authenticate (same as Vercel Cron uses)
+    const res = await fetch(`https://www.spikeai.studio${agentPath}`, {
       method: "GET",
+      headers: {
+        "Authorization": `Bearer ${process.env.CRON_SECRET}`,
+      },
     });
     const data = await res.json();
     return JSON.stringify(data);

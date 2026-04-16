@@ -31,7 +31,7 @@ const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
 // ─── Config ───
 const MIN_SCORE = 7;
-const MAX_PER_RUN = 5;
+const MAX_PER_RUN = 10;
 
 // Adaptive timing: high-value leads get faster follow-ups
 function getStepDelay(nextStep: number, score: number): number {
@@ -363,11 +363,12 @@ async function processSequence(supabase: any): Promise<SequenceResult> {
 // ─── API Route ───
 
 export async function GET(request: NextRequest) {
+  // Cron-only endpoint. Manual trigger via ?manual=true was removed for security.
+  // To run this manually, use the Telegram bot or OpenClaw.
   const authHeader = request.headers.get("authorization");
   const isVercelCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
-  const isManual = request.nextUrl.searchParams.get("manual") === "true";
 
-  if (!isVercelCron && !isManual) {
+  if (!isVercelCron) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

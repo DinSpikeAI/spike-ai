@@ -4,8 +4,8 @@ import { createClient } from "@supabase/supabase-js";
 /* ═══════════════════════════════════════════════════════════════
    Creator Application Endpoint
 
-   Receives form submissions from spike_apply_en.html
-   Saves to creator_leads and notifies Dean via Telegram.
+   Public form (by design) - but rate-limited and validated.
+   Limits: 3 applications per IP per hour, 1 per email per 24h.
    ═══════════════════════════════════════════════════════════════ */
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -28,12 +28,73 @@ async function sendTelegram(text: string): Promise<boolean> {
   return res.ok;
 }
 
+function getClientIp(request: NextRequest): string {
+  const fwd = request.headers.get("x-forwarded-for");
+  if (fwd) return fwd.split(",")[0].trim();
+  return request.headers.get("x-real-ip") || "unknown";
+}
+
+async function checkRateLimit(
+  supabase: any,
+  ip: string,
+  email: string
+): Promise<{ ok: boolean; reason?: string }> {
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  const { count: ipCount } = await supabase
+    .from("creator_leads")
+    .select("*", { count: "exact", head: true })
+    .eq("platform", "application")
+    .ilike("notes", `%ip:${ip}%`)
+    .gte("found_at", oneHourAgo);
+
+  if ((ipCount ?? 0) >= 3) {
+    return { ok: false, reason: "Too many applications from this location. Try again later." };
+  }
+
+  const { count: emailCount } = await supabase
+    .from("creator_leads")
+    .select("*", { count: "exact", head: true })
+    .eq("platform", "application")
+    .ilike("notes", `%Email: ${email.toLowerCase()}%`)
+    .gte("found_at", oneDayAgo);
+
+  if ((emailCount ?? 0) >= 1) {
+    return { ok: false, reason: "You have already applied recently. We'll be in touch." };
+  }
+
+  return { ok: true };
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    if (!body.name || !body.email || !body.film_url) {
+    if (!body.name?.trim() || !body.email?.trim() || !body.film_url?.trim()) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+      return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+    }
+
+    // Clip inputs to prevent payload abuse
+    const clean = {
+      name: String(body.name).slice(0, 100).trim(),
+      email: String(body.email).toLowerCase().slice(0, 200).trim(),
+      film_url: String(body.film_url).slice(0, 500).trim(),
+      website: String(body.website || "").slice(0, 300).trim(),
+      social: String(body.social || "").slice(0, 300).trim(),
+      bio: String(body.bio || "").slice(0, 1000).trim(),
+      country: String(body.country || "").slice(0, 60).trim(),
+      heard_from: String(body.heard_from || "").slice(0, 200).trim(),
+      phone: String(body.phone || "").slice(0, 30).trim(),
+      ai_tools: Array.isArray(body.ai_tools) ? body.ai_tools.slice(0, 20) : [],
+    };
+
+    if (!/^https?:\/\//.test(clean.film_url)) {
+      return NextResponse.json({ error: "Film URL must start with http(s)://" }, { status: 400 });
     }
 
     if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
@@ -41,54 +102,58 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+    const ip = getClientIp(request);
 
-    // Save to creator_leads
+    const rl = await checkRateLimit(supabase, ip, clean.email);
+    if (!rl.ok) {
+      return NextResponse.json({ error: rl.reason }, { status: 429 });
+    }
+
     const { error } = await supabase.from("creator_leads").insert({
-      name: body.name,
+      name: clean.name,
       platform: "application",
-      profile_url: body.social || body.website || "",
-      work_url: body.film_url,
-      work_title: `Application from ${body.name}`,
-      ai_tools: body.ai_tools || [],
+      profile_url: clean.social || clean.website || "",
+      work_url: clean.film_url,
+      work_title: `Application from ${clean.name}`,
+      ai_tools: clean.ai_tools,
       genre: null,
       score: 8,
       notes: [
-        `Email: ${body.email}`,
-        body.phone ? `Phone: ${body.phone}` : "",
-        body.country ? `Country: ${body.country}` : "",
-        body.heard_from ? `Heard from: ${body.heard_from}` : "",
-        body.bio ? `Bio: ${body.bio}` : "",
-        body.website ? `Website: ${body.website}` : "",
-        body.social ? `Social: ${body.social}` : "",
+        `ip:${ip}`,
+        `Email: ${clean.email}`,
+        clean.phone ? `Phone: ${clean.phone}` : "",
+        clean.country ? `Country: ${clean.country}` : "",
+        clean.heard_from ? `Heard from: ${clean.heard_from}` : "",
+        clean.bio ? `Bio: ${clean.bio}` : "",
+        clean.website ? `Website: ${clean.website}` : "",
+        clean.social ? `Social: ${clean.social}` : "",
       ].filter(Boolean).join(" | "),
       status: "interested",
     });
 
     if (error) {
-      console.error("Supabase insert error:", error);
+      console.error("creator-apply insert error:", error);
     }
 
-    // Notify Dean
     const msg = [
       "🎬 <b>New Creator Application!</b>",
       "",
-      `<b>${body.name}</b>`,
-      `Email: ${body.email}`,
-      body.phone ? `Phone: ${body.phone}` : "",
-      body.country ? `Country: ${body.country}` : "",
-      body.heard_from ? `📢 Heard from: <b>${body.heard_from}</b>` : "",
-      `Film: ${body.film_url}`,
-      body.website ? `Website: ${body.website}` : "",
-      body.social ? `Social: ${body.social}` : "",
-      body.ai_tools?.length > 0 ? `Tools: ${body.ai_tools.join(", ")}` : "",
-      body.bio ? `\nBio: ${body.bio}` : "",
+      `<b>${clean.name}</b>`,
+      `Email: ${clean.email}`,
+      clean.phone ? `Phone: ${clean.phone}` : "",
+      clean.country ? `Country: ${clean.country}` : "",
+      clean.heard_from ? `📢 Heard from: <b>${clean.heard_from}</b>` : "",
+      `Film: ${clean.film_url}`,
+      clean.website ? `Website: ${clean.website}` : "",
+      clean.social ? `Social: ${clean.social}` : "",
+      clean.ai_tools.length > 0 ? `Tools: ${clean.ai_tools.join(", ")}` : "",
+      clean.bio ? `\nBio: ${clean.bio}` : "",
       "",
       "⚡ This creator applied directly - high intent!",
-      "→ <a href=\"https://www.spikeai.studio/admin/pipeline\">View in Pipeline</a>",
+      '→ <a href="https://www.spikeai.studio/admin/pipeline">View in Pipeline</a>',
     ].filter(Boolean).join("\n");
 
     await sendTelegram(msg);
-
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

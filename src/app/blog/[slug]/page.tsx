@@ -13,12 +13,13 @@ const CATEGORY_COLORS: Record<string, string> = {
 }
 
 export async function generateStaticParams() {
-  return getAllSlugs().map(slug => ({ slug }))
+  const slugs = await getAllSlugs()
+  return slugs.map(slug => ({ slug }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const post = getPostBySlug(slug)
+  const post = await getPostBySlug(slug)
   if (!post) return { title: 'Not Found' }
   return {
     title: `${post.title} — Spike AI Blog`,
@@ -36,11 +37,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = getPostBySlug(slug)
+  const post = await getPostBySlug(slug)
   if (!post) notFound()
 
-  const related = getRelatedPosts(post, 3)
-  const allPosts = getAllPosts()
+  const related = await getRelatedPosts(post, 3)
+  const allPosts = await getAllPosts()
   const currentIndex = allPosts.findIndex(p => p.slug === slug)
   const prevPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null
   const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null

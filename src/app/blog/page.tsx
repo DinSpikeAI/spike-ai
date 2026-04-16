@@ -21,8 +21,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   'Opinion': 'text-rose-400 bg-rose-500/10 border-rose-500/20',
 }
 
-export default function BlogPage() {
-  const posts = getAllPosts()
+export default async function BlogPage() {
+  const posts = await getAllPosts()
   const featured = posts.find(p => p.featured) || posts[0]
   const rest = posts.filter(p => p.slug !== featured?.slug)
   const categories = [...new Set(posts.map(p => p.category))]

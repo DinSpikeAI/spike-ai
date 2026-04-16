@@ -50,7 +50,6 @@ export default function MovieCard({
     e.preventDefault();
     e.stopPropagation();
 
-
     // Optimistic UI — always works, even without DB
     const wasVoted = voted;
     setVoted(!wasVoted);
@@ -62,47 +61,36 @@ export default function MovieCard({
 
     // DB operations — only for real DB movies with logged-in user
     if (!supabase || !isDbMovie) {
-
       return;
     }
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user) {
-
+      // Roll back optimistic UI and send to auth
+      setVoted(wasVoted);
+      setVotes((v) => wasVoted ? v + 1 : Math.max(v - 1, 0));
       router.push("/auth");
       return;
     }
 
-    const userId = session.user.id;
-    
+    // Single atomic call — handles insert/delete + counter update server-side
+    const { data, error } = await supabase.rpc("toggle_upvote", {
+      p_movie_id: movie.id,
+    });
 
-    try {
-      if (wasVoted) {
-        const { error } = await supabase.from("user_votes").delete()
-          .eq("user_id", userId).eq("movie_id", movie.id);
+    if (error) {
+      // Roll back optimistic UI on failure
+      setVoted(wasVoted);
+      setVotes((v) => wasVoted ? v + 1 : Math.max(v - 1, 0));
+      console.error("toggle_upvote failed:", error.message);
+      return;
+    }
 
-      } else {
-        const { error } = await supabase.from("user_votes")
-          .insert({ user_id: userId, movie_id: movie.id });
-
-
-        if (error?.code === "23505") { setVoted(true); return; }
-      }
-
-      // Recount from user_votes (race-condition safe)
-      const { count } = await supabase
-        .from("user_votes")
-        .select("*", { count: "exact", head: true })
-        .eq("movie_id", movie.id);
-
-      const safeCount = count ?? 0;
-      await supabase.from("movies")
-        .update({ upvotes_count: safeCount })
-        .eq("id", movie.id);
-
-
-      setVotes(safeCount);
-    } catch {}
+    // Reconcile with server truth
+    if (Array.isArray(data) && data[0]) {
+      setVoted(Boolean(data[0].voted));
+      setVotes(Number(data[0].count) || 0);
+    }
   };
 
   /* ── SAVE / MY LIST HANDLER ── */

@@ -129,12 +129,16 @@ export default function MoviePage() {
             const { data: eps } = await supabase.from("movies").select("*").eq("series_name", data.series_name).eq("status", "approved").order("episode_number", { ascending: true });
             if (eps) setSeriesEpisodes(eps);
           }
-          // Check if user owns this movie
+          // Check if user owns this movie (by creator_id, not display_name)
           if (supabase) {
             const { data: { session: s } } = await supabase.auth.getSession();
             if (s?.user) {
-              const { data: p } = await supabase.from("profiles").select("role, display_name").eq("id", s.user.id).single();
-              if (p?.role === "admin" || (p?.display_name && p.display_name === data.creator_name)) setIsOwner(true);
+              if (data.creator_id === s.user.id) {
+                setIsOwner(true);
+              } else {
+                const { data: p } = await supabase.from("profiles").select("role").eq("id", s.user.id).single();
+                if (p?.role === "admin") setIsOwner(true);
+              }
             }
           }
           setLoading(false);
@@ -220,14 +224,22 @@ export default function MoviePage() {
     setPopAnim(true);
     setTimeout(() => setPopAnim(false), 400);
     if (!supabase || !isDbMovie) return;
-    try {
-      if (wasVoted) { await supabase.from("user_votes").delete().eq("user_id", user.id).eq("movie_id", movieId); }
-      else { const { error } = await supabase.from("user_votes").insert({ user_id: user.id, movie_id: movieId }); if (error?.code === "23505") { setVoted(true); return; } }
-      const { count } = await supabase.from("user_votes").select("*", { count: "exact", head: true }).eq("movie_id", movieId);
-      const safe = count ?? 0;
-      await supabase.from("movies").update({ upvotes_count: safe }).eq("id", movieId);
-      setVotes(safe);
-    } catch {}
+
+    const { data, error } = await supabase.rpc("toggle_upvote", {
+      p_movie_id: movieId,
+    });
+
+    if (error) {
+      setVoted(wasVoted);
+      setVotes(v => wasVoted ? v + 1 : Math.max(v - 1, 0));
+      console.error("toggle_upvote failed:", error.message);
+      return;
+    }
+
+    if (Array.isArray(data) && data[0]) {
+      setVoted(Boolean(data[0].voted));
+      setVotes(Number(data[0].count) || 0);
+    }
   };
 
   const handleWatchlist = async () => {
