@@ -49,7 +49,7 @@ function mapDbToCreator(row: any): Creator {
     links,
     stats: row.custom_stats || [
       { label: "AI tools", value: String((row.toolkit || []).length) },
-      { label: "Role", value: (row.role || "Creator").split(" · ")[0].split(" ").slice(0, 2).join(" ") },
+      { label: "Role", value: (row.role || "Creator").split(" · ")[0] },
       { label: "Status", value: "Pioneer" },
     ],
     featured: row.featured || false,
@@ -174,8 +174,8 @@ function CreatorCard({ creator }: { creator: Creator }) {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mb-10">
             {creator.stats.map((stat) => (
-              <div key={stat.label} className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 text-center">
-                <p className="text-2xl md:text-3xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent mb-1">{stat.value}</p>
+              <div key={stat.label} className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 text-center min-h-[110px] flex flex-col items-center justify-center">
+                <p className="text-lg md:text-xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent mb-2 leading-tight break-words">{stat.value}</p>
                 <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-white/20">{stat.label}</p>
               </div>
             ))}
@@ -329,8 +329,8 @@ function FeaturedCreatorCard({ creator }: { creator: Creator }) {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 mb-10">
             {creator.stats.map((stat) => (
-              <div key={stat.label} className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 text-center">
-                <p className="text-2xl md:text-3xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent mb-1">{stat.value}</p>
+              <div key={stat.label} className="bg-white/[0.02] border border-white/[0.05] rounded-2xl p-5 text-center min-h-[110px] flex flex-col items-center justify-center">
+                <p className="text-lg md:text-xl font-bold bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent mb-2 leading-tight break-words">{stat.value}</p>
                 <p className="text-[10px] font-semibold tracking-[0.15em] uppercase text-white/20">{stat.label}</p>
               </div>
             ))}
