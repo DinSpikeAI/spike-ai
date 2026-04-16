@@ -130,8 +130,17 @@ export default function AuthPage() {
     const userId = session?.user?.id || newUser?.id;
     if (userId) {
       const avatarUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(displayName || "U")}&backgroundColor=1a1a2e&textColor=ffffff&fontSize=42`;
-      await supabase.from("profiles").upsert({ id: userId, display_name: displayName.trim() || email.split("@")[0], avatar_url: avatarUrl, email }, { onConflict: "id" });
-      await supabase.auth.updateUser({ data: { display_name: displayName.trim() || email.split("@")[0], avatar_url: avatarUrl } });
+      const finalName = displayName.trim() || email.split("@")[0];
+      await supabase.from("profiles").upsert({ id: userId, display_name: finalName, avatar_url: avatarUrl, email }, { onConflict: "id" });
+      await supabase.auth.updateUser({ data: { display_name: finalName, avatar_url: avatarUrl } });
+      // Notify Dean via Telegram of new signup
+      try {
+        await fetch("/api/new-user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ display_name: finalName, email, provider: "email" }),
+        });
+      } catch {}
     }
     setSavingProfile(false);
     router.push("/");

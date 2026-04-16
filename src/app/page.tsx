@@ -29,14 +29,40 @@ let __cache: {
 export default function HomePage() {
   const router = useRouter();
 
-  // ── OAuth return redirect (must run first) ──
+  // ── OAuth return redirect + new signup detection (must run first) ──
   useEffect(() => {
     try {
       const returnTo = sessionStorage.getItem("returnTo");
       if (returnTo) {
         sessionStorage.removeItem("returnTo");
         window.location.replace(returnTo);
+        return;
       }
+      // Detect fresh Google signup & notify
+      (async () => {
+        if (!supabase) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
+        const notifiedKey = `notified_${session.user.id}`;
+        if (localStorage.getItem(notifiedKey)) return;
+        const { data: prof } = await supabase.from("profiles").select("created_at, display_name").eq("id", session.user.id).maybeSingle();
+        if (!prof) return;
+        const createdAt = new Date(prof.created_at).getTime();
+        if (Date.now() - createdAt < 60000) {
+          await fetch("/api/new-user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              display_name: prof.display_name || session.user.email?.split("@")[0],
+              email: session.user.email,
+              provider: session.user.app_metadata?.provider || "google",
+            }),
+          }).catch(() => {});
+          localStorage.setItem(notifiedKey, "1");
+        } else {
+          localStorage.setItem(notifiedKey, "1");
+        }
+      })();
     } catch {}
   }, []);
 
@@ -547,7 +573,7 @@ export default function HomePage() {
               <h2 className="text-lg md:text-xl font-semibold mb-6 text-white/70 tracking-wide">
                 {activeFilterLabel}
               </h2>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-5">
                 {filteredMovies.map((movie, index) => (
                   <MovieCard
                     key={movie.id}
