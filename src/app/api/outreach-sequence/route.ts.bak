@@ -318,16 +318,9 @@ async function processSequence(supabase: any): Promise<SequenceResult> {
       }).catch(() => {});
 
       const stepEmoji = nextStep === 2 ? "✉️" : nextStep === 3 ? "🔄" : "🏁";
-
-      // Extract email from notes if Scout found one (format: "📧 email@domain.com")
-      const emailMatch = (lead.notes || "").match(/📧\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
-      const foundEmail = emailMatch ? emailMatch[1] : null;
-
-      const platformNote = foundEmail
-        ? `📧 <b>Email found:</b> ${foundEmail}`
-        : lead.platform === "youtube"
-          ? `Send via YouTube DM (channel → About → View email)`
-          : `Send via ${lead.platform}`;
+      const platformNote = lead.platform === "youtube"
+        ? `Send via YouTube DM or ${lead.profile_url ? "channel" : "email"}`
+        : `Send via ${lead.platform}`;
 
       const msg = [
         `${stepEmoji} <b>SEQUENCE Step ${nextStep}/4 — ${stepLabel}</b>`,
@@ -340,7 +333,7 @@ async function processSequence(supabase: any): Promise<SequenceResult> {
         "",
         "━━━━━━━━━━━━━━━━━━━━",
         "",
-        platformNote,
+        `📋 ${platformNote}`,
         nextStep < 4
           ? `⏰ Next step in ${Math.round(nextDelay / 24)} days (Step ${nextStep + 1})`
           : "✅ Sequence complete for this lead",

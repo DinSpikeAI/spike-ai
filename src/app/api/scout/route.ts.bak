@@ -247,7 +247,7 @@ async function getChannelDetails(channelIds: string[]): Promise<Map<string, any>
   const map = new Map();
   if (channelIds.length === 0) return map;
   const params = new URLSearchParams({
-    part: "snippet,statistics,brandingSettings",
+    part: "snippet,statistics",
     id: channelIds.join(","),
     key: YOUTUBE_API_KEY!,
   });
@@ -258,42 +258,6 @@ async function getChannelDetails(channelIds: string[]): Promise<Map<string, any>
     map.set(ch.id, ch);
   }
   return map;
-}
-
-// ─── Email & Link Extraction ───
-
-/**
- * Extracts email from channel description. YouTube doesn't give us the
- * "Business inquiries" email directly (hidden behind CAPTCHA), but ~20-30%
- * of creators put contact emails in their public description.
- */
-function extractEmail(text: string): string | null {
-  if (!text) return null;
-  // Standard email regex - catches most real addresses, ignores obfuscated ones like "name [at] domain"
-  const match = text.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/);
-  if (!match) return null;
-
-  // Filter out obvious junk (youtube.com emails, example.com, etc)
-  const email = match[0].toLowerCase();
-  if (email.includes("youtube.com") || email.includes("example.com") || email.includes("gmail-donotreply")) {
-    return null;
-  }
-  return email;
-}
-
-/**
- * Extracts external URLs from the description. Useful because many creators
- * link to their personal site / linktree which has their contact email.
- */
-function extractUrls(text: string): string[] {
-  if (!text) return [];
-  const matches = text.match(/https?:\/\/[^\s<>"]+/g) || [];
-  // Dedupe + filter YouTube internal links
-  const filtered = matches
-    .filter(u => !u.includes("youtube.com") && !u.includes("youtu.be"))
-    .map(u => u.replace(/[.,;:)]+$/, "")) // strip trailing punctuation
-    .slice(0, 5); // cap at 5 URLs per lead
-  return Array.from(new Set(filtered));
 }
 
 // ─── Main Scout Function ───
@@ -343,7 +307,7 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
   let added = 0;
   let skipped = 0;
   const errors: string[] = [];
-  const hotLeads: Array<{ name: string; score: number; url: string; tools: string[]; email: string | null; urls: string[] }> = [];
+  const hotLeads: Array<{ name: string; score: number; url: string; tools: string[] }> = [];
 
   for (const video of videoDetails) {
     try {
@@ -369,23 +333,6 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
         continue;
       }
 
-      // Try to find contact email in channel description
-      const channelDesc = channel?.snippet?.description || "";
-      const brandingDesc = channel?.brandingSettings?.channel?.description || "";
-      const fullDesc = `${channelDesc} ${brandingDesc}`;
-      const email = extractEmail(fullDesc);
-      const externalUrls = extractUrls(fullDesc);
-
-      // Build notes with contact info if available
-      const contactParts: string[] = [];
-      if (email) contactParts.push(`📧 ${email}`);
-      if (externalUrls.length > 0) contactParts.push(`🔗 ${externalUrls.join(", ")}`);
-
-      const baseNotes = buildNotes(video, views, engagement.subscriberCount, tools, engagement);
-      const notes = contactParts.length > 0
-        ? `${baseNotes} | ${contactParts.join(" | ")}`
-        : baseNotes;
-
       const lead = {
         name: video.snippet?.channelTitle || "Unknown",
         platform: "youtube",
@@ -395,8 +342,9 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
         ai_tools: tools,
         genre: genre,
         score: score,
-        notes: notes,
+        notes: buildNotes(video, views, engagement.subscriberCount, tools, engagement),
         status: "new",
+        // Engagement metrics (new columns)
         engagement_ratio: engagement.engagementRatio,
         upload_frequency: engagement.uploadFrequency,
         channel_age_days: engagement.channelAgeDays,
@@ -417,8 +365,6 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
             score,
             url: lead.work_url,
             tools,
-            email,
-            urls: externalUrls,
           });
         }
       }
@@ -433,16 +379,10 @@ async function runScout(): Promise<{ found: number; added: number; skipped: numb
     const msg = [
       `🔥 <b>${hotLeads.length} hot lead${hotLeads.length > 1 ? "s" : ""} found!</b>`,
       "",
-      ...hotLeads.flatMap(l => {
-        const lines = [
-          `<b>${l.name}</b> (${l.score}/10) - ${l.tools.join(", ") || "AI"}`,
-          `🎬 ${l.url}`,
-        ];
-        if (l.email) lines.push(`📧 <b>${l.email}</b>  ← email ready to contact`);
-        if (l.urls.length > 0) lines.push(`🔗 ${l.urls.join(", ")}`);
-        lines.push("");
-        return lines;
-      }),
+      ...hotLeads.map(l =>
+        `• <b>${l.name}</b> (${l.score}/10) - ${l.tools.join(", ") || "AI"}\n  ${l.url}`
+      ),
+      "",
       "Sequencer will enroll these automatically in the 07:25 run.",
     ].join("\n");
     await sendTelegram(msg);
