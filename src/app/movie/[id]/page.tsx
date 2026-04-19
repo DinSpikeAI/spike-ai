@@ -6,7 +6,7 @@ import {
   Play, ArrowLeft, Plus, Share2, X,
   Star, Clock, Cpu, ChevronLeft, ChevronRight,
   Sparkles, ExternalLink, Flame, SkipForward,
-  Check, Film, Pencil, Save, Loader2, Eye,
+  Check, Film, Pencil, Save, Loader2, Eye, AlertCircle,
 } from "lucide-react";
 import { supabase, getSmartPoster, getSmartHeroImage } from "@/lib/supabase";
 
@@ -81,6 +81,7 @@ export default function MoviePage() {
   const [isDbMovie, setIsDbMovie] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [quality, setQuality] = useState<"auto" | "hd" | "4k">("auto");
+  const [embedBlocked, setEmbedBlocked] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // ── Upvote & Watchlist ──
@@ -373,6 +374,19 @@ export default function MoviePage() {
               <span className={`text-[10px] font-bold tracking-wider px-2 py-1 rounded border ${qColor}`}>{qLabel}</span>
               {(["auto", "hd", "4k"] as const).map(q => (<button key={q} onClick={() => setQuality(q)} className={`px-3 py-1.5 text-[11px] font-medium rounded-lg border transition-all ${quality === q ? "bg-white/15 border-white/20 text-white" : "bg-black/50 border-white/10 text-white/40 hover:text-white/70"}`}>{q === "auto" ? "Auto" : q === "hd" ? "1080p" : "4K"}</button>))}
             </div>
+            {/* Fallback link for age-restricted / embed-blocked videos */}
+            {movie.video_url && (
+              <a
+                href={movie.video_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute top-4 left-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all text-[11px] font-medium"
+                title="If video won't play here (age-restricted), open directly"
+              >
+                <ExternalLink size={12} />
+                <span>Open on YouTube</span>
+              </a>
+            )}
           </div>
         ) : (
           <div className="relative w-full h-full cursor-pointer group" onClick={() => movie.video_url && handlePlay()}>
