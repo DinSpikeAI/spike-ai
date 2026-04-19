@@ -9,16 +9,16 @@
       "schedule": "5 7 * * *"
     },
     {
-      "path": "/api/check",
-      "schedule": "10 7 * * *"
-    },
-    {
       "path": "/api/reddit-scout",
       "schedule": "15 7 * * *"
     },
     {
       "path": "/api/draft",
       "schedule": "20 7 * * *"
+    },
+    {
+      "path": "/api/outreach-sequence",
+      "schedule": "25 7 * * *"
     },
     {
       "path": "/api/auto-enrich",
@@ -39,10 +39,6 @@
     {
       "path": "/api/auto-comment",
       "schedule": "50 7 * * *"
-    },
-    {
-      "path": "/api/outreach-sequence",
-      "schedule": "25 7 * * *"
     },
     {
       "path": "/api/manager",
