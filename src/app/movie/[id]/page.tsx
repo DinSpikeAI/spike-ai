@@ -366,27 +366,27 @@ export default function MoviePage() {
 
       {/* ═══ HERO / PLAYER ═══ */}
       <section className="relative w-full aspect-video max-h-[75vh] overflow-hidden bg-black">
+        {/* Persistent fallback banner for age-restricted / embed-blocked videos */}
+        {playing && movie.video_url && (
+          <a
+            href={movie.video_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-black/80 backdrop-blur-md border border-white/15 text-white/70 hover:text-white hover:border-white/30 hover:bg-black/90 transition-all text-[12px] font-medium shadow-lg"
+            title="Click if video won't play here (age-restricted)"
+          >
+            <ExternalLink size={13} />
+            <span>Having trouble? Open on YouTube</span>
+          </a>
+        )}
         {playing && embedUrl ? (
           <div className="relative w-full h-full">
             <iframe src={embedUrl} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ border: "none" }} />
-            <button onClick={() => setPlaying(false)} className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center text-white/60 hover:text-white transition-colors"><X size={18} /></button>
-            <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2">
+            <button onClick={() => setPlaying(false)} className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-black/70 backdrop-blur-sm flex items-center justify-center text-white/60 hover:text-white transition-colors"><X size={18} /></button>
+            <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
               <span className={`text-[10px] font-bold tracking-wider px-2 py-1 rounded border ${qColor}`}>{qLabel}</span>
               {(["auto", "hd", "4k"] as const).map(q => (<button key={q} onClick={() => setQuality(q)} className={`px-3 py-1.5 text-[11px] font-medium rounded-lg border transition-all ${quality === q ? "bg-white/15 border-white/20 text-white" : "bg-black/50 border-white/10 text-white/40 hover:text-white/70"}`}>{q === "auto" ? "Auto" : q === "hd" ? "1080p" : "4K"}</button>))}
             </div>
-            {/* Fallback link for age-restricted / embed-blocked videos */}
-            {movie.video_url && (
-              <a
-                href={movie.video_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute top-4 left-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/70 backdrop-blur-sm border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all text-[11px] font-medium"
-                title="If video won't play here (age-restricted), open directly"
-              >
-                <ExternalLink size={12} />
-                <span>Open on YouTube</span>
-              </a>
-            )}
           </div>
         ) : (
           <div className="relative w-full h-full cursor-pointer group" onClick={() => movie.video_url && handlePlay()}>
