@@ -10,6 +10,8 @@ import SearchOverlay from "./components/SearchOverlay";
 import HeroSection from "./components/HeroSection";
 import MarqueeHero from "./components/MarqueeHero";
 import Ticker from "./components/Ticker";
+import PioneerShelf from "./components/PioneerShelf";
+import GenreBar from "./components/GenreBar";
 import MovieCard from "./components/MovieCard";
 import { GenreFilter, AiModelFilter } from "./components/Filters";
 import Footer from "./components/Footer";
@@ -608,6 +610,8 @@ export default function HomePage() {
         </div>
       </div>
 
+      <PioneerShelf />
+      <GenreBar />
       <Footer />
 
       {/* Fixed Install Button — always visible at bottom right */}
