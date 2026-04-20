@@ -2,259 +2,895 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import {
-  ArrowLeft, Play, Award, Globe, ExternalLink,
-  Sparkles, Film, Star, Clock, Share2, Check,
-} from "lucide-react";
+import Link from "next/link";
 import { supabase, getSmartPoster } from "@/lib/supabase";
 
-interface StudioData {
-  name: string; role: string; bio: string; highlight: string;
-  avatar: string; toolkit: string[];
-  works: { title: string; type: string; note: string }[];
-  stats: { label: string; value: string }[];
-  links: { label: string; url: string }[];
-  website: string;
+/* ═══════════════════════════════════════════════════════════════
+   CONSTANTS
+   ═══════════════════════════════════════════════════════════════ */
+
+const GOLD = "#D4A857";
+const MONO = "ui-monospace, 'JetBrains Mono', Menlo, Monaco, monospace";
+const INK = "#0A0A0C";
+
+/* ═══════════════════════════════════════════════════════════════
+   TYPES
+   ═══════════════════════════════════════════════════════════════ */
+
+type PressQuote = { outlet: string; quote: string };
+
+type FilmItem = {
+  id?: string;
+  num: string;
+  title: string;
+  titleItalic?: string;
+  year: number;
+  duration: string;
+  thumbnail: string;
+  flames?: string;
+};
+
+type PioneerRich = {
+  tagline?: string;
+  kicker?: string;
+  pioneerNumber?: string;
+  bannerStills?: string[];
+  leadBio?: string[];
+  craftHeading?: string;
+  craftQuote?: string;
+  pressHeading?: string;
+  pressQuotes?: PressQuote[];
+  based?: { city: string; coords: string };
+  representation?: string;
+  tools?: string[];
+  recognition?: string[];
+  contactEmail?: string;
+  socials?: { label: string; href: string }[];
+  filmography?: FilmItem[];
+};
+
+type PioneerFull = PioneerRich & {
+  name: string;
+  nameItalic: string;
+  avatarUrl: string;
+  bioFallback: string;
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   HARDCODED RICH OVERRIDES - keyed by normalized slug
+   Extend as more pioneers get editorial content.
+   ═══════════════════════════════════════════════════════════════ */
+
+const RICH_OVERRIDES: Record<string, PioneerRich> = {
+  "vallee-duhamel": {
+    tagline: "Storytelling with an AI twist",
+    kicker: "Duo · Julien Vallée + Eve Duhamel · Montréal, QC · Since 2019",
+    pioneerNumber: "01/04",
+    bannerStills: [
+      "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=640&q=70",
+      "https://images.unsplash.com/photo-1444080748397-f442aa95c3e5?w=640&q=70",
+      "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=640&q=70",
+      "https://images.unsplash.com/photo-1511497584788-876760111969?w=640&q=70",
+      "https://images.unsplash.com/photo-1507146153580-69a1fe6d8aa1?w=640&q=70",
+      "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=640&q=70",
+      "https://images.unsplash.com/photo-1485470733090-0aae1788d5af?w=640&q=70",
+      "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=640&q=70",
+    ],
+    leadBio: [
+      "Vallée Duhamel is the shared name of Julien Vallée and Eve Duhamel, a Montréal duo working in generative video since late 2024. Before Spike, they directed titles for Frieze and a short for MoMA's Department of Film.",
+      "Their first AI-native work, Small Weather, was acquired by the Cinémathèque québécoise – the first AI film to enter its permanent collection. They tend to work slowly, in long takes, with one editor and no agency.",
+    ],
+    craftHeading: "On Craft",
+    craftQuote:
+      "\"We don't prompt a model. We conduct it – the way a cinematographer conducts weather, or a conductor conducts a room that is already playing.\" Their process begins on paper, photographed not scanned, and ends in a single offline edit.",
+    pressHeading: "Selected Press",
+    pressQuotes: [
+      { outlet: "The New Yorker", quote: "the first AI film that remembers to leave things out." },
+      { outlet: "Sight & Sound", quote: "a house style inside tools that are allergic to style." },
+      { outlet: "Cahiers du Cinéma", quote: "a patience for accident – the oldest craft – ported into latent space." },
+    ],
+    based: { city: "Montréal, QC", coords: "45.5°N · 73.5°W" },
+    representation: "Caviar",
+    tools: ["Runway Gen-3", "Sora", "ElevenLabs · Suno"],
+    recognition: [
+      "Spike Pioneer · 2026",
+      "Cinémathèque QC · 2025",
+      "SXSW Jury · 2025",
+    ],
+    contactEmail: "studio@vd.com",
+    socials: [
+      { label: "Instagram", href: "#" },
+      { label: "Vimeo", href: "#" },
+      { label: "Website", href: "#" },
+    ],
+    filmography: [
+      { num: "08 · Latest", title: "Small ", titleItalic: "Weather", year: 2026, duration: "11 min", thumbnail: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=640&q=80", flames: "4.2K" },
+      { num: "07", title: "Paper ", titleItalic: "Birds", year: 2025, duration: "6 min", thumbnail: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=640&q=80", flames: "3.1K" },
+      { num: "06", title: "Field", titleItalic: "notes", year: 2025, duration: "8 min", thumbnail: "https://images.unsplash.com/photo-1444080748397-f442aa95c3e5?w=640&q=80", flames: "5.4K" },
+      { num: "05", title: "Room ", titleItalic: "Tone", year: 2025, duration: "4 min", thumbnail: "https://images.unsplash.com/photo-1507146153580-69a1fe6d8aa1?w=640&q=80", flames: "2.8K" },
+      { num: "04", title: "North ", titleItalic: "Face", year: 2024, duration: "7 min", thumbnail: "https://images.unsplash.com/photo-1485470733090-0aae1788d5af?w=640&q=80", flames: "3.6K" },
+      { num: "03", title: "Quiet ", titleItalic: "Hours", year: 2024, duration: "5 min", thumbnail: "https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=640&q=80", flames: "2.1K" },
+      { num: "02", title: "A/B ", titleItalic: "Tests", year: 2024, duration: "3 min", thumbnail: "https://images.unsplash.com/photo-1511497584788-876760111969?w=640&q=80", flames: "1.7K" },
+      { num: "01", title: "First ", titleItalic: "Light", year: 2024, duration: "6 min", thumbnail: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=640&q=80", flames: "1.3K" },
+    ],
+  },
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════════ */
+
+const normalize = (s: string) =>
+  s
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+function splitName(fullName: string): { name: string; italic: string } {
+  const parts = fullName.trim().split(" ");
+  if (parts.length === 1) return { name: parts[0], italic: "" };
+  return { name: parts[0], italic: parts.slice(1).join(" ") };
 }
 
-interface MovieData {
-  id: string; title: string; poster: string; genre: string;
-  year: number; duration: string; rating: number;
-  video_url: string; ai_models: string[]; upvotes_count: number;
+function formatFlames(n: number): string {
+  if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+  return String(n);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE COMPONENT
+   ═══════════════════════════════════════════════════════════════ */
 
 export default function StudioPage() {
   const params = useParams();
   const router = useRouter();
-  const slug = (params.slug as string || "").replace(/-/g, " ");
-  const [studio, setStudio] = useState<StudioData | null>(null);
-  const [movies, setMovies] = useState<MovieData[]>([]);
+  const slug = (params.slug as string) || "";
+
+  const [pioneer, setPioneer] = useState<PioneerFull | null>(null);
   const [loading, setLoading] = useState(true);
-  const [shareMsg, setShareMsg] = useState("");
+  const [notFound, setNotFound] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [bannerHover, setBannerHover] = useState<number | null>(null);
+  const [filmHover, setFilmHover] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "features" | "short">("all");
 
   useEffect(() => {
-    async function load() {
-      if (!supabase) { setLoading(false); return; }
-      let match: any = null;
-      const { data: d1 } = await supabase.from("pioneer_creators").select("*").eq("visible", true).ilike("name", `%${slug}%`).limit(1);
-      if (d1 && d1.length > 0) match = d1[0];
-      if (!match) {
-        const { data: all } = await supabase.from("pioneer_creators").select("*").eq("visible", true);
-        const normalize = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-        match = (all || []).find((c: any) => normalize(c.name) === normalize(slug));
-      }
-      if (!match) { setLoading(false); return; }
-      const links: { label: string; url: string }[] = [];
-      if (match.website) links.push({ label: "Website", url: match.website });
-      if (match.social_instagram) links.push({ label: "Instagram", url: `https://instagram.com/${match.social_instagram.replace("@", "")}` });
-      if (match.social_youtube) links.push({ label: "YouTube", url: match.social_youtube.startsWith("http") ? match.social_youtube : `https://youtube.com/${match.social_youtube}` });
-      if (match.social_facebook) links.push({ label: "Facebook", url: match.social_facebook.startsWith("http") ? match.social_facebook : `https://facebook.com/${match.social_facebook}` });
-      if (match.social_x) links.push({ label: "X", url: `https://x.com/${match.social_x.replace("@", "")}` });
-      setStudio({
-        name: match.name, role: match.role || "AI Creator", bio: match.bio || "",
-        highlight: match.highlight || "", avatar: match.avatar_url || "",
-        toolkit: match.toolkit || [], works: match.works || [],
-        stats: match.custom_stats || [{ label: "Tools", value: String((match.toolkit || []).length) }, { label: "Role", value: "Creator" }, { label: "Status", value: "Pioneer" }],
-        links, website: match.website || "",
-      });
-      const { data: films } = await supabase.from("movies").select("*").eq("status", "approved").ilike("creator_name", `%${match.name}%`).order("sort_order", { ascending: true });
-      if (films) setMovies(films.map((f: any) => ({ id: f.id, title: f.title, poster: getSmartPoster(f.poster_url, f.video_url, f.id), genre: f.genre || "", year: f.year || 2026, duration: f.duration || "", rating: Number(f.rating) || 0, video_url: f.video_url || "", ai_models: f.ai_models || [], upvotes_count: f.upvotes_count || 0 })));
-      setLoading(false);
-    }
-    load();
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
-  const handleShare = async () => {
-    const url = window.location.href;
+  async function loadData() {
+    setLoading(true);
+    if (!supabase) {
+      setNotFound(true);
+      setLoading(false);
+      return;
+    }
     try {
-      if (navigator.share) { await navigator.share({ title: `${studio?.name} on Spike AI`, url }); }
-      else { await navigator.clipboard.writeText(url); setShareMsg("Copied!"); setTimeout(() => setShareMsg(""), 2000); }
-    } catch {}
-  };
+      // Fetch all visible pioneers and match slug
+      const { data: all } = await supabase
+        .from("pioneer_creators")
+        .select("*")
+        .eq("visible", true);
 
-  if (loading) return <div style={S.loadingPage}><div style={S.spinner} /></div>;
-  if (!studio) return (
-    <div style={S.loadingPage}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, color: "rgba(255,255,255,0.5)", marginBottom: 16 }}>Studio not found</h1>
-      <button onClick={() => router.push("/creators")} style={{ background: "none", border: "none", color: gold(0.6), fontSize: 14, cursor: "pointer" }}>&larr; Back to creators</button>
-    </div>
-  );
+      const match = (all || []).find((c: any) => normalize(c.name) === slug);
+
+      if (!match) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
+
+      // Optional rich override for editorial content
+      const rich = RICH_OVERRIDES[slug] || {};
+      const { name: firstName, italic: lastName } = splitName(match.name);
+
+      // Fetch movies from DB by creator_name
+      const { data: films } = await supabase
+        .from("movies")
+        .select("*")
+        .eq("status", "approved")
+        .ilike("creator_name", `%${match.name}%`)
+        .order("year", { ascending: false });
+
+      let filmography: FilmItem[] = rich.filmography || [];
+      if ((!filmography || filmography.length === 0) && films && films.length > 0) {
+        filmography = films.map((f: any, i: number) => ({
+          id: f.id,
+          num:
+            i === 0
+              ? `${String(films.length - i).padStart(2, "0")} · Latest`
+              : String(films.length - i).padStart(2, "0"),
+          title: f.title,
+          year: f.year || 2026,
+          duration: f.duration || "—",
+          thumbnail: getSmartPoster(f.poster_url, f.video_url, f.id),
+          flames: formatFlames(f.upvotes_count || 0),
+        }));
+      }
+
+      const full: PioneerFull = {
+        name: firstName,
+        nameItalic: lastName,
+        avatarUrl: match.avatar_url || "",
+        bioFallback: match.bio || "",
+        tagline: rich.tagline || match.highlight || "",
+        kicker: rich.kicker || match.role || "",
+        pioneerNumber: rich.pioneerNumber,
+        bannerStills: rich.bannerStills,
+        leadBio: rich.leadBio || (match.bio ? [match.bio] : []),
+        craftHeading: rich.craftHeading,
+        craftQuote: rich.craftQuote,
+        pressHeading: rich.pressHeading,
+        pressQuotes: rich.pressQuotes,
+        based: rich.based,
+        representation: rich.representation,
+        tools: rich.tools,
+        recognition: rich.recognition,
+        contactEmail: rich.contactEmail,
+        socials: rich.socials,
+        filmography,
+      };
+
+      setPioneer(full);
+      setLoading(false);
+      setTimeout(() => setIsLoaded(true), 80);
+    } catch (err) {
+      console.error("Studio load error:", err);
+      setNotFound(true);
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: "100vh", background: INK, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div
+          style={{
+            width: 28,
+            height: 28,
+            border: `1px solid rgba(212,168,87,0.3)`,
+            borderTopColor: GOLD,
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+          }}
+        />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (notFound || !pioneer) {
+    return (
+      <div style={{ minHeight: "100vh", background: INK, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.5)" }}>
+        <h1 className="font-serif" style={{ fontSize: 32, fontWeight: 400, color: "#FAFAFA", margin: "0 0 14px" }}>
+          Studio not found
+        </h1>
+        <Link
+          href="/creators"
+          style={{
+            fontFamily: MONO,
+            fontSize: 11,
+            letterSpacing: "0.28em",
+            textTransform: "uppercase",
+            color: GOLD,
+            textDecoration: "none",
+            borderBottom: `1px solid rgba(212,168,87,0.4)`,
+            paddingBottom: 4,
+          }}
+        >
+          ← Back to creators
+        </Link>
+      </div>
+    );
+  }
+
+  // Filter films
+  const filmsVisible =
+    filter === "all"
+      ? pioneer.filmography || []
+      : filter === "features"
+      ? (pioneer.filmography || []).filter((f) => parseInt(f.duration) >= 10)
+      : (pioneer.filmography || []).filter((f) => parseInt(f.duration) < 10);
+
+  const films = pioneer.filmography || [];
+  const totalFilms = films.length;
+  const filmYears = films.map((f) => f.year);
+  const minYear = filmYears.length ? Math.min(...filmYears) : 0;
+  const maxYear = filmYears.length ? Math.max(...filmYears) : 0;
+
+  const hasStills = pioneer.bannerStills && pioneer.bannerStills.length >= 4;
+  const stills = pioneer.bannerStills || [];
 
   return (
-    <div style={S.page}>
-      {/* Ambient */}
-      <div style={S.ambientWrap}>
-        <div style={{ ...S.ambientOrb, top: "10%", left: "50%", transform: "translateX(-50%)", width: 900, height: 600, opacity: 0.05, background: `radial-gradient(ellipse, ${gold(0.8)} 0%, ${gold(0.3)} 35%, transparent 70%)` }} />
-        <div style={{ ...S.ambientOrb, bottom: "10%", right: "20%", width: 500, height: 400, opacity: 0.03, background: `radial-gradient(ellipse, ${gold(0.5)} 0%, transparent 70%)` }} />
-      </div>
+    <div style={{ minHeight: "100vh", background: INK, color: "#FAFAFA", position: "relative", overflow: "hidden" }}>
+      {/* Grain */}
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          pointerEvents: "none",
+          opacity: 0.035,
+          zIndex: 1,
+          backgroundImage:
+            'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 512 512\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'1\'/%3E%3C/svg%3E")',
+        }}
+      />
 
-      {/* Nav */}
-      <nav style={S.nav}>
-        <div style={S.navInner}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <button onClick={() => router.push("/creators")} style={S.backBtn}><ArrowLeft size={15} /></button>
-            <span style={{ fontSize: 14, fontWeight: 500, color: gold(0.4) }}>Studio</span>
-          </div>
-          <button onClick={handleShare} style={S.shareBtn}>
-            {shareMsg ? <><Check size={12} /> {shareMsg}</> : <><Share2 size={12} /> Share</>}
-          </button>
-        </div>
-      </nav>
-
-      {/* ═══ All Content — Single Centered Column ═══ */}
-      <div style={S.mainColumn}>
-
-        {/* ── Hero ── */}
-        <div style={{ ...S.section, paddingTop: 64, paddingBottom: 48 }}>
-          {/* Avatar */}
-          <div style={{ position: "relative", marginBottom: 28 }}>
-            <div style={{ position: "absolute", inset: -12, borderRadius: 28, opacity: 0.7, background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d, #e8c65a)", filter: "blur(10px)" }} />
-            <div style={{ position: "relative", width: 280, height: 180, borderRadius: 24, overflow: "hidden", border: "3px solid rgba(212,168,83,0.4)", background: "#0a0a0c", boxShadow: "0 0 60px rgba(212,168,83,0.2), 0 20px 60px rgba(0,0,0,0.5)" }}>
-              <img src={studio.avatar} alt={studio.name} style={{ width: "100%", height: "100%", objectFit: "contain" }} />
-            </div>
-            <div style={{ position: "absolute", bottom: -16, left: "50%", transform: "translateX(-50%)" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 50, background: "linear-gradient(145deg, #d4a84b, #f5d77a, #b8862d)", boxShadow: "0 2px 12px rgba(180,130,40,0.5), inset 0 1px 1px rgba(255,235,170,0.5)" }}>
-                <Award size={11} style={{ color: "#5c3d0e" }} />
-                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: "0.3em", textTransform: "uppercase" as const, color: "#5c3d0e" }}>Featured Creator</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Name */}
-          <h1 style={{ fontSize: 56, fontWeight: 700, letterSpacing: "-0.02em", background: "linear-gradient(180deg, #f5d77a 0%, #d4a853 40%, #b8862d 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", marginBottom: 8 }}>{studio.name}</h1>
-          <p style={{ fontSize: 15, letterSpacing: "0.3em", textTransform: "uppercase" as const, color: gold(0.4), marginBottom: 32 }}>{studio.role}</p>
-
-          {/* Highlight */}
-          {studio.highlight && (
-            <div style={{ maxWidth: 520, padding: "24px 32px", borderRadius: 16, border: `1px solid ${gold(0.1)}`, background: gold(0.03), marginBottom: 32 }}>
-              <Sparkles size={14} style={{ color: gold(0.4), marginBottom: 12 }} />
-              <p style={{ fontSize: 15, lineHeight: 1.8, fontStyle: "italic", color: gold(0.5) }}>{studio.highlight}</p>
-            </div>
-          )}
-
-          {/* Stats */}
-          <div style={{ display: "flex", gap: 20, marginBottom: 32 }}>
-            {studio.stats.map((s) => (
-              <div key={s.label} style={{ padding: "16px 28px", borderRadius: 16, border: `1px solid ${gold(0.1)}`, background: gold(0.02), minWidth: 120, textAlign: "center" as const }}>
-                <p style={{ fontSize: 28, fontWeight: 700, color: gold(0.8), marginBottom: 4 }}>{s.value}</p>
-                <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.2em", textTransform: "uppercase" as const, color: gold(0.25) }}>{s.label}</p>
+      {/* ═══════════════════════════════════════════════════════════
+          BANNER
+         ═══════════════════════════════════════════════════════════ */}
+      <section style={{ position: "relative", height: 320, width: "100%", overflow: "hidden", zIndex: 2 }}>
+        {hasStills ? (
+          <div style={{ position: "absolute", inset: 0, display: "grid", gridTemplateColumns: "repeat(8, 1fr)", gap: 2 }}>
+            {stills.slice(0, 8).map((src, i) => (
+              <div
+                key={i}
+                onMouseEnter={() => setBannerHover(i)}
+                onMouseLeave={() => setBannerHover(null)}
+                style={{
+                  position: "relative",
+                  overflow: "hidden",
+                  background: "#111",
+                  transform: bannerHover === i ? "scale(1.04)" : "scale(1)",
+                  transition: "transform 0.6s cubic-bezier(.22,1,.36,1)",
+                }}
+              >
+                <img
+                  src={src}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    display: "block",
+                    filter: bannerHover === i ? "grayscale(0) contrast(1.05) brightness(0.95)" : "grayscale(0.3) contrast(1.05) brightness(0.72)",
+                    transition: "filter 0.5s ease",
+                  }}
+                />
               </div>
             ))}
           </div>
-
-          {/* Links */}
-          <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 12, justifyContent: "center" }}>
-            {studio.links.map((link) => (
-              <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer"
-                style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", borderRadius: 50, fontSize: 12, fontWeight: 500, border: `1px solid ${gold(0.15)}`, color: gold(0.5), textDecoration: "none" }}>
-                <ExternalLink size={12} /> {link.label}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Divider ── */}
-        <div style={S.divider} />
-
-        {/* ── Films ── */}
-        {movies.length > 0 && (
-          <div style={S.section}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 40 }}>
-              <Film size={18} style={{ color: gold(0.4) }} />
-              <h2 style={{ fontSize: 28, fontWeight: 700, color: gold(0.7) }}>Films</h2>
-              <span style={{ fontSize: 12, fontWeight: 500, padding: "4px 12px", borderRadius: 50, border: `1px solid ${gold(0.15)}`, color: gold(0.35) }}>{movies.length} films</span>
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap" as const, justifyContent: "center", gap: 24 }}>
-              {movies.map((movie) => (
-                <div key={movie.id} onClick={() => router.push(`/movie/${movie.id}`)}
-                  style={{ width: 300, borderRadius: 12, overflow: "hidden", border: `1px solid ${gold(0.08)}`, background: gold(0.02), cursor: "pointer", boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
-                  <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden" }}>
-                    <img src={movie.poster} alt={movie.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    {movie.genre && (
-                      <span style={{ position: "absolute", bottom: 8, left: 8, padding: "2px 8px", borderRadius: 4, fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, background: "rgba(0,0,0,0.7)", color: gold(0.7), border: `1px solid ${gold(0.15)}` }}>{movie.genre}</span>
-                    )}
-                  </div>
-                  <div style={{ padding: 16 }}>
-                    <h3 style={{ fontSize: 15, fontWeight: 700, color: "rgba(255,255,255,0.8)", marginBottom: 6 }}>{movie.title}</h3>
-                    <div style={{ display: "flex", gap: 12, fontSize: 11, color: gold(0.3) }}>
-                      {movie.rating > 0 && <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Star size={10} /> {movie.rating}</span>}
-                      <span>{movie.year}</span>
-                      {movie.duration && <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={10} /> {movie.duration}</span>}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+        ) : (
+          // Simpler hero: gradient + avatar bg
+          <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at center, rgba(212,168,87,0.12) 0%, transparent 60%), linear-gradient(180deg, #0f0f13 0%, ${INK} 100%)` }}>
+            {pioneer.avatarUrl && (
+              <img
+                src={pioneer.avatarUrl}
+                alt=""
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  opacity: 0.18,
+                  filter: "grayscale(0.6) blur(2px)",
+                }}
+              />
+            )}
           </div>
         )}
 
-        {/* ── Divider ── */}
-        <div style={S.divider} />
+        {/* Top & bottom scrims */}
+        <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 80, background: "linear-gradient(to bottom, rgba(10,10,12,0.75) 0%, transparent 100%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 120, background: "linear-gradient(to top, rgba(10,10,12,1) 0%, transparent 100%)", pointerEvents: "none" }} />
 
-        {/* ── About ── */}
-        <div style={{ ...S.section, maxWidth: 600 }}>
-          <h2 style={S.sectionTitle}>About</h2>
-          <p style={{ fontSize: 15, lineHeight: 2, color: "rgba(255,255,255,0.35)", textAlign: "center" as const, marginBottom: 48 }}>{studio.bio}</p>
-
-          {studio.works.length > 0 && (
-            <>
-              <h2 style={S.sectionTitle}>Selected Works</h2>
-              <div style={{ display: "flex", flexDirection: "column" as const, gap: 12, marginBottom: 48, width: "100%" }}>
-                {studio.works.map((work) => (
-                  <div key={work.title} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 16, borderRadius: 12, border: `1px solid ${gold(0.06)}`, background: gold(0.02) }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                      <div style={{ width: 40, height: 40, borderRadius: 12, background: gold(0.06), border: `1px solid ${gold(0.1)}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <Award size={16} style={{ color: gold(0.4) }} />
-                      </div>
-                      <div>
-                        <p style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>{work.title}</p>
-                        <p style={{ fontSize: 11, color: gold(0.25), marginTop: 2 }}>{work.type}</p>
-                      </div>
-                    </div>
-                    <span style={{ fontSize: 11, color: gold(0.2) }}>{work.note}</span>
-                  </div>
-                ))}
-              </div>
-            </>
+        {/* Name + tagline overlay */}
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", pointerEvents: "none", padding: "0 24px" }}>
+          <h1
+            className="font-serif"
+            style={{
+              fontSize: "clamp(56px, 12vw, 200px)",
+              lineHeight: 0.9,
+              letterSpacing: "-0.03em",
+              margin: 0,
+              fontWeight: 300,
+              color: "#FAFAFA",
+              textTransform: "lowercase",
+              textShadow: "0 4px 30px rgba(0,0,0,0.5)",
+              opacity: isLoaded ? 1 : 0,
+              transform: isLoaded ? "translateY(0)" : "translateY(20px)",
+              transition: "opacity 1s ease, transform 1s ease",
+              textAlign: "center",
+            }}
+          >
+            {pioneer.name.toLowerCase()}
+            {pioneer.nameItalic ? (
+              <>
+                {" "}
+                <em style={{ fontStyle: "italic", opacity: 0.88, fontWeight: 300 }}>
+                  {pioneer.nameItalic.toLowerCase()}
+                </em>
+              </>
+            ) : null}
+          </h1>
+          {pioneer.tagline && (
+            <p
+              className="font-serif"
+              style={{
+                marginTop: 14,
+                fontSize: 16,
+                lineHeight: 1.5,
+                fontStyle: "italic",
+                color: GOLD,
+                fontWeight: 300,
+                opacity: isLoaded ? 0.95 : 0,
+                transform: isLoaded ? "translateY(0)" : "translateY(10px)",
+                transition: "opacity 1.2s ease 0.25s, transform 1.2s ease 0.25s",
+                textShadow: "0 2px 18px rgba(0,0,0,0.6)",
+                textAlign: "center",
+              }}
+            >
+              {pioneer.tagline}
+            </p>
           )}
+        </div>
 
-          <h2 style={S.sectionTitle}>Toolkit</h2>
-          <div style={{ display: "flex", flexWrap: "wrap" as const, gap: 8, justifyContent: "center" }}>
-            {studio.toolkit.map((tool) => (
-              <span key={tool} style={{ padding: "8px 16px", borderRadius: 50, fontSize: 12, fontWeight: 500, border: `1px solid ${gold(0.12)}`, color: gold(0.45), background: gold(0.03) }}>{tool}</span>
-            ))}
+        {/* Top nav */}
+        <div style={{ position: "absolute", top: 24, left: 32, right: 32, display: "flex", justifyContent: "space-between", alignItems: "center", pointerEvents: "auto", zIndex: 5 }}>
+          <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "inherit" }}>
+            <svg width="22" height="22" viewBox="0 0 32 32" style={{ display: "block" }}>
+              <rect x="6" y="6" width="4" height="20" fill="#8B5CF6" rx="0.5" />
+              <rect x="14" y="6" width="4" height="20" fill="#6366F1" rx="0.5" opacity="0.9" />
+              <rect x="22" y="6" width="4" height="20" fill="#6366F1" rx="0.5" opacity="0.75" />
+            </svg>
+            <span className="font-serif" style={{ fontSize: 14, fontWeight: 500, letterSpacing: "0.02em", color: "rgba(255,255,255,0.85)" }}>
+              spike <em style={{ fontStyle: "italic", opacity: 0.85 }}>AI</em>
+            </span>
+          </Link>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <Link href="/" style={{ color: "inherit", textDecoration: "none" }}>
+              Catalog
+            </Link>
+            <span style={{ opacity: 0.4 }}>/</span>
+            <Link href="/creators" style={{ color: "inherit", textDecoration: "none" }}>
+              Pioneers
+            </Link>
+            <span style={{ opacity: 0.4 }}>/</span>
+            <span style={{ color: GOLD }}>
+              {pioneer.name} {pioneer.nameItalic}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          IDENTITY ROW
+         ═══════════════════════════════════════════════════════════ */}
+      <section style={{ position: "relative", maxWidth: 1160, margin: "0 auto", padding: "28px 40px 0", zIndex: 2 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 24, flexWrap: "wrap" }}>
+          {/* Avatar */}
+          <div style={{ position: "relative", width: 72, height: 72, borderRadius: "50%", overflow: "hidden", border: "1px solid rgba(255,255,255,0.12)", flexShrink: 0, background: "#111" }}>
+            {pioneer.avatarUrl ? (
+              <img src={pioneer.avatarUrl} alt={pioneer.name} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "grayscale(1) contrast(1.05)" }} />
+            ) : (
+              <div className="font-serif" style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: GOLD, fontSize: 24 }}>
+                {pioneer.name.charAt(0)}
+              </div>
+            )}
+          </div>
+
+          {/* Name + meta */}
+          <div style={{ flex: "1 1 440px", minWidth: 280 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+              <h2 className="font-serif" style={{ fontSize: 30, lineHeight: 1.1, letterSpacing: "-0.01em", margin: 0, color: "#FAFAFA", fontWeight: 500 }}>
+                {pioneer.name}
+                {pioneer.nameItalic ? (
+                  <>
+                    {" "}
+                    <em style={{ fontStyle: "italic", opacity: 0.75, fontWeight: 400 }}>{pioneer.nameItalic}</em>
+                  </>
+                ) : null}
+              </h2>
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 9,
+                  letterSpacing: "0.28em",
+                  textTransform: "uppercase",
+                  color: GOLD,
+                  border: "1px solid rgba(212,168,87,0.4)",
+                  padding: "5px 9px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "rgba(212,168,87,0.05)",
+                }}
+              >
+                <span style={{ width: 4, height: 4, borderRadius: "50%", background: GOLD, boxShadow: `0 0 8px ${GOLD}` }} />
+                Pioneer{pioneer.pioneerNumber ? ` · ${pioneer.pioneerNumber}` : ""}
+              </span>
+            </div>
+            {pioneer.kicker && (
+              <p style={{ marginTop: 8, fontFamily: MONO, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)" }}>
+                {pioneer.kicker}
+              </p>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
+            <button
+              style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.28em", textTransform: "uppercase", color: GOLD, background: "transparent", border: `1px solid ${GOLD}`, padding: "12px 22px", cursor: "pointer", transition: "background 0.3s ease" }}
+              onMouseEnter={(e) => ((e.target as HTMLElement).style.background = "rgba(212,168,87,0.08)")}
+              onMouseLeave={(e) => ((e.target as HTMLElement).style.background = "transparent")}
+            >
+              Commission
+            </button>
+            <button
+              style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.28em", textTransform: "uppercase", color: INK, background: "#FAFAFA", border: "1px solid #FAFAFA", padding: "12px 22px", cursor: "pointer", transition: "opacity 0.3s ease" }}
+              onMouseEnter={(e) => ((e.target as HTMLElement).style.opacity = "0.88")}
+              onMouseLeave={(e) => ((e.target as HTMLElement).style.opacity = "1")}
+            >
+              + Follow
+            </button>
           </div>
         </div>
 
-        {/* ── Footer ── */}
-        <div style={{ ...S.divider, marginTop: 48 }} />
-        <div style={{ textAlign: "center" as const, padding: "40px 0" }}>
-          <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: "0.2em", color: gold(0.12) }}>spike AI</span>
-          <p style={{ fontSize: 11, color: "rgba(255,255,255,0.1)", marginTop: 12 }}>&copy; 2026 Spike AI. The home for AI-generated cinema.</p>
+        <div style={{ height: 1, background: "linear-gradient(to right, transparent, rgba(255,255,255,0.12), transparent)", marginTop: 32 }} />
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          BODY GRID: bio + aside
+         ═══════════════════════════════════════════════════════════ */}
+      <section
+        style={{
+          position: "relative",
+          maxWidth: 1160,
+          margin: "0 auto",
+          padding: "44px 40px 0",
+          zIndex: 2,
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) 240px",
+          gap: 56,
+        }}
+      >
+        {/* ── Bio left ── */}
+        <div>
+          {(pioneer.leadBio || []).map((para, i) => (
+            <p
+              key={i}
+              className="font-serif"
+              style={{
+                fontSize: 15,
+                lineHeight: 1.75,
+                fontWeight: 300,
+                color: "rgba(255,255,255,0.72)",
+                margin: "0 0 20px",
+              }}
+            >
+              {i === 0 ? (
+                <>
+                  <span
+                    className="font-serif"
+                    style={{
+                      float: "left",
+                      fontSize: 58,
+                      lineHeight: 0.9,
+                      fontWeight: 400,
+                      color: GOLD,
+                      marginRight: 10,
+                      marginTop: 4,
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {para.charAt(0)}
+                  </span>
+                  {para.slice(1)}
+                </>
+              ) : (
+                para
+              )}
+            </p>
+          ))}
+
+          {(!pioneer.leadBio || pioneer.leadBio.length === 0) && pioneer.bioFallback && (
+            <p className="font-serif" style={{ fontSize: 15, lineHeight: 1.75, fontWeight: 300, color: "rgba(255,255,255,0.72)", margin: 0 }}>
+              {pioneer.bioFallback}
+            </p>
+          )}
+
+          {pioneer.craftQuote && (
+            <div style={{ marginTop: 32 }}>
+              <h3 style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.3em", textTransform: "uppercase", color: GOLD, margin: "0 0 14px", fontWeight: 500 }}>
+                {pioneer.craftHeading || "On Craft"}
+              </h3>
+              <p className="font-serif" style={{ fontSize: 15, lineHeight: 1.75, fontWeight: 300, color: "rgba(255,255,255,0.72)", margin: 0 }}>
+                {pioneer.craftQuote}
+              </p>
+            </div>
+          )}
+
+          {pioneer.pressQuotes && pioneer.pressQuotes.length > 0 && (
+            <div style={{ marginTop: 32 }}>
+              <h3 style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.3em", textTransform: "uppercase", color: GOLD, margin: "0 0 14px", fontWeight: 500 }}>
+                {pioneer.pressHeading || "Selected Press"}
+              </h3>
+              <p className="font-serif" style={{ fontSize: 15, lineHeight: 1.75, fontWeight: 300, color: "rgba(255,255,255,0.72)", margin: 0 }}>
+                {pioneer.pressQuotes.map((pq, i) => (
+                  <span key={i}>
+                    <em style={{ fontStyle: "italic", color: "rgba(255,255,255,0.88)" }}>{pq.outlet}</em> called their work <em style={{ fontStyle: "italic" }}>&ldquo;{pq.quote}&rdquo;</em>
+                    {i < (pioneer.pressQuotes!.length - 1) ? "  " : ""}
+                  </span>
+                ))}
+              </p>
+            </div>
+          )}
         </div>
-      </div>
+
+        {/* ── Aside right ── */}
+        <aside style={{ borderLeft: "1px solid rgba(255,255,255,0.08)", paddingLeft: 28 }}>
+          {pioneer.based && (
+            <AsideBlock heading="Based">
+              <span className="font-serif" style={{ fontSize: 14, color: "rgba(255,255,255,0.88)", fontWeight: 400 }}>
+                {pioneer.based.city}
+              </span>
+              <br />
+              <span style={{ fontFamily: MONO, fontSize: 10, color: "rgba(255,255,255,0.45)", letterSpacing: "0.12em", fontStyle: "italic" }}>
+                {pioneer.based.coords}
+              </span>
+            </AsideBlock>
+          )}
+
+          {pioneer.representation && (
+            <AsideBlock heading="Representation">
+              <span className="font-serif" style={{ fontSize: 14, color: "rgba(255,255,255,0.88)", textDecoration: "underline", textUnderlineOffset: 3, textDecorationColor: "rgba(255,255,255,0.2)" }}>
+                {pioneer.representation}
+              </span>
+            </AsideBlock>
+          )}
+
+          {pioneer.tools && pioneer.tools.length > 0 && (
+            <AsideBlock heading="Tools">
+              {pioneer.tools.map((t, i) => {
+                const parts = t.split(" ");
+                const a = parts[0];
+                const b = parts.slice(1).join(" ");
+                return (
+                  <div key={i} className="font-serif" style={{ fontSize: 14, color: "rgba(255,255,255,0.88)", fontWeight: 400, lineHeight: 1.6 }}>
+                    {a}
+                    {b ? (
+                      <>
+                        {" "}
+                        <em style={{ fontStyle: "italic", opacity: 0.7 }}>{b}</em>
+                      </>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </AsideBlock>
+          )}
+
+          {pioneer.recognition && pioneer.recognition.length > 0 && (
+            <AsideBlock heading="Recognition">
+              {pioneer.recognition.map((r, i) => {
+                const parts = r.split("·");
+                return (
+                  <div key={i} className="font-serif" style={{ fontSize: 14, color: "rgba(255,255,255,0.88)", lineHeight: 1.6 }}>
+                    {parts[0]?.trim()}{" "}
+                    {parts[1] ? (
+                      <em style={{ fontStyle: "italic", opacity: 0.7 }}>· {parts[1]?.trim()}</em>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </AsideBlock>
+          )}
+
+          {pioneer.contactEmail && (
+            <AsideBlock heading="Contact" isLast>
+              <a
+                href={`mailto:${pioneer.contactEmail}`}
+                className="font-serif"
+                style={{ fontSize: 14, color: GOLD, textDecoration: "underline", textUnderlineOffset: 3, textDecorationColor: "rgba(212,168,87,0.4)" }}
+              >
+                {pioneer.contactEmail}
+              </a>
+            </AsideBlock>
+          )}
+
+          {/* If no aside data at all, show a single "No additional info" placeholder */}
+          {!pioneer.based && !pioneer.representation && (!pioneer.tools || pioneer.tools.length === 0) && (!pioneer.recognition || pioneer.recognition.length === 0) && !pioneer.contactEmail && (
+            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.3)" }}>
+              Profile in progress
+            </div>
+          )}
+        </aside>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          FILMOGRAPHY
+         ═══════════════════════════════════════════════════════════ */}
+      <section style={{ position: "relative", maxWidth: 1160, margin: "0 auto", padding: "80px 40px 0", zIndex: 2 }}>
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 20, marginBottom: 28, flexWrap: "wrap" }}>
+          <div>
+            <h2 className="font-serif" style={{ fontSize: 22, letterSpacing: "-0.01em", margin: 0, fontWeight: 500, color: "#FAFAFA" }}>
+              Film<em style={{ fontStyle: "italic", color: GOLD, fontWeight: 300 }}>ography</em>
+              {totalFilms > 0 && (
+                <span style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", marginLeft: 16, fontWeight: 400 }}>
+                  {String(totalFilms).padStart(2, "0")} Films{minYear ? ` · ${minYear} → ${maxYear}` : ""}
+                </span>
+              )}
+            </h2>
+          </div>
+          {totalFilms > 0 && (
+            <div style={{ display: "flex", gap: 4 }}>
+              {(["all", "features", "short"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  style={{
+                    fontFamily: MONO,
+                    fontSize: 9.5,
+                    letterSpacing: "0.24em",
+                    textTransform: "uppercase",
+                    color: filter === f ? INK : "rgba(255,255,255,0.55)",
+                    background: filter === f ? "#FAFAFA" : "transparent",
+                    border: `1px solid ${filter === f ? "#FAFAFA" : "rgba(255,255,255,0.15)"}`,
+                    padding: "8px 14px",
+                    cursor: "pointer",
+                    transition: "all 0.25s ease",
+                  }}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {totalFilms === 0 ? (
+          <div style={{ padding: "60px 20px", textAlign: "center", border: "1px dashed rgba(255,255,255,0.08)" }}>
+            <p className="font-serif" style={{ fontSize: 15, fontStyle: "italic", color: "rgba(255,255,255,0.4)", margin: 0 }}>
+              Films coming soon.
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
+            {filmsVisible.map((f) => {
+              const isHover = filmHover === f.num;
+              return (
+                <div
+                  key={f.num + f.title}
+                  onMouseEnter={() => setFilmHover(f.num)}
+                  onMouseLeave={() => setFilmHover(null)}
+                  onClick={() => f.id && router.push(`/movie/${f.id}`)}
+                  style={{ cursor: f.id ? "pointer" : "default" }}
+                >
+                  <div
+                    style={{
+                      position: "relative",
+                      aspectRatio: "1 / 1",
+                      overflow: "hidden",
+                      border: isHover ? `1px solid ${GOLD}` : "1px solid rgba(255,255,255,0.06)",
+                      background: "#0d0d11",
+                      transition: "border 0.3s ease",
+                    }}
+                  >
+                    <img
+                      src={f.thumbnail}
+                      alt={f.title + (f.titleItalic || "")}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                        filter: isHover ? "grayscale(0) contrast(1.05)" : "grayscale(0.45) contrast(1.08) brightness(0.8)",
+                        transform: isHover ? "scale(1.04)" : "scale(1)",
+                        transition: "filter 0.5s ease, transform 0.6s cubic-bezier(.22,1,.36,1)",
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        left: 8,
+                        fontFamily: MONO,
+                        fontSize: 8,
+                        letterSpacing: "0.28em",
+                        textTransform: "uppercase",
+                        color: f.num.includes("Latest") ? GOLD : "rgba(255,255,255,0.85)",
+                        background: "rgba(5,5,7,0.7)",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        padding: "4px 7px",
+                        backdropFilter: "blur(8px)",
+                      }}
+                    >
+                      {f.num}
+                    </div>
+                    <div
+                      style={{
+                        position: "absolute",
+                        bottom: 8,
+                        right: 8,
+                        fontFamily: MONO,
+                        fontSize: 8,
+                        letterSpacing: "0.22em",
+                        textTransform: "uppercase",
+                        color: "rgba(255,255,255,0.85)",
+                        background: "rgba(5,5,7,0.7)",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        padding: "4px 7px",
+                        backdropFilter: "blur(8px)",
+                      }}
+                    >
+                      {f.duration}
+                    </div>
+                  </div>
+                  <div style={{ paddingTop: 10 }}>
+                    <h4 className="font-serif" style={{ fontSize: 15, margin: 0, fontWeight: 500, color: "#FAFAFA", letterSpacing: "-0.01em" }}>
+                      {f.title}
+                      {f.titleItalic ? (
+                        <em style={{ fontStyle: "italic", opacity: 0.75, fontWeight: 400 }}>{f.titleItalic}</em>
+                      ) : null}
+                    </h4>
+                    <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 8, fontFamily: MONO, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)" }}>
+                      <span>{f.year}</span>
+                      {f.flames ? (
+                        <>
+                          <span style={{ opacity: 0.4 }}>·</span>
+                          <span style={{ color: GOLD }}>△ {f.flames}</span>
+                        </>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          FOOTER
+         ═══════════════════════════════════════════════════════════ */}
+      <footer style={{ position: "relative", borderTop: "1px solid rgba(255,255,255,0.08)", padding: "28px 40px", maxWidth: 1160, margin: "100px auto 0", zIndex: 2, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+        <div className="font-serif" style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", fontWeight: 400 }}>
+          spike <em style={{ fontStyle: "italic" }}>AI</em> <span style={{ opacity: 0.4 }}>·</span>{" "}
+          <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: "0.18em" }}>© 2026</span>
+        </div>
+        {pioneer.socials && pioneer.socials.length > 0 && (
+          <div style={{ display: "flex", gap: 20 }}>
+            {pioneer.socials.map((s, i) => (
+              <a
+                key={i}
+                href={s.href}
+                style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(255,255,255,0.5)", textDecoration: "none", transition: "color 0.3s ease" }}
+                onMouseEnter={(e) => ((e.target as HTMLElement).style.color = GOLD)}
+                onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "rgba(255,255,255,0.5)")}
+              >
+                {s.label}
+              </a>
+            ))}
+          </div>
+        )}
+      </footer>
     </div>
   );
 }
 
-// ─── Gold helper ───
-function gold(opacity: number): string {
-  return `rgba(212,168,83,${opacity})`;
-}
+/* ═══════════════════════════════════════════════════════════════
+   ASIDE BLOCK
+   ═══════════════════════════════════════════════════════════════ */
 
-// ─── Styles ───
-const S: Record<string, React.CSSProperties> = {
-  page: { minHeight: "100vh", background: "#08080a", color: "white", overflow: "hidden" },
-  loadingPage: { minHeight: "100vh", background: "#08080a", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" },
-  spinner: { width: 32, height: 32, border: "2px solid rgba(212,168,83,0.3)", borderTopColor: "rgba(212,168,83,1)", borderRadius: "50%", animation: "spin 1s linear infinite" },
-  ambientWrap: { position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 },
-  ambientOrb: { position: "absolute", borderRadius: "50%" },
-  nav: { position: "sticky", top: 0, zIndex: 50, background: "rgba(8,8,10,0.7)", backdropFilter: "blur(24px)", borderBottom: "1px solid rgba(212,168,83,0.08)" },
-  navInner: { maxWidth: 800, margin: "0 auto", padding: "0 24px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between" },
-  backBtn: { width: 36, height: 36, borderRadius: "50%", border: "1px solid rgba(212,168,83,0.15)", background: "none", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(212,168,83,0.4)", cursor: "pointer" },
-  shareBtn: { display: "flex", alignItems: "center", gap: 8, padding: "8px 16px", borderRadius: 50, border: "1px solid rgba(212,168,83,0.15)", background: "none", color: "rgba(212,168,83,0.4)", fontSize: 12, fontWeight: 500, cursor: "pointer" },
-  mainColumn: { position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", padding: "0 24px" },
-  section: { display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", width: "100%", maxWidth: 800, padding: "48px 0" },
-  sectionTitle: { fontSize: 10, fontWeight: 700, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(212,168,83,0.3)", marginBottom: 24 },
-  divider: { width: "100%", maxWidth: 800, height: 1, background: "linear-gradient(90deg, transparent, rgba(212,168,83,0.15), transparent)" },
-};
+function AsideBlock({
+  heading,
+  children,
+  isLast,
+}: {
+  heading: string;
+  children: React.ReactNode;
+  isLast?: boolean;
+}) {
+  return (
+    <div style={{ paddingBottom: 20, marginBottom: 20, borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.06)" }}>
+      <h4 style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.3em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", margin: "0 0 8px", fontWeight: 500 }}>
+        {heading}
+      </h4>
+      <div>{children}</div>
+    </div>
+  );
+}
