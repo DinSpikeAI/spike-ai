@@ -8,6 +8,7 @@ import CategoryRow from "./components/CategoryRow";
 import Navbar from "./components/Navbar";
 import SearchOverlay from "./components/SearchOverlay";
 import HeroSection from "./components/HeroSection";
+import MarqueeHero from "./components/MarqueeHero";
 import MovieCard from "./components/MovieCard";
 import { GenreFilter, AiModelFilter } from "./components/Filters";
 import Footer from "./components/Footer";
@@ -497,38 +498,13 @@ export default function HomePage() {
   return (
     <main>
       {/* Splash Screen — Auto-Start, Zero-Click */}
-      {showSplash && (
-        <div className={`splash-screen ${splashFading ? "fade-out" : ""}`}>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[600px] h-[600px] rounded-full bg-white/[0.03] blur-[150px]" />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[400px] h-[400px] rounded-full bg-white/[0.02] blur-[100px] translate-y-[-80px]" />
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[200px] h-[200px] rounded-full bg-white/[0.04] blur-[60px] translate-y-[40px]" />
-          </div>
-
-          <div className="splash-logo relative flex flex-col items-center">
-            <div className="select-none">
-              <span className="splash-text-spike text-7xl sm:text-8xl md:text-[9rem] font-semibold tracking-[0.15em] text-white" style={{ fontStyle: "normal", fontFamily: "'Inter', -apple-system, sans-serif" }}>
-                spike AI
-              </span>
-            </div>
-          </div>
-          <div className="splash-subtitle text-[10px] md:text-[11px] tracking-[0.6em] uppercase text-white/20 font-extralight mt-8">
-            AI Cinema
-          </div>
-          <div className="splash-line" />
-        </div>
-      )}
+      
 
       <div className={`transition-opacity duration-500 ${splashChecked ? "opacity-100" : "opacity-0"}`}>
       <Navbar onSearchOpen={() => setSearchOpen(true)} categories={liveCategories} isAdmin={isAdmin} isCreator={isCreator} />
       <SearchOverlay active={searchOpen} onClose={() => setSearchOpen(false)} categories={liveCategories} />
 
-      <HeroSection dbSlides={heroSlides} />
-
+      <MarqueeHero />
       {/* Genre Filters + Category Rows */}
       <div className="relative z-10 -mt-2 pt-10">
         {dbReady && (

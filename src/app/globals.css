@@ -1,4 +1,12 @@
 @import "tailwindcss";
+@theme {
+  --font-serif: var(--font-fraunces), Georgia, serif;
+}
+
+@theme {
+  --font-serif: var(--font-fraunces), Georgia, serif;
+}
+
 
 /* ─── Spike AI Custom Properties ────────────────────────────── */
 
@@ -1066,4 +1074,41 @@ body {
 @keyframes installPulse {
   0%, 100% { border-color: rgba(255, 255, 255, 0.08); }
   50% { border-color: rgba(255, 255, 255, 0.25); }
+}
+
+
+/* ─── Editorial MovieCard Override ─────────────────────────── */
+/* Override existing MovieCard styles to match Marquee hero */
+.group h4,
+article h4 {
+  font-family: var(--font-fraunces), Georgia, serif !important;
+  font-weight: 400 !important;
+  font-size: 16px !important;
+  letter-spacing: -0.005em !important;
+  line-height: 1.25 !important;
+  color: #FAFAFA !important;
+}
+
+/* Remove colorful badges/borders from cards */
+.card-image {
+  border-radius: 2px !important;
+}
+
+/* Editorial spacing for category rows */
+.category-row h2,
+.category-row h3 {
+  font-family: var(--font-fraunces), Georgia, serif !important;
+  font-weight: 300 !important;
+  letter-spacing: -0.015em !important;
+  text-transform: none !important;
+}
+
+/* Softer filter chips */
+.filter-pill,
+[class*="genre-filter"] button,
+[class*="model-filter"] button {
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-size: 10px !important;
+  font-family: ui-monospace, monospace;
 }

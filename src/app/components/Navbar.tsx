@@ -112,7 +112,7 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="flex items-center gap-6 md:gap-12">
         <div className="select-none cursor-pointer flex items-center" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <span className="text-[20px] font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
+          <span className="inline-flex items-center gap-3 font-serif font-light tracking-[-0.01em] text-[22px] text-white"><svg width="28" height="28" viewBox="0 0 60 60" style={{ borderRadius: 7, background: "#0a0a10", flexShrink: 0 }} aria-label="Spike AI"><rect x="20" y="20" width="4" height="20" rx="1" fill="#8B5CF6" /><rect x="28" y="16" width="4" height="28" rx="1" fill="#6366F1" /><rect x="36" y="23" width="4" height="14" rx="1" fill="#6366F1" opacity="0.75" /></svg><span>spike<em className="not-italic [font-style:italic] font-light opacity-80">&nbsp;AI</em></span></span>
         </div>
         <div className="hidden md:flex items-center gap-10">
           {[
@@ -335,7 +335,7 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
           >
             <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
               <div className="flex items-center">
-                <span className="text-[16px] font-semibold tracking-[0.18em] text-white" style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}>spike AI</span>
+                <span className="inline-flex items-center gap-3 font-serif font-light tracking-[-0.01em] text-[18px] text-white"><svg width="22" height="22" viewBox="0 0 60 60" style={{ borderRadius: 7, background: "#0a0a10", flexShrink: 0 }} aria-label="Spike AI"><rect x="20" y="20" width="4" height="20" rx="1" fill="#8B5CF6" /><rect x="28" y="16" width="4" height="28" rx="1" fill="#6366F1" /><rect x="36" y="23" width="4" height="14" rx="1" fill="#6366F1" opacity="0.75" /></svg><span>spike<em className="not-italic [font-style:italic] font-light opacity-80">&nbsp;AI</em></span></span>
               </div>
               <button onClick={() => setShowMobileMenu(false)} className="text-white/30 hover:text-white transition-colors"><X size={20} /></button>
             </div>
