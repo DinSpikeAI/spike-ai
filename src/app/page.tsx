@@ -9,7 +9,6 @@ import Navbar from "./components/Navbar";
 import SearchOverlay from "./components/SearchOverlay";
 import HeroSection from "./components/HeroSection";
 import MarqueeHero from "./components/MarqueeHero";
-import Ticker from "./components/Ticker";
 import PioneerShelf from "./components/PioneerShelf";
 import GenreBar from "./components/GenreBar";
 import MovieCard from "./components/MovieCard";
@@ -504,7 +503,6 @@ export default function HomePage() {
       <SearchOverlay active={searchOpen} onClose={() => setSearchOpen(false)} categories={liveCategories} />
 
       <MarqueeHero />
-      <Ticker />
       {/* Genre Filters + Category Rows */}
       <div className="relative z-10 -mt-2 pt-10">
         {dbReady && (
