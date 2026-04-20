@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import SearchOverlay from "./components/SearchOverlay";
 import HeroSection from "./components/HeroSection";
 import MarqueeHero from "./components/MarqueeHero";
+import Ticker from "./components/Ticker";
 import MovieCard from "./components/MovieCard";
 import { GenreFilter, AiModelFilter } from "./components/Filters";
 import Footer from "./components/Footer";
@@ -496,15 +497,12 @@ export default function HomePage() {
   }
 
   return (
-    <main>
-      {/* Splash Screen — Auto-Start, Zero-Click */}
-      
-
-      <div className={`transition-opacity duration-500 ${splashChecked ? "opacity-100" : "opacity-0"}`}>
+    <main><div>
       <Navbar onSearchOpen={() => setSearchOpen(true)} categories={liveCategories} isAdmin={isAdmin} isCreator={isCreator} />
       <SearchOverlay active={searchOpen} onClose={() => setSearchOpen(false)} categories={liveCategories} />
 
       <MarqueeHero />
+      <Ticker />
       {/* Genre Filters + Category Rows */}
       <div className="relative z-10 -mt-2 pt-10">
         {dbReady && (
