@@ -366,19 +366,6 @@ export default function MoviePage() {
 
       {/* ═══ HERO / PLAYER ═══ */}
       <section className="relative w-full aspect-video max-h-[75vh] overflow-hidden bg-black">
-        {/* Persistent fallback banner for age-restricted / embed-blocked videos */}
-        {playing && movie.video_url && (
-          <a
-            href={movie.video_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-2 rounded-full bg-black/80 backdrop-blur-md border border-white/15 text-white/70 hover:text-white hover:border-white/30 hover:bg-black/90 transition-all text-[12px] font-medium shadow-lg"
-            title="Click if video won't play here (age-restricted)"
-          >
-            <ExternalLink size={13} />
-            <span>Having trouble? Open on YouTube</span>
-          </a>
-        )}
         {playing && embedUrl ? (
           <div className="relative w-full h-full">
             <iframe src={embedUrl} className="w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={{ border: "none" }} />
