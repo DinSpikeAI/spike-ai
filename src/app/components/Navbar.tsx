@@ -627,7 +627,9 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
           ) : (
             <button
               onClick={() => router.push("/auth")}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/10 text-sm font-medium text-white/70 hover:text-white hover:border-white/20 transition-all"
+              style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", color: GOLD, background: "rgba(212,168,87,0.05)", border: "1px solid rgba(212,168,87,0.4)", padding: "8px 18px", cursor: "pointer", transition: "background 0.25s ease" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(212,168,87,0.12)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(212,168,87,0.05)"; }}
             >
               Sign In
             </button>
