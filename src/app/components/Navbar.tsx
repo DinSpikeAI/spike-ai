@@ -155,9 +155,9 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
             ...(!isCreator ? [{ label: "Join as Creator", href: "/become-creator", special: true }] : []),
           ].map((link) => (
             link.special ? (
-              <a key={link.label} href={link.href} style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", color: GOLD, textDecoration: "none", padding: "8px 16px", border: "1px solid rgba(212,168,87,0.4)", background: "rgba(212,168,87,0.05)", marginLeft: 4, transition: "all 0.25s ease" }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(212,168,87,0.12)"; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(212,168,87,0.05)"; }}>{link.label}</a>
+              <a key={link.label} href={link.href} className="font-serif" style={{ fontSize: 14, fontWeight: 400, letterSpacing: "-0.005em", color: "#FAFAFA", textDecoration: "none", padding: "7px 18px", border: "1px solid rgba(196,181,253,0.4)", background: "rgba(196,181,253,0.06)", borderRadius: 999, marginLeft: 6, display: "inline-flex", alignItems: "center", gap: 6, transition: "background 0.25s ease, border-color 0.25s ease" }} onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(196,181,253,0.14)"; el.style.borderColor = "rgba(196,181,253,0.7)"; }} onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(196,181,253,0.06)"; el.style.borderColor = "rgba(196,181,253,0.4)"; }}><span style={{ fontFamily: "'Instrument Serif', serif", fontStyle: "italic", fontWeight: 300, fontSize: 16, lineHeight: 1, color: "#C4B5FD" }}>+</span>{link.label}</a>
             ) : (
-              <a key={link.label} href={link.href} style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.26em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", textDecoration: "none", transition: "color 0.25s ease" }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#FAFAFA"; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.55)"; }}>{link.label}</a>
+              <a key={link.label} href={link.href} className="font-serif" style={{ fontSize: 15, fontWeight: 400, letterSpacing: "-0.01em", color: "rgba(255,255,255,0.85)", textDecoration: "none", paddingBottom: 4, borderBottom: "1px solid transparent", transition: "border-color 0.25s ease" }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderBottomColor = GOLD; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderBottomColor = "transparent"; }}>{link.label}</a>
             )
           ))}
         </div>
@@ -627,9 +627,10 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
           ) : (
             <button
               onClick={() => router.push("/auth")}
-              style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", color: GOLD, background: "rgba(212,168,87,0.05)", border: "1px solid rgba(212,168,87,0.4)", padding: "8px 18px", cursor: "pointer", transition: "background 0.25s ease" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(212,168,87,0.12)"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(212,168,87,0.05)"; }}
+              className="font-serif"
+              style={{ fontSize: 15, fontStyle: "italic", fontWeight: 400, color: "rgba(255,255,255,0.85)", background: "transparent", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 999, padding: "7px 22px", cursor: "pointer", transition: "background 0.25s ease, border-color 0.25s ease" }}
+              onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.background = "rgba(255,255,255,0.06)"; el.style.borderColor = "rgba(255,255,255,0.35)"; }}
+              onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.background = "transparent"; el.style.borderColor = "rgba(255,255,255,0.18)"; }}
             >
               Sign In
             </button>
