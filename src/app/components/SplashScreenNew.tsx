@@ -1,67 +1,189 @@
 "use client";
+
 import { useEffect, useState } from "react";
 
-const STORAGE_KEY = "spike.splash.seen";
-const HOLD_MS = 2400;
-const FADE_MS = 500;
+/* ═══════════════════════════════════════════════════════════════
+   SPLASH SCREEN — Aurora · Delicate
+   First-visit only (uses localStorage). Dismissible.
+   ═══════════════════════════════════════════════════════════════ */
 
-export default function SplashScreen() {
-  const [mounted, setMounted] = useState(false);
-  const [visible, setVisible] = useState(false);
+const STORAGE_KEY = "spike.splash.seen";
+const HOLD_MS = 3800;
+const FADE_MS = 700;
+
+export default function SplashScreenNew() {
+  const [show, setShow] = useState(false);
   const [fading, setFading] = useState(false);
 
   useEffect(() => {
+    // First-visit gate
+    if (typeof window === "undefined") return;
     try {
-      if (typeof window !== "undefined" && localStorage.getItem(STORAGE_KEY)) return;
-    } catch {}
-    setMounted(true);
-    const raf = requestAnimationFrame(() => setVisible(true));
-    return () => cancelAnimationFrame(raf);
-  }, []);
+      const seen = localStorage.getItem(STORAGE_KEY);
+      if (seen) return;
+      localStorage.setItem(STORAGE_KEY, "1");
+    } catch {
+      // if localStorage unavailable, still show once
+    }
 
-  useEffect(() => {
-    if (!mounted) return;
+    setShow(true);
+
+    // Auto-dismiss after hold
+    const t = setTimeout(() => setFading(true), HOLD_MS);
+    const t2 = setTimeout(() => setShow(false), HOLD_MS + FADE_MS);
+
+    // Dismiss on any key / click
     const dismiss = () => {
       setFading(true);
-      setTimeout(() => {
-        setMounted(false);
-        try { localStorage.setItem(STORAGE_KEY, String(Date.now())); } catch {}
-      }, FADE_MS);
+      setTimeout(() => setShow(false), FADE_MS);
     };
-    const t = setTimeout(dismiss, HOLD_MS);
-    const onInteract = () => dismiss();
-    window.addEventListener("keydown", onInteract, { once: true });
-    window.addEventListener("pointerdown", onInteract, { once: true });
+    window.addEventListener("keydown", dismiss, { once: true });
+    window.addEventListener("pointerdown", dismiss, { once: true });
+
     return () => {
       clearTimeout(t);
-      window.removeEventListener("keydown", onInteract);
-      window.removeEventListener("pointerdown", onInteract);
+      clearTimeout(t2);
+      window.removeEventListener("keydown", dismiss);
+      window.removeEventListener("pointerdown", dismiss);
     };
-  }, [mounted]);
+  }, []);
 
-  if (!mounted) return null;
+  if (!show) return null;
 
   return (
-    <div aria-hidden="true" style={{ position: "fixed", inset: 0, zIndex: 9999, display: "grid", placeItems: "center", overflow: "hidden", background: "#030303", opacity: fading ? 0 : 1, transition: `opacity ${FADE_MS}ms ease` }}>
-      <div style={{ position: "absolute", width: 1100, height: 700, left: "50%", top: "50%", transform: `translate(-50%, -50%) scale(${visible ? 1 : 0.92})`, opacity: visible ? 1 : 0, transition: "opacity 900ms ease, transform 1400ms cubic-bezier(.22,1,.36,1)", background: "radial-gradient(ellipse at center, rgba(99,102,241,0.28) 0%, rgba(139,92,246,0.08) 40%, transparent 70%)", filter: "blur(8px)", pointerEvents: "none" }} />
+    <>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Instrument+Serif:ital@0;1&display=swap"
+      />
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9999,
+          background: "#050610",
+          overflow: "hidden",
+          opacity: fading ? 0 : 1,
+          transition: `opacity ${FADE_MS}ms ease`,
+          pointerEvents: fading ? "none" : "auto",
+        }}
+      >
+        {/* ── Aurora background ── */}
+        <div style={{ position: "absolute", inset: 0, background: "#050610" }}>
+          {/* 4 colored radial blobs that drift */}
+          <div
+            style={{
+              position: "absolute",
+              inset: "-20%",
+              backgroundImage: `
+                radial-gradient(ellipse 60% 50% at 30% 30%, rgba(99,102,241,0.50) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 60% at 70% 70%, rgba(236,72,153,0.35) 0%, transparent 55%),
+                radial-gradient(ellipse 45% 55% at 50% 90%, rgba(20,184,166,0.30) 0%, transparent 50%),
+                radial-gradient(ellipse 45% 40% at 80% 20%, rgba(139,92,246,0.35) 0%, transparent 55%)
+              `,
+              filter: "blur(80px)",
+              opacity: 0,
+              animation:
+                "spike-aurora-in 3s ease 0.1s forwards, spike-aurora-drift 20s ease-in-out 0.1s infinite alternate",
+            }}
+          />
 
-      <div style={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 24, textAlign: "center", padding: "0 24px" }}>
-        <svg width="56" height="56" viewBox="0 0 60 60" style={{ borderRadius: 14, background: "#0a0a10", opacity: visible ? 1 : 0, transform: `translateY(${visible ? 0 : 12}px)`, transition: "opacity 700ms ease 100ms, transform 900ms cubic-bezier(.22,1,.36,1) 100ms" }}>
-          <rect x="20" y="20" width="4" height="20" rx="1" fill="#8B5CF6" />
-          <rect x="28" y="16" width="4" height="28" rx="1" fill="#6366F1" />
-          <rect x="36" y="23" width="4" height="14" rx="1" fill="#6366F1" opacity="0.75" />
-        </svg>
+          {/* Dark vignette + top/bottom fade for contrast */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: `
+                radial-gradient(ellipse at center, transparent 30%, rgba(5,6,16,0.75) 80%),
+                linear-gradient(180deg, rgba(5,6,16,0.35) 0%, transparent 30%, transparent 70%, rgba(5,6,16,0.7) 100%)
+              `,
+            }}
+          />
 
-        <div className="font-serif font-light" style={{ fontSize: "clamp(56px, 9vw, 96px)", letterSpacing: "-0.02em", lineHeight: 1, color: "#FAFAFA", opacity: visible ? 1 : 0, transform: `translateY(${visible ? 0 : 18}px)`, transition: "opacity 900ms ease 250ms, transform 1100ms cubic-bezier(.22,1,.36,1) 250ms" }}>
-          spike<em style={{ fontStyle: "italic", marginLeft: "0.08em", fontWeight: 300, opacity: 0.8 }}>AI</em>
+          {/* Noise */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              opacity: 0.06,
+              mixBlendMode: "overlay",
+              backgroundImage:
+                'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 512 512\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'1.4\' numOctaves=\'2\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")',
+            }}
+          />
         </div>
 
-        <span aria-hidden style={{ display: "block", height: 1, background: "#D4A857", width: visible ? 72 : 0, opacity: visible ? 1 : 0, transition: "width 900ms cubic-bezier(.22,1,.36,1) 650ms, opacity 600ms ease 650ms" }} />
-
-        <div style={{ fontFamily: "monospace", fontSize: 11, letterSpacing: "0.36em", textTransform: "uppercase", color: "#D4A857", opacity: visible ? 0.95 : 0, transform: `translateY(${visible ? 0 : 8}px)`, transition: "opacity 700ms ease 900ms, transform 900ms ease 900ms" }}>
-          AI&nbsp;&nbsp;CINEMA
+        {/* ── Wordmark (only) ── */}
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            textAlign: "center",
+            width: "90%",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 300,
+              fontSize: "clamp(84px, 12vw, 180px)",
+              lineHeight: 1,
+              letterSpacing: "0.04em",
+              color: "#FAFAFA",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "baseline",
+              gap: "0.32em",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                letterSpacing: "0.12em",
+                opacity: 0,
+                transform: "translateY(16px)",
+                filter: "blur(6px)",
+                animation: "spike-blur-in 2s cubic-bezier(.22,1,.36,1) 1.0s forwards",
+              }}
+            >
+              spike
+            </span>
+            <span
+              style={{
+                display: "inline-block",
+                fontStyle: "italic",
+                fontWeight: 300,
+                letterSpacing: "0.04em",
+                backgroundImage: "linear-gradient(135deg, #FAFAFA 0%, #C4B5FD 80%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+                opacity: 0,
+                transform: "translateY(16px)",
+                filter: "blur(6px)",
+                animation: "spike-blur-in 2s cubic-bezier(.22,1,.36,1) 1.4s forwards",
+              }}
+            >
+              Ai
+            </span>
+          </div>
         </div>
+
+        {/* Keyframes */}
+        <style>{`
+          @keyframes spike-aurora-in { to { opacity: 1; } }
+          @keyframes spike-aurora-drift {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(4%, -2%) scale(1.08); }
+          }
+          @keyframes spike-blur-in {
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+          }
+        `}</style>
       </div>
-    </div>
+    </>
   );
 }
