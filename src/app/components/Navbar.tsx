@@ -2,12 +2,17 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
-  Search, Bell, Star, X, Shield, Menu, Plus,
+  Search, Bell, X, Shield, Menu, Plus,
+  User as UserIcon, List as ListIcon, Settings as SettingsIcon, HelpCircle, LogOut,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { Category } from "./types";
+
+const GOLD = "#D4A857";
+const ACCENT = "#C4B5FD";
+const MONO = "ui-monospace, 'JetBrains Mono', Menlo, Monaco, monospace";
+const SERIF = "'Fraunces', 'Instrument Serif', Georgia, serif";
 
 export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }: { onSearchOpen: () => void; categories: Category[]; isAdmin: boolean; isCreator: boolean }) {
   const router = useRouter();
@@ -22,6 +27,9 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
   const searchInputRef = useRef<HTMLInputElement>(null);
   const notifsRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  // Admin beats Creator when both are true
+  const isGoldUser = isAdmin || isCreator;
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -58,6 +66,18 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Close on Escape
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowProfile(false);
+        setShowNotifs(false);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   const toggleSearch = () => {
     if (searchExpanded) {
       setSearchExpanded(false);
@@ -76,7 +96,7 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
       ).slice(0, 5)
     : [];
 
-  // ── DB-driven notifications (admin adds via Supabase) ──
+  // DB-driven notifications
   const [dbNotifs, setDbNotifs] = useState<{ id: string; title: string; body: string | null; created_at: string }[]>([]);
   useEffect(() => {
     if (!supabase) return;
@@ -108,11 +128,22 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
     unread: i < 2,
   }));
 
+  const displayName = user?.user_metadata?.display_name || user?.user_metadata?.full_name || (user?.email ? user.email.split("@")[0] : "User");
+  const firstLetter = (displayName || "U").charAt(0).toUpperCase();
+  const avatarUrl = user?.user_metadata?.avatar_url;
+
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="flex items-center gap-6 md:gap-12">
-        <div className="select-none cursor-pointer flex items-center" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <span className="inline-flex items-center gap-3 font-serif font-light tracking-[-0.01em] text-[22px] text-white"><svg width="28" height="28" viewBox="0 0 60 60" style={{ borderRadius: 7, background: "#0a0a10", flexShrink: 0 }} aria-label="Spike AI"><rect x="20" y="20" width="4" height="20" rx="1" fill="#8B5CF6" /><rect x="28" y="16" width="4" height="28" rx="1" fill="#6366F1" /><rect x="36" y="23" width="4" height="14" rx="1" fill="#6366F1" opacity="0.75" /></svg><span>spike<em className="not-italic [font-style:italic] font-light opacity-80">&nbsp;AI</em></span></span>
+        <div className="select-none cursor-pointer flex items-center" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+          <span className="inline-flex items-center gap-3 font-serif font-light tracking-[-0.01em] text-[22px] text-white">
+            <svg width="28" height="28" viewBox="0 0 60 60" style={{ borderRadius: 7, background: "#0a0a10", flexShrink: 0 }} aria-label="Spike AI">
+              <rect x="20" y="20" width="4" height="20" rx="1" fill="#8B5CF6" />
+              <rect x="28" y="16" width="4" height="28" rx="1" fill="#6366F1" />
+              <rect x="36" y="23" width="4" height="14" rx="1" fill="#6366F1" opacity="0.75" />
+            </svg>
+            <span>spike<em className="not-italic [font-style:italic] font-light opacity-80">&nbsp;AI</em></span>
+          </span>
         </div>
         <div className="hidden md:flex items-center gap-10">
           {[
@@ -130,11 +161,11 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
             )
           ))}
         </div>
-        {/* Mobile Hamburger */}
         <button onClick={() => setShowMobileMenu(true)} className="md:hidden text-white/50 hover:text-white transition-colors">
           <Menu size={22} />
         </button>
       </div>
+
       <div className="flex items-center gap-3 md:gap-5 relative">
         {/* Inline Search */}
         <div className="relative">
@@ -151,10 +182,7 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
               placeholder="Search films..."
               className={`navbar-search ${searchExpanded ? "expanded" : ""}`}
             />
-            <button
-              onClick={toggleSearch}
-              className="text-white/40 hover:text-white transition-colors"
-            >
+            <button onClick={toggleSearch} className="text-white/40 hover:text-white transition-colors">
               {searchExpanded ? <X size={19} /> : <Search size={19} />}
             </button>
           </div>
@@ -174,17 +202,14 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
                   </div>
                 </div>
               ))}
-              <button
-                onClick={() => { onSearchOpen(); toggleSearch(); }}
-                className="w-full py-2.5 text-xs font-medium tracking-wide text-[#ffffff] hover:bg-white/[0.04] transition-colors"
-              >
+              <button onClick={() => { onSearchOpen(); toggleSearch(); }} className="w-full py-2.5 text-xs font-medium tracking-wide text-[#ffffff] hover:bg-white/[0.04] transition-colors">
                 See all results →
               </button>
             </div>
           )}
         </div>
 
-        {/* ── Notifications Bell (Interactive) ── */}
+        {/* Notifications Bell */}
         <div ref={notifsRef} className="relative">
           <button
             onClick={() => { setShowNotifs(!showNotifs); setShowProfile(false); }}
@@ -195,120 +220,406 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
           </button>
 
           {showNotifs && (
-            <div className="absolute top-full right-0 mt-3 w-[320px] bg-[#0c0c0e] border border-white/[0.06] rounded-xl shadow-2xl shadow-black/60 overflow-hidden z-[200]" style={{ animation: "fadeInUp 0.25s cubic-bezier(0.22,1,0.36,1)" }}>
-              <div className="px-4 py-3 border-b border-white/[0.06] flex items-center justify-between">
-                <span className="text-sm font-semibold tracking-wide text-white">Notifications</span>
-                <span onClick={() => showToast("All notifications marked as read")} className="text-[10px] font-medium tracking-wide text-[#ffffff] cursor-pointer hover:text-[#e0e0e0] transition-colors">Mark all read</span>
+            <div
+              className="absolute top-full right-0 mt-3 w-[320px] overflow-hidden z-[200]"
+              style={{
+                background: "rgba(12,12,18,0.94)",
+                backdropFilter: "blur(24px) saturate(1.2)",
+                WebkitBackdropFilter: "blur(24px) saturate(1.2)",
+                border: "1px solid rgba(255,255,255,0.09)",
+                borderRadius: 2,
+                boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+                animation: "fadeInUp 0.25s cubic-bezier(0.22,1,0.36,1)",
+              }}
+            >
+              <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 400, color: "#FAFAFA" }}>Notifications</span>
+                <span
+                  onClick={() => showToast("All notifications marked as read")}
+                  style={{ fontFamily: MONO, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(255,255,255,0.4)", cursor: "pointer" }}
+                >
+                  Mark read
+                </span>
               </div>
               {NOTIFICATIONS.length === 0 ? (
-                <div className="px-4 py-8 text-center">
-                  <Bell size={20} className="text-white/10 mx-auto mb-2" />
-                  <p className="text-[12px] text-white/25 tracking-wide">No notifications yet</p>
+                <div style={{ padding: "32px 20px", textAlign: "center" }}>
+                  <Bell size={18} style={{ color: "rgba(255,255,255,0.15)", margin: "0 auto 10px" }} />
+                  <p style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", letterSpacing: "0.04em", margin: 0 }}>No notifications yet</p>
                 </div>
               ) : (
-                <>
-                  {NOTIFICATIONS.map((n) => (
-                    <div
-                      key={n.id}
-                      onClick={() => showToast(n.text)}
-                      className="flex items-start gap-3 px-4 py-3 hover:bg-white/[0.04] cursor-pointer transition-colors border-b border-white/[0.04] last:border-0 active:scale-[0.98]"
-                    >
-                      {n.unread && <span className="w-1.5 h-1.5 bg-[#ffffff] rounded-full mt-1.5 flex-shrink-0" />}
-                      {!n.unread && <span className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" />}
-                      <div className="min-w-0">
-                        <p className={`text-[13px] leading-snug tracking-wide ${n.unread ? "text-white font-medium" : "text-white/50 font-normal"}`}>{n.text}</p>
-                        <p className="text-[10px] font-light tracking-wider text-white/25 mt-1">{n.time}</p>
-                      </div>
+                NOTIFICATIONS.map((n) => (
+                  <div
+                    key={n.id}
+                    onClick={() => showToast(n.text)}
+                    style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 20px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.04)" }}
+                    onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)")}
+                    onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
+                  >
+                    <span style={{ width: 6, height: 6, background: n.unread ? ACCENT : "transparent", borderRadius: "50%", marginTop: 7, flexShrink: 0 }} />
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ fontSize: 13, lineHeight: 1.4, color: n.unread ? "#FAFAFA" : "rgba(255,255,255,0.5)", margin: 0, fontWeight: n.unread ? 500 : 400 }}>
+                        {n.text}
+                      </p>
+                      <p style={{ fontFamily: MONO, fontSize: 9.5, letterSpacing: "0.18em", color: "rgba(255,255,255,0.3)", marginTop: 4, textTransform: "uppercase" }}>
+                        {n.time}
+                      </p>
                     </div>
-                  ))}
-                </>
+                  </div>
+                ))
               )}
             </div>
           )}
         </div>
 
-        {/* ── User Avatar (Auth-aware) ── */}
+        {/* ═══════════════════════════════════════════════════════════
+            USER AVATAR + PROFILE DROPDOWN (editorial)
+           ═══════════════════════════════════════════════════════════ */}
         <div ref={profileRef} className="relative">
           {user ? (
             <>
               <button
                 onClick={() => { setShowProfile(!showProfile); setShowNotifs(false); }}
-                className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-white/[0.15] transition-all"
+                aria-expanded={showProfile}
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: "50%",
+                  border: 0,
+                  cursor: "pointer",
+                  background: isGoldUser
+                    ? `linear-gradient(135deg, ${GOLD} 0%, #7A5A28 100%)`
+                    : `linear-gradient(135deg, ${ACCENT} 0%, #7C3AED 100%)`,
+                  color: "#FAFAFA",
+                  fontFamily: SERIF,
+                  fontWeight: 400,
+                  fontSize: 16,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                  overflow: "hidden",
+                  transition: "transform 0.15s ease",
+                }}
+                onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.transform = "scale(1.05)")}
+                onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.transform = "scale(1)")}
               >
-                {user.user_metadata?.avatar_url ? (
-                  <img src={user.user_metadata.avatar_url} alt="" className="w-full h-full object-cover" />
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900 flex items-center justify-center text-[11px] font-bold text-white">
-                    {(user.user_metadata?.display_name || user.email || "U")[0].toUpperCase()}
-                  </div>
+                  firstLetter
+                )}
+                {/* Admin indicator dot */}
+                {isGoldUser && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: -1,
+                      right: -1,
+                      width: 10,
+                      height: 10,
+                      background: GOLD,
+                      border: "2px solid #050610",
+                      borderRadius: "50%",
+                    }}
+                  />
                 )}
               </button>
 
               {showProfile && (
-                <div className="absolute top-full right-0 mt-3 w-[240px] bg-[#0c0c0e] border border-white/[0.06] rounded-xl shadow-2xl shadow-black/60 overflow-hidden z-[200]" style={{ animation: "fadeInUp 0.25s cubic-bezier(0.22,1,0.36,1)" }}>
-                  <div className="px-4 py-3 border-b border-white/[0.06] flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0">
-                      {user.user_metadata?.avatar_url ? (
-                        <img src={user.user_metadata.avatar_url} alt="" className="w-full h-full object-cover" />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    marginTop: 12,
+                    width: 280,
+                    background: "rgba(12,12,18,0.94)",
+                    backdropFilter: "blur(24px) saturate(1.2)",
+                    WebkitBackdropFilter: "blur(24px) saturate(1.2)",
+                    border: "1px solid rgba(255,255,255,0.09)",
+                    borderRadius: 2,
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.02) inset",
+                    overflow: "hidden",
+                    zIndex: 200,
+                    animation: "fadeInUp 0.22s cubic-bezier(0.22,1,0.36,1)",
+                  }}
+                >
+                  {/* Hair-thin stroke at top */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: -1,
+                      right: 12,
+                      width: 24,
+                      height: 1,
+                      background: `linear-gradient(90deg, transparent, ${isGoldUser ? "rgba(212,168,87,0.7)" : "rgba(196,181,253,0.6)"}, transparent)`,
+                    }}
+                  />
+
+                  {/* ── Header: avatar + name + email + badge ── */}
+                  <div style={{ padding: "20px 20px 18px", display: "flex", alignItems: "center", gap: 14, borderBottom: "1px solid rgba(255,255,255,0.06)", position: "relative" }}>
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: "50%",
+                        overflow: "hidden",
+                        background: isGoldUser
+                          ? `linear-gradient(135deg, ${GOLD} 0%, #7A5A28 100%)`
+                          : `linear-gradient(135deg, ${ACCENT} 0%, #7C3AED 100%)`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontFamily: SERIF,
+                        fontWeight: 400,
+                        fontSize: 18,
+                        color: "#FAFAFA",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-zinc-700 to-zinc-900 flex items-center justify-center text-xs font-bold">
-                          {(user.user_metadata?.display_name || user.email || "U")[0].toUpperCase()}
+                        firstLetter
+                      )}
+                    </div>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 17, letterSpacing: "-0.01em", lineHeight: 1.2, color: "#FAFAFA", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {displayName}
+                      </div>
+                      <div style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.06em", color: "rgba(255,255,255,0.45)", marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {user.email}
+                      </div>
+                    </div>
+                    {isAdmin && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 16,
+                          right: 16,
+                          fontFamily: MONO,
+                          fontSize: 8.5,
+                          letterSpacing: "0.24em",
+                          textTransform: "uppercase",
+                          color: GOLD,
+                          padding: "3px 7px",
+                          border: "1px solid rgba(212,168,87,0.35)",
+                          borderRadius: 2,
+                          background: "rgba(212,168,87,0.06)",
+                        }}
+                      >
+                        Admin
+                      </div>
+                    )}
+                    {!isAdmin && isCreator && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 16,
+                          right: 16,
+                          fontFamily: MONO,
+                          fontSize: 8.5,
+                          letterSpacing: "0.24em",
+                          textTransform: "uppercase",
+                          color: GOLD,
+                          padding: "3px 7px",
+                          border: "1px solid rgba(212,168,87,0.35)",
+                          borderRadius: 2,
+                          background: "rgba(212,168,87,0.06)",
+                        }}
+                      >
+                        Creator
+                      </div>
+                    )}
+                  </div>
+
+                  {/* ── ADMIN/CREATOR BLOCK ── */}
+                  {isGoldUser && (
+                    <div
+                      style={{
+                        padding: "14px 20px 12px",
+                        background: "linear-gradient(180deg, rgba(212,168,87,0.05), rgba(212,168,87,0))",
+                        borderBottom: "1px solid rgba(255,255,255,0.06)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: MONO,
+                          fontSize: 9,
+                          letterSpacing: "0.32em",
+                          textTransform: "uppercase",
+                          color: "rgba(212,168,87,0.75)",
+                          marginBottom: 10,
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <span style={{ width: 14, height: 1, background: "rgba(212,168,87,0.5)" }} />
+                        {isAdmin ? "Administration" : "Creator Studio"}
+                      </div>
+
+                      {/* Admin Dashboard — admin only */}
+                      {isAdmin && (
+                        <div
+                          onClick={() => { setShowProfile(false); router.push("/admin/dashboard"); }}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 12,
+                            padding: "11px 20px",
+                            margin: "0 -20px",
+                            color: GOLD,
+                            cursor: "pointer",
+                            fontSize: 14,
+                            fontWeight: 500,
+                            transition: "background 0.12s ease",
+                          }}
+                          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "rgba(212,168,87,0.08)")}
+                          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "transparent")}
+                        >
+                          <Shield size={16} style={{ color: GOLD, flexShrink: 0 }} />
+                          <span>Admin Dashboard</span>
+                          <span style={{ marginLeft: "auto", fontFamily: SERIF, fontStyle: "italic", fontWeight: 300, color: "rgba(212,168,87,0.7)" }}>↗</span>
                         </div>
                       )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold tracking-wide text-white truncate">{user.user_metadata?.display_name || user.user_metadata?.full_name || "User"}</p>
-                      <p className="text-[10px] font-light tracking-wider text-white/30 truncate">{user.email}</p>
-                    </div>
-                  </div>
-                  {/* Admin-Only Links — Split Reality */}
-                  {(isAdmin || isCreator) && (
-                    <div className="border-b border-white/[0.06]">
-                      {isAdmin && (
-                      <div
-                        onClick={() => { setShowProfile(false); router.push("/admin/dashboard"); }}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#ffffff]/[0.06] cursor-pointer transition-colors active:scale-[0.98]"
-                      >
-                        <Shield size={14} className="text-[#ffffff]" />
-                        <span className="text-[13px] font-semibold tracking-wide text-[#ffffff]">Admin Dashboard</span>
-                      </div>
-                      )}
+
+                      {/* Add New Film — admin + creator */}
                       <div
                         onClick={() => { setShowProfile(false); router.push("/submit"); }}
-                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-green-500/[0.04] cursor-pointer transition-colors active:scale-[0.98]"
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                          marginTop: 6,
+                          padding: "11px 14px",
+                          background: "#FAFAFA",
+                          color: "#050610",
+                          fontWeight: 600,
+                          fontSize: 13.5,
+                          borderRadius: 2,
+                          justifyContent: "center",
+                          cursor: "pointer",
+                          transition: "transform 0.12s ease",
+                        }}
+                        onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.transform = "translateY(-1px)")}
+                        onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.transform = "translateY(0)")}
                       >
-                        <Plus size={14} className="text-green-400" />
-                        <span className="text-[13px] font-medium tracking-wide text-green-400">Add New Film</span>
+                        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 300, fontSize: 16, lineHeight: 1 }}>+</span>
+                        Add New Film
                       </div>
                     </div>
                   )}
-                  {[
-                    { label: "My Profile", icon: "👤", href: "/profile" },
-                    { label: "My List", icon: "📋", href: "/my-list" },
-                    { label: "Settings", icon: "⚙️", href: "/settings" },
-                    { label: "Help Center", icon: "❓", href: "/help" },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      onClick={() => { setShowProfile(false); router.push(item.href); }}
-                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.04] cursor-pointer transition-colors text-white/60 hover:text-white active:scale-[0.98]"
-                    >
-                      <span className="text-sm">{item.icon}</span>
-                      <span className="text-[13px] font-normal tracking-wide">{item.label}</span>
-                    </div>
-                  ))}
-                  <div className="border-t border-white/[0.06]">
+
+                  {/* ── Regular items ── */}
+                  <div style={{ padding: "6px 0" }}>
+                    {[
+                      { label: "My Profile", icon: UserIcon, href: "/profile", kbd: "⌘ P" },
+                      { label: "My List", icon: ListIcon, href: "/my-list", kbd: "⌘ L" },
+                      { label: "Settings", icon: SettingsIcon, href: "/settings" },
+                      { label: "Help Center", icon: HelpCircle, href: "/help" },
+                    ].map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <div
+                          key={item.label}
+                          onClick={() => { setShowProfile(false); router.push(item.href); }}
+                          className="menu-item"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 12,
+                            padding: "10px 20px",
+                            color: "rgba(255,255,255,0.85)",
+                            cursor: "pointer",
+                            fontSize: 14,
+                            fontWeight: 400,
+                            transition: "background 0.12s ease, color 0.12s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            const el = e.currentTarget as HTMLElement;
+                            el.style.background = "rgba(255,255,255,0.04)";
+                            el.style.color = "#FAFAFA";
+                            const iconEl = el.querySelector(".menu-icon") as HTMLElement | null;
+                            if (iconEl) iconEl.style.color = isGoldUser ? GOLD : ACCENT;
+                          }}
+                          onMouseLeave={(e) => {
+                            const el = e.currentTarget as HTMLElement;
+                            el.style.background = "transparent";
+                            el.style.color = "rgba(255,255,255,0.85)";
+                            const iconEl = el.querySelector(".menu-icon") as HTMLElement | null;
+                            if (iconEl) iconEl.style.color = "rgba(255,255,255,0.5)";
+                          }}
+                        >
+                          <Icon size={16} className="menu-icon" style={{ color: "rgba(255,255,255,0.5)", flexShrink: 0, transition: "color 0.12s ease" }} />
+                          <span>{item.label}</span>
+                          {item.kbd && (
+                            <span style={{ marginLeft: "auto", fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", color: "rgba(255,255,255,0.3)" }}>
+                              {item.kbd}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div style={{ height: 1, background: "rgba(255,255,255,0.06)", margin: "6px 0" }} />
+
+                  {/* Sign out */}
+                  <div style={{ padding: "6px 0" }}>
                     <div
                       onClick={async () => {
                         if (supabase) await supabase.auth.signOut();
                         setShowProfile(false);
                         showToast("Signed out");
                       }}
-                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-white/[0.04] cursor-pointer transition-colors text-[#ffffff] hover:text-[#e0e0e0] active:scale-[0.98]"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 12,
+                        padding: "10px 20px",
+                        color: "rgba(255,255,255,0.75)",
+                        cursor: "pointer",
+                        fontSize: 14,
+                        fontWeight: 400,
+                        transition: "background 0.12s ease, color 0.12s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.background = "rgba(255,255,255,0.04)";
+                        el.style.color = "#E8AE6C";
+                        const iconEl = el.querySelector(".signout-icon") as HTMLElement | null;
+                        if (iconEl) iconEl.style.color = "#E8AE6C";
+                      }}
+                      onMouseLeave={(e) => {
+                        const el = e.currentTarget as HTMLElement;
+                        el.style.background = "transparent";
+                        el.style.color = "rgba(255,255,255,0.75)";
+                        const iconEl = el.querySelector(".signout-icon") as HTMLElement | null;
+                        if (iconEl) iconEl.style.color = "rgba(212,168,87,0.55)";
+                      }}
                     >
-                      <span className="text-sm">🚪</span>
-                      <span className="text-[13px] font-medium tracking-wide">Sign Out</span>
+                      <LogOut size={16} className="signout-icon" style={{ color: "rgba(212,168,87,0.55)", flexShrink: 0, transition: "color 0.12s ease" }} />
+                      <span>Sign out</span>
                     </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div
+                    style={{
+                      padding: "10px 20px 12px",
+                      borderTop: "1px solid rgba(255,255,255,0.06)",
+                      fontFamily: MONO,
+                      fontSize: 9,
+                      letterSpacing: "0.28em",
+                      textTransform: "uppercase",
+                      color: "rgba(255,255,255,0.3)",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <span>Vol · I · 2026</span>
+                    <span>v1.0.3</span>
                   </div>
                 </div>
               )}
@@ -335,29 +646,43 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
           >
             <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
               <div className="flex items-center">
-                <span className="inline-flex items-center gap-3 font-serif font-light tracking-[-0.01em] text-[18px] text-white"><svg width="22" height="22" viewBox="0 0 60 60" style={{ borderRadius: 7, background: "#0a0a10", flexShrink: 0 }} aria-label="Spike AI"><rect x="20" y="20" width="4" height="20" rx="1" fill="#8B5CF6" /><rect x="28" y="16" width="4" height="28" rx="1" fill="#6366F1" /><rect x="36" y="23" width="4" height="14" rx="1" fill="#6366F1" opacity="0.75" /></svg><span>spike<em className="not-italic [font-style:italic] font-light opacity-80">&nbsp;AI</em></span></span>
+                <span className="inline-flex items-center gap-3 font-serif font-light tracking-[-0.01em] text-[18px] text-white">
+                  <svg width="22" height="22" viewBox="0 0 60 60" style={{ borderRadius: 7, background: "#0a0a10", flexShrink: 0 }}>
+                    <rect x="20" y="20" width="4" height="20" rx="1" fill="#8B5CF6" />
+                    <rect x="28" y="16" width="4" height="28" rx="1" fill="#6366F1" />
+                    <rect x="36" y="23" width="4" height="14" rx="1" fill="#6366F1" opacity="0.75" />
+                  </svg>
+                  <span>spike<em className="not-italic [font-style:italic] font-light opacity-80">&nbsp;AI</em></span>
+                </span>
               </div>
               <button onClick={() => setShowMobileMenu(false)} className="text-white/30 hover:text-white transition-colors"><X size={20} /></button>
             </div>
             <div className="py-3">
               {[
-                { label: "Home", href: "/", icon: "🏠" },
-                { label: "Blog", href: "/blog", icon: "📝" },
-                { label: "My List", href: "/my-list", icon: "📋" },
-                { label: "Creators", href: "/creators", icon: "🎭" },
-                ...(isCreator ? [{ label: "Submit Film", href: "/submit", icon: "🎥" }] : []),
-                ...(!isCreator ? [{ label: "Join as Creator", href: "/become-creator", icon: "⭐" }] : []),
+                { label: "Home", href: "/" },
+                { label: "Blog", href: "/blog" },
+                { label: "My List", href: "/my-list" },
+                { label: "Creators", href: "/creators" },
+                ...(isCreator ? [{ label: "Submit Film", href: "/submit" }] : []),
+                ...(!isCreator ? [{ label: "Join as Creator", href: "/become-creator" }] : []),
               ].map((item) => (
                 <a key={item.label} href={item.href} className="flex items-center gap-3 px-5 py-3.5 text-white/60 hover:text-white hover:bg-white/[0.04] transition-colors" onClick={() => setShowMobileMenu(false)}>
-                  <span className="text-base">{item.icon}</span>
                   <span className="text-[14px] font-medium tracking-wide">{item.label}</span>
                 </a>
               ))}
               {isAdmin && (
                 <div className="border-t border-white/[0.06] mt-2 pt-2">
-                  <a href="/admin/dashboard" className="flex items-center gap-3 px-5 py-3.5 text-green-400 hover:bg-green-500/5 transition-colors" onClick={() => setShowMobileMenu(false)}>
+                  <a href="/admin/dashboard" className="flex items-center gap-3 px-5 py-3.5 transition-colors" style={{ color: GOLD }} onClick={() => setShowMobileMenu(false)}>
                     <Shield size={16} />
                     <span className="text-[14px] font-medium tracking-wide">Admin Dashboard</span>
+                  </a>
+                </div>
+              )}
+              {isGoldUser && (
+                <div className="border-t border-white/[0.06] mt-2 pt-2">
+                  <a href="/submit" className="flex items-center gap-3 px-5 py-3.5 transition-colors" style={{ color: GOLD }} onClick={() => setShowMobileMenu(false)}>
+                    <Plus size={16} />
+                    <span className="text-[14px] font-medium tracking-wide">Add New Film</span>
                   </a>
                 </div>
               )}
@@ -365,15 +690,14 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
                 {user ? (
                   <button
                     onClick={async () => { if (supabase) await supabase.auth.signOut(); setShowMobileMenu(false); }}
-                    className="flex items-center gap-3 px-5 py-3.5 text-[#ffffff] hover:bg-white/15/5 transition-colors w-full"
+                    className="flex items-center gap-3 px-5 py-3.5 text-white/75 hover:text-white hover:bg-white/[0.04] transition-colors w-full"
                   >
-                    <span className="text-base">🚪</span>
-                    <span className="text-[14px] font-medium tracking-wide">Sign Out</span>
+                    <LogOut size={16} />
+                    <span className="text-[14px] font-medium tracking-wide">Sign out</span>
                   </button>
                 ) : (
-                  <a href="/auth" className="flex items-center gap-3 px-5 py-3.5 text-[#ffffff] hover:bg-white/15/5 transition-colors" onClick={() => setShowMobileMenu(false)}>
-                    <span className="text-base">🔑</span>
-                    <span className="text-[14px] font-medium tracking-wide">Sign In</span>
+                  <a href="/auth" className="flex items-center gap-3 px-5 py-3.5 text-white hover:bg-white/[0.04] transition-colors" onClick={() => setShowMobileMenu(false)}>
+                    <span className="text-[14px] font-medium tracking-wide">Sign in</span>
                   </a>
                 )}
               </div>
@@ -382,7 +706,7 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
         </div>
       )}
 
-      {/* Toast Notification */}
+      {/* Toast */}
       {toast && (
         <div
           className="fixed top-20 left-1/2 -translate-x-1/2 z-[300] px-5 py-3 rounded-xl bg-[#1a1a1e]/95 backdrop-blur-xl border border-white/[0.08] shadow-2xl shadow-black/50 flex items-center gap-3"
@@ -394,9 +718,3 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
     </nav>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════
-   HERO CAROUSEL — Dynamic Top 10 from Supabase
-   Crossfade transitions, YouTube thumbnails, auto-rotation
-   ═══════════════════════════════════════════════════════════════ */
-
