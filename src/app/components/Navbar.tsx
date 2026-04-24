@@ -155,9 +155,9 @@ export default function Navbar({ onSearchOpen, categories, isAdmin, isCreator }:
             ...(!isCreator ? [{ label: "Join as Creator", href: "/become-creator", special: true }] : []),
           ].map((link) => (
             link.special ? (
-              <a key={link.label} href={link.href} className="text-[12.5px] font-medium tracking-[0.04em] px-5 py-1.5 rounded-full border border-white/30 text-white/70 hover:bg-white/10 hover:text-white transition-all duration-300 ml-1">{link.label}</a>
+              <a key={link.label} href={link.href} style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", color: GOLD, textDecoration: "none", padding: "8px 16px", border: "1px solid rgba(212,168,87,0.4)", background: "rgba(212,168,87,0.05)", marginLeft: 4, transition: "all 0.25s ease" }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(212,168,87,0.12)"; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "rgba(212,168,87,0.05)"; }}>{link.label}</a>
             ) : (
-              <a key={link.label} href={link.href} className="text-[13px] text-white/50 hover:text-white transition-colors duration-300 font-normal tracking-[0.04em]">{link.label}</a>
+              <a key={link.label} href={link.href} style={{ fontFamily: MONO, fontSize: 10.5, letterSpacing: "0.26em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", textDecoration: "none", transition: "color 0.25s ease" }} onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "#FAFAFA"; }} onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.55)"; }}>{link.label}</a>
             )
           ))}
         </div>
